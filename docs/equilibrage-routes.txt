@@ -1,0 +1,76 @@
+EQUILIBRAGE DES ROUTES — CHRONIQUES D'OBSIDENNE
+=================================================
+
+Objectif
+--------
+Les routes sont de vrais paliers : le joueur doit améliorer son équipement
+avant de réussir la famille de monstres suivante.
+
+Routes (difficulté Normal)
+----------------------------
+1. Marais des slimes — Débutant
+   PV : x0,65 ; dégâts : x0,65
+   But : récupérer les premiers équipements communs.
+
+2. Camp des orcs — Requiert un set commun
+   PV : x1,85 ; dégâts : x1,70
+   But : impossible à faire confortablement sans équipement.
+
+3. Manoir vampirique — Requiert un build rare
+   PV : x2,80 ; dégâts : x2,50
+   But : route difficile, prévue pour un personnage optimisé.
+
+VALEURS RÉELLES EN NORMAL
+-------------------------
+Les valeurs ci-dessous sont déjà calculées. Chaque famille possède trois
+monstres ; les chiffres donnent donc une plage du moins fort au plus fort.
+L'étape 10 est le boss.
+
+                     Étape 1        Étape 4        Étape 8        Boss étape 10
+Slimes              47-69 PV       57-83 PV       70-103 PV      153-225 PV
+                     3-5 dégâts     4-5 dégâts     4-6 dégâts     9-12 dégâts
+
+Orcs                218-300 PV    264-363 PV     326-447 PV     712-977 PV
+                    12-17 dégâts  13-19 dégâts  15-21 dégâts   31-45 dégâts
+
+Vampires            269-414 PV    325-501 PV     401-617 PV     876-1351 PV
+                    20-28 dégâts  22-30 dégâts  25-34 dégâts   53-72 dégâts
+
+Progression à l'intérieur d'une route
+--------------------------------------
+- 10 étapes par route.
+- Chaque étape : +7 % PV et +3,5 % dégâts, par rapport aux stats de base.
+- Boss étape 10 : x2 PV et dégâts en plus.
+- Après une victoire : héros entièrement soigné.
+- Après une défaite : retour à l'étape 1 de la même route.
+
+Élites
+------
+- 5 % de chance d'apparaître à chaque étape hors boss.
+- x1,6 PV et dégâts.
+- Donnent toujours un objet.
+
+Difficultés globales
+--------------------
+Normal : PV x1,00 ; dégâts x1,00 ; récompenses x1,00 ; or x1,00 ; butin T1
+Hard   : PV x6,20 ; dégâts x6,50 ; récompenses x4,00 ; or x2,50 ; butin T2
+Hell   : PV x18,00 ; dégâts x15,00 ; récompenses x12,00 ; or x6,00 ; butin T3
+
+Paliers d'équipement
+--------------------
+- T1 : objets obtenus en Normal. Multiplicateur de stats x1.
+- T2 : objets obtenus en Hard. Multiplicateur de stats x2,2.
+- T3 : objets obtenus en Hell. Multiplicateur de stats x3,8.
+- Les objets déjà possédés deviennent automatiquement T1.
+- Les améliorations +1, +2, etc. restent disponibles et donnent +15 % de
+  statistiques par niveau, en plus du palier T1, T2 ou T3.
+- Le bonus d'un set complet utilise le palier le plus bas de ses six pièces.
+
+Vitesse de combat
+-----------------
+- Vitesse de base : 1,00.
+- Chaque +0,10 de vitesse donne +1 % de vitesse de combat réelle.
+- Exemple : 1,60 de vitesse donne +6 % de vitesse de combat.
+- Plafond : +50 % de vitesse de combat.
+- Les objets de vitesse ont été réduits : les gants donnent +0,4 % à +0,8 %
+  et les bottes +0,5 % à +1,7 % avant les bonus T2/T3 et améliorations.

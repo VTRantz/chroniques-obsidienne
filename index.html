@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chroniques d'Obsidienne</title>
+  <link rel="stylesheet" href="css/style.css?v=12" />
+</head>
+<body>
+  <main class="app-shell">
+    <!-- HEADER -->
+    <header>
+      <div>
+        <p class="eyebrow">IDLE RPG • PROTOTYPE</p>
+        <h1>Chroniques d'Obsidienne</h1>
+      </div>
+      <div class="header-actions">
+        <div class="currencies">
+          <div class="gold">
+            <span>◈</span>
+            <strong id="gold">0</strong>
+            <small>or</small>
+          </div>
+          <div class="essence">
+            <span>✦</span>
+            <strong id="essence">0</strong>
+            <small>essence</small>
+          </div>
+        </div>
+        <button id="reset-account-btn" class="reset-account">Réinitialiser le test</button>
+      </div>
+    </header>
+
+    <!-- ONGLETS -->
+    <nav class="main-tabs" aria-label="Navigation principale">
+      <div class="tab-group">
+        <span class="tab-group-label">MODES DE JEU</span>
+        <button class="tab-active" data-tab="combat">⚔ Combat idle</button>
+        <button data-tab="donjon">🗝 Donjon</button>
+      </div>
+      <div class="tab-group">
+        <span class="tab-group-label">GESTION</span>
+        <button data-tab="personnage">Personnage</button>
+        <button data-tab="talents">Talents</button>
+        <button data-tab="classement">Classement</button>
+        <button data-tab="jardin">Jardin</button>
+      </div>
+    </nav>
+
+    <aside class="mode-indicator" aria-live="polite">
+      <span class="mode-pill" id="mode-kind">MODE IDLE</span>
+      <div>
+        <strong id="mode-title">Combat automatique</strong>
+        <small id="mode-description">Ton héros combat seul et récolte du butin.</small>
+      </div>
+    </aside>
+
+    <!-- ===================== ONGLET COMBAT ===================== -->
+    <section id="tab-combat">
+      <section class="battle-grid">
+        <article class="combat-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">EXPLORATION AUTO</p>
+              <h2 id="combat-name">Cryptes oubliées</h2>
+            </div>
+            <span class="status"><i></i> En cours</span>
+          </div>
+
+          <div class="classic-route" aria-label="Route de progression classique">
+            <div class="route-heading">
+              <span>ROUTE D'EXPLORATION</span>
+              <small id="route-label">Étape 1 sur 10</small>
+              <small id="route-keys">🔑 0</small>
+            </div>
+            <div id="classic-route-nodes" class="route-nodes"></div>
+            <div id="route-actions" class="route-actions">
+              <span id="route-mode">Mode : route suivante</span>
+              <div id="route-picker" class="route-picker" aria-label="Choisir une route"></div>
+              <div id="difficulty-picker" class="difficulty-picker" aria-label="Choisir une difficulté"></div>
+              <button id="toggle-farm-route-btn">Farmer cette route : NON</button>
+            </div>
+          </div>
+
+          <div class="battle-area" id="battle-area">
+            <!-- HÉROS -->
+            <div class="fighter player" id="player-fighter">
+                <img src="assets/sprites/hero/idle/right/1.png" alt="Héros" class="fighter-sprite" id="player-sprite">
+              <div class="fighter-icon" style="display:none">🧙</div>
+              <h3>Ton héros</h3>
+              <p><span id="player-hp-text">100 / 100</span> PV</p>
+              <div class="enemy-hp"><i id="player-hp"></i></div>
+            </div>
+
+            <div class="versus">VS</div>
+
+            <!-- ENNEMI -->
+            <div class="fighter enemy" id="enemy-fighter">
+              <img src="" alt="Ennemi" class="fighter-sprite" id="enemy-sprite"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'">
+              <div class="fighter-icon" style="display:none">💀</div>
+              <h3 id="enemy-name">Aucun monstre</h3>
+              <p>
+                <span id="enemy-style">Normal</span> ·
+                <span id="enemy-hp-text">100 / 100</span> PV
+              </p>
+              <div class="enemy-hp"><i id="enemy-hp"></i></div>
+            </div>
+
+            <div id="damage-layer" class="damage-layer"></div>
+          </div>
+
+          <div class="combat-traits">
+            <span id="hero-traits">Esquive 0% · Parade 0%</span>
+            <span id="monster-traits">Esquive 0% · Parade 0%</span>
+          </div>
+
+          <div class="combat-log" id="log"></div>
+
+          <div class="combat-footer">
+            <span id="kills">0 ennemis vaincus</span>
+            <button id="pause-btn">Mettre en pause</button>
+          </div>
+        </article>
+
+        <aside class="loot-card">
+          <p class="eyebrow">DERNIERS BUTINS</p>
+          <div id="last-loot" class="empty-loot">Les butins apparaîtront ici.</div>
+          <p class="hint">Les objets améliorent votre personnage : il n'y a pas de classe.</p>
+        </aside>
+      </section>
+    </section>
+
+    <!-- ===================== ONGLET DONJON ===================== -->
+    <section id="tab-donjon" class="hidden">
+      <section class="dungeon-game-panel">
+        <div class="dungeon-game-heading">
+          <div>
+            <p class="eyebrow">MODE DONJON MYSTÈRE · TOUR PAR TOUR</p>
+            <h2>Les profondeurs changeantes</h2>
+          </div>
+          <div class="dungeon-game-controls">
+            <span><b>ZQSD</b> Jouer un tour</span>
+            <span><b>Espace</b> Attaquer / interagir</span>
+            <span><b>I</b> Sac du jardin</span>
+          </div>
+        </div>
+        <iframe class="dungeon-game-frame" src="dungeon-mystery.html?v=18" title="Mode Donjon Mystère" loading="eager"></iframe>
+      </section>
+    </section>
+
+    <!-- ===================== ONGLET JARDIN ===================== -->
+    <section id="tab-jardin" class="hidden">
+      <section class="isometric-garden-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">FERME PIXEL ART</p>
+            <h2>Ferme de l’aventurier</h2>
+            <p class="sub">Déplace-toi avec ZQSD ou clique une case pour marcher et agir.</p>
+          </div>
+        </div>
+        <iframe class="isometric-garden-frame" src="isometric-garden.html?v=47" title="Ferme pixel art jouable"></iframe>
+      </section>
+      <section class="garden-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">FARM & ARTISANAT</p>
+            <h2>Jardin de l’aventurier</h2>
+            <p class="sub">Les plantes poussent en 5 minutes. Une récolte peut contenir une graine rare.</p>
+          </div>
+          <div class="materials">
+            <span>🌿 Herbes : <b id="herbs">0</b></span>
+            <span>🌸 Fleurs : <b id="flowers">0</b></span>
+            <span>✨ Herbes rares : <b id="rare-herbs">0</b></span>
+          </div>
+        </div>
+
+        <div class="seed-shop">
+          <span>
+            Graines : 🌱 <b id="herb-seeds">0</b> · 🌼 <b id="flower-seeds">0</b> · ✨
+            <b id="rare-seeds">0</b>
+          </span>
+          <button id="buy-herb-seed">Acheter graine herbe — 10 ◈</button>
+          <button id="buy-flower-seed">Acheter graine fleur — 15 ◈</button>
+        </div>
+
+        <div id="garden" class="garden-grid"></div>
+	<div class="garden-actions">
+ 	 <button id="harvest-all">Tout récolter</button>
+ 	 <button id="plant-all-herbs">Tout planter (herbes)</button>
+	</div>
+        <div class="craft-row">
+          <button id="craft-heal">Fabriquer potion de soin (2 🌿)</button>
+          <button id="craft-power">Fabriquer tonique (1 🌿 + 1 🌸)</button>
+          <span>
+            Inventaire :
+            <b id="potions">0</b> potions <button id="use-heal">Utiliser</button> ·
+            <b id="tonics">0</b> toniques <button id="use-power">Utiliser</button>
+          </span>
+        </div>
+        <p id="buff-status" class="garden-buff">Aucun bonus actif.</p>
+      </section>
+    </section>
+
+    <!-- ===================== ONGLET PERSONNAGE ===================== -->
+    <section id="tab-personnage" class="hidden">
+      <section class="hero-card">
+        <div class="hero-title">
+          <span class="portrait">⚔</span>
+          <div>
+            <p>Niveau <b id="level">1</b></p>
+            <h2 id="build-name">Aventurier novice</h2>
+            <small id="build-detail">Équipez du matériel pour définir votre style.</small>
+          </div>
+        </div>
+        <div class="xp-wrap">
+          <div class="xp-label">
+            <span>EXP</span>
+            <span id="xp-text">0 / 100</span>
+          </div>
+          <div class="bar"><i id="xp-bar"></i></div>
+        </div>
+        <div class="stats">
+          <div><small>Dégâts réels</small><b id="power">10.00</b></div>
+          <div><small>PV maximum</small><b id="max-hp-stat">100</b></div>
+          <div><small>Armure</small><b id="armor">0</b></div>
+          <div><small>Critique</small><b id="crit">5%</b></div>
+          <div><small>Vitesse combat</small><b id="speed">+0%</b></div>
+          <div><small>Esquive</small><b id="dodge-stat">0%</b></div>
+          <div><small>Parade</small><b id="parry-stat">0%</b></div>
+          <div><small>Vol de vie</small><b id="lifesteal-stat">0%</b></div>
+        </div>
+      </section>
+
+      <section class="equipment-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">BUILD ACTIF</p>
+            <h2>Équipement</h2>
+          </div>
+          <span id="set-bonus">0 / 5 emplacements</span>
+        </div>
+        <div id="equipment" class="equipment-grid"></div>
+      </section>
+
+      <section class="inventory-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">SAC DE L'AVENTURIER</p>
+            <h2>Inventaire</h2>
+            <p class="sub">Équipe tes trouvailles, ou recycle-les contre de l’essence.</p>
+          </div>
+          <div class="inventory-actions">
+            <span id="inventory-count">0 objet</span>
+          </div>
+        </div>
+        <div class="recycle-bar">
+          <span>Filtre de recyclage :</span>
+          <button data-tier="commun">Commun</button>
+          <button data-tier="peuCommun">Peu commun</button>
+          <button data-tier="rare">Rare</button>
+          <button data-tier="epique">Épique</button>
+          <button data-tier="legendaire">Légendaire</button>
+          <button id="recycle-all-btn" class="recycle-all">Recycler tout</button>
+        </div>
+        <div id="inventory" class="inventory-grid"></div>
+      </section>
+
+    </section>
+
+    <!-- ===================== ONGLET TALENTS ===================== -->
+    <section id="tab-talents" class="hidden">
+      <article class="talent-card standalone-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">PROGRESSION</p>
+            <h2>Arbre de talents</h2>
+          </div>
+          <div class="talent-actions">
+            <span><b id="talent-points">0 nœud</b> débloqué(s)</span>
+            <button id="talent-sell-last" type="button">Revendre le dernier nœud (75%)</button>
+            <button id="talent-refund-all" type="button">Réinitialiser l’arbre (70%)</button>
+          </div>
+          </div>
+          <p class="sub">Maximise un nœud pour ouvrir le suivant. Termine les sept passifs d’une branche pour accéder à ses deux choix finaux avec contrepartie. Le jardin aura son arbre séparé.</p>
+          <div id="talent-summary" class="talent-summary"><em>Aucun bonus acheté</em></div>
+          <div id="talent-viewport" class="talent-viewport"><div id="talents" class="talent-tree"></div></div>
+      </article>
+    </section>
+
+    <!-- ===================== ONGLET CLASSEMENT ===================== -->
+    <section id="tab-classement" class="hidden">
+      <article class="leaderboard-card standalone-panel">
+        <p class="eyebrow">CLASSEMENTS</p>
+        <h2>Héros de la semaine</h2>
+        <ol id="leaderboard"></ol>
+        <p class="hint">Classement local de prototype.</p>
+      </article>
+    </section>
+  </main>
+
+  <template id="slot-template">
+    <article class="slot">
+      <span class="slot-icon"></span>
+      <div>
+        <small class="slot-name"></small>
+        <h3 class="item-name">Vide</h3>
+        <p class="item-stats">Aucun bonus</p>
+      </div>
+      <button>Équiper</button>
+    </article>
+  </template>
+
+  <script src="js/game.js?v=17"></script>
+</body>
+</html>

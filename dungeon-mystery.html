@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chroniques d'Obsidienne — Donjon Mystère</title>
+  <link rel="stylesheet" href="css/dungeon-mystery.css?v=3">
+</head>
+<body>
+  <main id="mystery-app">
+    <canvas id="mystery-canvas" tabindex="0" aria-label="Donjon Mystère jouable"></canvas>
+
+    <section class="top-hud">
+      <div class="hero-card">
+        <strong>Épéiste</strong>
+        <span id="floor-label">Étage 1 / 5</span>
+        <div class="meter hp"><i id="hp-fill"></i><b id="hp-label">100 / 100 PV</b></div>
+      </div>
+      <div class="run-card">
+        <span id="turn-label">Tour 0</span>
+        <span id="enemy-label">0 ennemi</span>
+        <span id="reward-label">0 or · 0 essence</span>
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <button id="bag-toggle" type="button">Sac du jardin [I]</button>
+      <button id="wait-turn" type="button">Attendre un tour [.]</button>
+      <button id="new-run" type="button">Nouvelle expédition</button>
+      <div class="legend">
+        <b>Commandes</b>
+        <span>ZQSD : avancer / attaquer</span>
+        <span>Flèches : avancer / attaquer</span>
+        <span>Espace : attaquer / interagir devant</span>
+        <span>I : inventaire</span>
+      </div>
+    </aside>
+
+    <section id="inventory-panel" class="inventory-panel" hidden>
+      <div class="inventory-heading">
+        <div><small>INVENTAIRE PARTAGÉ</small><h2>Cuisine & alchimie du jardin</h2></div>
+        <button id="bag-close" type="button">Fermer</button>
+      </div>
+      <p>Consommer un objet retire réellement une unité de ton inventaire du jardin.</p>
+      <div id="inventory-list" class="inventory-list"></div>
+    </section>
+
+    <div id="message" class="message hidden"></div>
+    <section id="intro" class="intro">
+      <span class="rune">◆</span>
+      <h1>Donjon Mystère</h1>
+      <p>À chaque action, les monstres jouent à leur tour. Trouve l'escalier et atteins le cinquième étage.</p>
+      <button id="start-run" type="button" disabled>Chargement…</button>
+    </section>
+  </main>
+  <script src="js/dungeon-mystery.js?v=18"></script>
+</body>
+</html>
