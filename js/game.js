@@ -9,8 +9,8 @@ const tiers = {
 // Tous les objets d'une même rareté appartiennent au même set.
 const setDefs = {
   sentinelle: { name:'Set de la Sentinelle', bonus:{armor:10, vitality:30} },
-  vagabond: { name:'Set du Vagabond', bonus:{power:8, crit:3, speed:.04, luck:7} },
-  eclaireur: { name:'Set de l’Éclaireur', bonus:{power:10, crit:7, speed:.07, luck:10} },
+  vagabond: { name:'Set du Vagabond', bonus:{power:16, armor:10, vitality:60, crit:4, speed:.04, lifesteal:6, luck:7} },
+  eclaireur: { name:'Set de l’Éclaireur', bonus:{power:22, armor:12, vitality:70, crit:7, speed:.07, lifesteal:6, luck:10} },
   obsidienne: { name:'Set d’Obsidienne', bonus:{power:15, armor:13, vitality:25, lifesteal:3} },
   eclipse: { name:'Set de l’Éclipse', bonus:{power:22, armor:18, vitality:35, crit:10, speed:.10, lifesteal:7, luck:20} }
 };
@@ -229,8 +229,8 @@ const CLASSIC_DIFFICULTIES = {
 };
 const CLASSIC_ROUTES = [
   { family: 'slime',   name: 'Marais des slimes',   boss: 'Roi slime',          bossGold: 105, level: 'Débutant',               hpMultiplier: 0.75, attackMultiplier: 0.75 },
-  { family: 'orc',     name: 'Camp des orcs',       boss: 'Chef de guerre orc', bossGold: 210, level: 'Requiert un set commun',  hpMultiplier: 2.40, attackMultiplier: 2.20 },
-  { family: 'vampire', name: 'Manoir vampirique',   boss: 'Seigneur vampire',   bossGold: 360, level: 'Requiert un build rare',  hpMultiplier: 3.60, attackMultiplier: 3.20 }
+  { family: 'orc',     name: 'Camp des orcs',       boss: 'Chef de guerre orc', bossGold: 210, level: 'Requiert un set commun',  hpMultiplier: 2.10, attackMultiplier: 1.90 },
+  { family: 'vampire', name: 'Manoir vampirique',   boss: 'Seigneur vampire',   bossGold: 360, level: 'Requiert un build rare',  hpMultiplier: 4.50, attackMultiplier: 4.00 }
 ];
 
 // Nouveau système de stuff : chaque rareté possède un nombre de bonus fixe.
@@ -289,7 +289,7 @@ const state = {
   keys:0,
   stuffVersion:STUFF_VERSION,
   equipment:{Arme:null,Casque:null,Armure:null,Gants:null,Bottes:null,Amulette:null},
-  inventory:[], lastLoot:null, lootHistory:[],
+  inventory:[], lastLoot:null, lootHistory:[], sellHistory:[],
   lastAction:'L expedition commence.'
 };
 
@@ -298,7 +298,7 @@ function load(){
   try{
     const s = JSON.parse(localStorage.getItem('chroniques-obsidienne-save'));
     if(s){
-      ['gold','essence','xp','level','kills','playerHp','talentPoints','talents','talentTree','talentRanks','talentPurchases','recycleFilter','garden','herbs','flowers','rareHerbs','herbSeeds','flowerSeeds','rareSeeds','potions','tonics','mobResources','buffs','equipment','inventory','lastLoot','lootHistory','route','keys']
+      ['gold','essence','xp','level','kills','playerHp','talentPoints','talents','talentTree','talentRanks','talentPurchases','recycleFilter','garden','herbs','flowers','rareHerbs','herbSeeds','flowerSeeds','rareSeeds','potions','tonics','mobResources','buffs','equipment','inventory','lastLoot','lootHistory','sellHistory','route','keys']
         .forEach(k => { if(s[k] !== undefined) state[k] = s[k]; });
       resetStuff = s.stuffVersion !== STUFF_VERSION;
     }
@@ -331,13 +331,18 @@ function load(){
     state.lastLoot = null;
     state.lootHistory = [];
   }
-  state.inventory = state.inventory.map(normalizeItem);
+  state.inventory = stackInventory(state.inventory.map(normalizeItem));
   Object.keys(state.equipment).forEach(k => {
-    if(state.equipment[k]) state.equipment[k] = normalizeItem(state.equipment[k]);
+    if(state.equipment[k]) state.equipment[k] = {...normalizeItem(state.equipment[k]),count:1};
   });
   if(state.lastLoot) state.lastLoot = normalizeItem(state.lastLoot);
   state.lootHistory = (state.lootHistory || []).map(normalizeItem).slice(0, 5);
   if(!state.lootHistory.length && state.lastLoot) state.lootHistory = [state.lastLoot];
+  state.sellHistory = (Array.isArray(state.sellHistory) ? state.sellHistory : []).map(entry=>({
+    name:String(entry?.name||'Objet'), tier:String(entry?.tier||'commun'), upgrade:Math.max(0,Number(entry?.upgrade)||0),
+    rank:Math.max(1,Math.min(3,Number(entry?.rank)||1)), count:Math.max(1,Number(entry?.count)||1),
+    essence:Math.max(0,Number(entry?.essence)||0), at:Number(entry?.at)||Date.now()
+  })).slice(0,30);
   state.paused = false;
   state.enemy = null;
 }
@@ -351,21 +356,18 @@ const MOB_RESOURCE_BY_FAMILY = {
   orc:{id:'orcTusk',name:'Défense d’orc'},
   vampire:{id:'vampireDust',name:'Poussière vampirique'}
 };
+const MOB_RESOURCE_NAMES = Object.fromEntries(Object.values(MOB_RESOURCE_BY_FAMILY).map(resource=>[resource.id,resource.name]));
 
 function gardenFrame(){ return document.querySelector('.isometric-garden-frame'); }
 function dungeonMysteryFrame(){ return document.querySelector('#tab-donjon .dungeon-game-frame'); }
 function syncGardenMobResources(){
   gardenFrame()?.contentWindow?.postMessage({type:'chroniques:mob-resources',resources:{...state.mobResources}},'*');
 }
-function awardMobResource(enemy){
-  const resource=MOB_RESOURCE_BY_FAMILY[enemy?.family];
-  if(!resource)return;
-  const guaranteed=enemy.title==='Elite'||enemy.title==='Mini-boss';
-  if(!guaranteed&&Math.random()>=.45)return;
-  const amount=enemy.title==='Mini-boss'?2:1;
-  state.mobResources[resource.id]=(state.mobResources[resource.id]||0)+amount;
-  log(`+${amount} ${resource.name}.`);
-  syncGardenMobResources();
+function mysteryPlayerSnapshot(){
+  return {maxHp:maxHp(),damage:baseDamage(),keys:Math.max(0,Math.floor(Number(state.keys)||0))};
+}
+function sendMysteryPlayerSnapshot(target,type='chroniques:classic-player-snapshot',extra={}){
+  target?.postMessage({type,...mysteryPlayerSnapshot(),...extra},'*');
 }
 
 function id(){ return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`; }
@@ -376,10 +378,44 @@ function normalizeItem(item){
   // nouvelle valeur de vitesse de leur modèle pour rester équilibrés.
   const template = catalog.find(entry => entry.name === item.name && entry.slot === item.slot);
   const speed = template?.speed ?? item.speed;
-  return {...item, speed, set:item.set || setForTier[item.tier], id:item.id||id(), upgrade:item.upgrade||0, rank};
+  return {...item, speed, set:item.set || setForTier[item.tier], id:item.id||id(), upgrade:item.upgrade||0, rank, count:Math.max(1,item.count||1)};
 }
 
 function copy(item, rank=1){ return normalizeItem({...item, id:id(), upgrade:0, rank}); }
+function sameItemStack(a,b){
+  return a.name===b.name&&a.slot===b.slot&&a.tier===b.tier&&a.rank===b.rank&&a.upgrade===b.upgrade;
+}
+function stackInventory(items){
+  return items.reduce((stacks,item)=>{
+    const existing=stacks.find(stack=>sameItemStack(stack,item));
+    if(existing) existing.count+=item.count;
+    else stacks.push({...item});
+    return stacks;
+  },[]);
+}
+function addInventoryItem(item){
+  const normalized=normalizeItem(item);
+  const existing=state.inventory.find(stack=>sameItemStack(stack,normalized));
+  if(existing) existing.count+=normalized.count;
+  else state.inventory.push({...normalized});
+}
+function takeOneFromStack(index){
+  const stack=state.inventory[index];
+  if(!stack)return null;
+  const item={...stack,id:id(),count:1};
+  stack.count--;
+  if(stack.count<=0)state.inventory.splice(index,1);
+  return item;
+}
+function itemRefund(item){
+  let invested=0;
+  for(let level=0;level<item.upgrade;level++)invested+=10+(level+1)*12;
+  return tiers[item.tier].sell+Math.floor(invested*.5);
+}
+function recordSale(item,count,essence){
+  state.sellHistory.unshift({name:item.name,tier:item.tier,upgrade:item.upgrade,rank:item.rank,count,essence,at:Date.now()});
+  state.sellHistory=state.sellHistory.slice(0,30);
+}
 function val(i,k){ return i ? (i[k]||0) * (1+i.upgrade*.15) * (GEAR_RANKS[i.rank]?.statMultiplier || 1) : 0; }
 function activeSet(){
   return Object.entries(setDefs).find(([key]) => slots.every(slot => state.equipment[slot]?.set === key));
@@ -434,6 +470,8 @@ function dodge(){ return Math.min(.25, .02 + combatSpeedBonus() * .10 + talentVa
 // Exemple : 1,60 de vitesse = +6 % de vitesse de combat.
 function combatHaste(){ return Math.min(.50, combatSpeedBonus() * .10 + talentValue('haste')); }
 function combatDelay(){ return Math.max(800, Math.round(1200 / (1 + combatHaste()))); }
+let combatTestSpeed=1;
+function combatTestDelay(delay){ return Math.max(1,Math.round(delay/combatTestSpeed)); }
 function criticalChance(){ return Math.max(0, total('crit',5) / 100 + talentValue('crit')); }
 function baseDamage(){ return Math.max(8, total('power',10)) * playerDamageMultiplier(); }
 function totalLifesteal(){ return total('lifesteal') + talentValue('lifesteal'); }
@@ -1164,7 +1202,7 @@ function tick(){
     state.paused = true;
     const wolfDeath = isWolf(enemySpriteFolder());
     animateDeath('enemy');
-    setTimeout(() => resolveEnemyDeath(e), wolfDeath ? 850 : 760);
+    setTimeout(() => resolveEnemyDeath(e), combatTestDelay(wolfDeath ? 850 : 760));
     return;
   }
 
@@ -1209,13 +1247,13 @@ function tick(){
         state.paused = false;
         log('Ton héros reprend son souffle.');
         render();
-      }, 760);
+      }, combatTestDelay(760));
       return;
     }
 
     log(`${msg} ${enemyMsg}`);
     render();
-  }, Math.max(250, Math.round(380 / (1 + combatHaste()))));
+  }, combatTestDelay(Math.max(250, Math.round(380 / (1 + combatHaste())))));
 }
 
 function resolveEnemyDeath(e){
@@ -1224,7 +1262,6 @@ function resolveEnemyDeath(e){
     state.gold += gold;
     state.xp += xp;
     state.kills++;
-    awardMobResource(e);
     log(`Victoire ! +${gold} or.`);
     showCombatReward(gold, xp);
 
@@ -1236,7 +1273,7 @@ function resolveEnemyDeath(e){
       state.lastLoot = item;
       state.lootHistory.unshift(item);
       state.lootHistory = state.lootHistory.slice(0, 5);
-      state.inventory.push(item);
+      addInventoryItem(item);
     }
 
     if(state.xp >= state.level*100){
@@ -1363,7 +1400,8 @@ function render(){
   $('set-bonus').textContent = fullSet
     ? `${fullSet[1].name} complet : bonus actif !`
     : `${setDefs[setKey].name} : ${setCount} / 6 pièces`;
-  $('inventory-count').textContent = state.inventory.length + ' objet' + (state.inventory.length !== 1 ? 's' : '');
+  const inventoryTotal=state.inventory.reduce((sum,item)=>sum+item.count,0);
+  $('inventory-count').textContent = inventoryTotal + ' objet' + (inventoryTotal !== 1 ? 's' : '');
 
   document.querySelectorAll('.recycle-bar [data-tier]').forEach(b => {
     b.classList.toggle('active', !!state.recycleFilter[b.dataset.tier]);
@@ -1375,6 +1413,7 @@ function render(){
 
   renderEquipmentCards();
   renderInventoryCards();
+  renderSellHistory();
   loot();
   renderTalentTree();
   initTalentPan();
@@ -1491,14 +1530,35 @@ function renderInventoryCards(){
     card.style.setProperty('--rarity', rarity.color);
     card.innerHTML = `
       <div class="inventory-meta"><span class="inventory-icon">${item.icon}</span><span class="item-rarity">${rarity.label} · ${item.slot}</span><span class="set-label">${setDefs[item.set].name}</span></div>
-      <div class="item-title-row"><span class="rank-badge">T${item.rank}</span><h3>${item.name}</h3></div>
+      <div class="item-title-row"><span class="rank-badge">T${item.rank}</span><h3>${item.name}</h3>${item.count>1?`<span class="upgrade-count">x${item.count}</span>`:''}</div>
       <div class="item-separator"></div>
       <p>${stats(item)}</p>
-      <div class="inventory-actions"><button>Équiper</button><button class="sell">Vendre +${rarity.sell} ✦</button></div>`;
+      <div class="inventory-actions"><button>Équiper</button><button class="sell">Vendre 1 · +${itemRefund(item)} ✦</button></div>`;
     card.querySelector('button').onclick = () => equip(item.id);
     card.querySelector('.sell').onclick = () => sell(item.id);
     container.append(card);
   });
+}
+
+function saleAge(at){
+  const seconds=Math.max(0,Math.floor((Date.now()-at)/1000));
+  if(seconds<60)return `il y a ${seconds}s`;
+  const minutes=Math.floor(seconds/60);if(minutes<60)return `il y a ${minutes} min`;
+  const hours=Math.floor(minutes/60);if(hours<24)return `il y a ${hours} h`;
+  return `il y a ${Math.floor(hours/24)} j`;
+}
+function renderSellHistory(){
+  let section=$('sell-history');
+  if(!section){
+    section=document.createElement('section');section.id='sell-history';section.className='sell-history';
+    section.style.cssText='margin-top:12px;padding:12px;border:1px solid #303a50;border-radius:10px;background:#151a27;color:#aab5cc';
+    document.querySelector('.inventory-section .recycle-bar')?.insertAdjacentElement('afterend',section);
+  }
+  if(!section)return;
+  section.innerHTML=`<h3 style="margin:0 0 8px;color:#e8ecf9;font-size:13px">Historique des recyclages</h3>${state.sellHistory.length?`<ul style="display:grid;gap:6px;margin:0;padding:0;list-style:none">${state.sellHistory.map(entry=>{
+    const rarity=tiers[entry.tier]||tiers.commun;
+    return `<li style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center"><span style="color:${rarity.color}">${entry.name}${entry.upgrade?` +${entry.upgrade}`:''}${entry.count>1?` ×${entry.count}`:''}</span><strong style="color:#c8a9ff">+${entry.essence} ✦</strong><small>${saleAge(entry.at)}</small></li>`;
+  }).join('')}</ul>`:'<p>Aucun objet recyclé.</p>'}`;
 }
 
 function shop(){
@@ -1545,9 +1605,10 @@ function loot(){
 
 function equip(k){
   const n = state.inventory.findIndex(i=>i.id===k);
-  const i = state.inventory.splice(n,1)[0];
+  const i = takeOneFromStack(n);
+  if(!i)return;
   const old = state.equipment[i.slot];
-  if(old) state.inventory.push(old);
+  if(old) addInventoryItem({...old,count:1});
   state.equipment[i.slot] = i;
   log(`${i.name} est equipe.`);
   render();
@@ -1555,19 +1616,27 @@ function equip(k){
 
 function sell(k){
   const n = state.inventory.findIndex(i=>i.id===k);
-  const i = state.inventory.splice(n,1)[0];
-  state.essence += tiers[i.tier].sell;
-  log(`${i.name} recycle : +${tiers[i.tier].sell} essence.`);
+  const i = takeOneFromStack(n);
+  if(!i)return;
+  const refund=itemRefund(i);
+  state.essence+=refund;
+  recordSale(i,1,refund);
+  log(`${i.name} recyclé : +${refund} essence.`);
   render();
 }
 
 function recycleAll(){
   const selected = state.inventory.filter(i=>state.recycleFilter[i.tier]);
   if(!selected.length){ log('Aucun objet ne correspond au filtre.'); return; }
-  const gain = selected.reduce((n,i)=>n + tiers[i.tier].sell, 0);
+  const gain = selected.reduce((total,item)=>{
+    const stackGain=itemRefund(item)*item.count;
+    recordSale(item,item.count,stackGain);
+    return total+stackGain;
+  },0);
+  const itemCount=selected.reduce((total,item)=>total+item.count,0);
   state.inventory = state.inventory.filter(i=>!state.recycleFilter[i.tier]);
   state.essence += gain;
-  log(`${selected.length} objet(s) recycle(s) : +${gain} essence.`);
+  log(`${itemCount} objet(s) recyclé(s) : +${gain} essence.`);
   render();
 }
 
@@ -1588,7 +1657,7 @@ function buy(n){
   const i = state.shop[n];
   if(state.gold < i.price) return;
   state.gold -= i.price;
-  state.inventory.push(i);
+  addInventoryItem(i);
   state.shop.splice(n,1);
   log(`${i.name} rejoint l inventaire.`);
   render();
@@ -1610,6 +1679,20 @@ function tickBuffs(){
 window.addEventListener('message',event=>{
   const dungeonFrame=dungeonMysteryFrame();
   if(dungeonFrame&&event.source===dungeonFrame.contentWindow){
+    if(event.data?.type==='chroniques:request-classic-player-snapshot'){
+      sendMysteryPlayerSnapshot(event.source);
+      return;
+    }
+    if(event.data?.type==='chroniques:request-mystery-expedition'){
+      if(state.keys<1){
+        sendMysteryPlayerSnapshot(event.source,'chroniques:mystery-expedition-result',{allowed:false,message:'Aucune clé disponible. Bats un mini-boss classique pour obtenir une clé.'});
+        return;
+      }
+      state.keys--;
+      save(); render();
+      sendMysteryPlayerSnapshot(event.source,'chroniques:mystery-expedition-result',{allowed:true});
+      return;
+    }
     if(event.data?.type==='chroniques:request-garden-consumables'){
       gardenFrame()?.contentWindow?.postMessage({type:'chroniques:request-garden-consumables'},'*');
       return;
@@ -1621,11 +1704,17 @@ window.addEventListener('message',event=>{
     if(event.data?.type==='chroniques:mystery-reward'){
       const gold=Math.max(0,Math.min(100000,Math.floor(Number(event.data.gold)||0)));
       const essence=Math.max(0,Math.min(10000,Math.floor(Number(event.data.essence)||0)));
-      const slimeGel=Math.max(0,Math.min(1000,Math.floor(Number(event.data.slimeGel)||0)));
+      const resources=event.data.resources&&typeof event.data.resources==='object'?event.data.resources:{};
+      const resourceGains={};
+      Object.keys(state.mobResources).forEach(id=>{
+        const legacy=id==='slimeGel'?event.data.slimeGel:0;
+        resourceGains[id]=Math.max(0,Math.min(1000,Math.floor(Number(resources[id]??legacy)||0)));
+      });
       state.gold+=gold;
       state.essence+=essence;
-      state.mobResources.slimeGel=(state.mobResources.slimeGel||0)+slimeGel;
-      log(`Donjon Mystère terminé : +${gold} or, +${essence} essence${slimeGel?` et +${slimeGel} gel de slime`:''}.`);
+      Object.entries(resourceGains).forEach(([id,amount])=>state.mobResources[id]=(state.mobResources[id]||0)+amount);
+      const resourceSummary=Object.entries(resourceGains).filter(([,amount])=>amount>0).map(([id,amount])=>`+${amount} ${MOB_RESOURCE_NAMES[id]||id}`);
+      log(`Donjon Mystère terminé : +${gold} or, +${essence} essence${resourceSummary.length?` et ${resourceSummary.join(', ')}`:''}.`);
       save(); render(); syncGardenMobResources();
     }
     return;
@@ -1675,6 +1764,12 @@ $('pause-btn').onclick = ()=>{
   $('pause-btn').textContent = state.paused ? 'Reprendre' : 'Mettre en pause';
   save();
 };
+$('test-speed-btn').onclick=()=>{
+  combatTestSpeed=combatTestSpeed===1?10:1;
+  $('test-speed-btn').textContent=`Vitesse x10 : ${combatTestSpeed===10?'OUI':'NON'}`;
+  $('test-speed-btn').classList.toggle('active',combatTestSpeed===10);
+  log(combatTestSpeed===10?'Vitesse de test x10 activée.':'Vitesse de test normale.');
+};
 
 document.querySelectorAll('.recycle-bar [data-tier]').forEach(b=>{
   b.onclick = ()=>{
@@ -1720,7 +1815,7 @@ render();
 setInterval(garden, 1000);
 function runCombatLoop(){
   tick();
-  setTimeout(runCombatLoop, combatDelay());
+  setTimeout(runCombatLoop, combatTestDelay(combatDelay()));
 }
-setTimeout(runCombatLoop, combatDelay());
+setTimeout(runCombatLoop, combatTestDelay(combatDelay()));
 setInterval(tickBuffs, 1000);

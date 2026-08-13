@@ -64,8 +64,39 @@
     slime3: {
       idle: 'assets/sprites/slime3/Slime3_Idle.png', walk: 'assets/sprites/slime3/Slime3_Walk.png',
       attack: 'assets/sprites/slime3/Slime3_Attack.png', death: 'assets/sprites/slime3/Slime3_Death.png'
+    },
+    orc1: {
+      idle: 'assets/sprites/orc1/orc1_idle.png', walk: 'assets/sprites/orc1/orc1_walk.png',
+      attack: 'assets/sprites/orc1/orc1_attack.png', death: 'assets/sprites/orc1/orc1_death.png'
+    },
+    orc2: {
+      idle: 'assets/sprites/orc2/orc2_idle.png', walk: 'assets/sprites/orc2/orc2_run.png',
+      attack: 'assets/sprites/orc2/orc2_attack.png', death: 'assets/sprites/orc2/orc2_death.png'
+    },
+    orc3: {
+      idle: 'assets/sprites/orc3/orc3_idle.png', walk: 'assets/sprites/orc3/orc3_walk.png',
+      attack: 'assets/sprites/orc3/orc3_attack.png', death: 'assets/sprites/orc3/orc3_death.png'
+    },
+    vampires1: {
+      idle: 'assets/sprites/vampires1/Vampires1_Idle.png', walk: 'assets/sprites/vampires1/Vampires1_Walk.png',
+      attack: 'assets/sprites/vampires1/Vampires1_Attack.png', death: 'assets/sprites/vampires1/Vampires1_Death.png'
+    },
+    vampires2: {
+      idle: 'assets/sprites/vampires2/Vampires2_Idle.png', walk: 'assets/sprites/vampires2/Vampires2_Walk.png',
+      attack: 'assets/sprites/vampires2/Vampires2_Attack.png', death: 'assets/sprites/vampires2/Vampires2_Death.png'
+    },
+    vampires3: {
+      idle: 'assets/sprites/vampires3/Vampires3_Idle.png', walk: 'assets/sprites/vampires3/Vampires3_Walk.png',
+      attack: 'assets/sprites/vampires3/Vampires3_Attack.png', death: 'assets/sprites/vampires3/Vampires3_Death.png'
     }
   };
+
+  const ENEMY_FAMILIES = {
+    slime: ['slime1', 'slime2', 'slime3'],
+    orc: ['orc1', 'orc2', 'orc3'],
+    vampire: ['vampires1', 'vampires2', 'vampires3']
+  };
+  const MOB_RESOURCE_BY_FAMILY = { slime: 'slimeGel', orc: 'orcTusk', vampire: 'vampireDust' };
 
   function loadImage(src) {
     return new Promise(resolve => {
@@ -155,6 +186,7 @@
       this.type = type; this.x = x; this.y = y; this.visualX = x; this.visualY = y;
       this.fromX = x; this.fromY = y; this.direction = 'down';
       this.maxHp = stats.hp || 50; this.hp = this.maxHp; this.damage = stats.damage || 8;
+      this.family = stats.family || null;
       this.images = imageSet; this.state = 'idle'; this.stateTime = 0; this.dead = false;
       this.rowMap = type === 'player' ? { down: 0, left: 1, right: 2, up: 3 } : { down: 0, up: 1, left: 2, right: 3 };
     }
@@ -233,6 +265,9 @@
       this.visible = new Set(); this.explored = new Set(); this.busy = false; this.started = false;
       this.powerTurns = 0; this.guardTurns = 0;
       this.runGold = 0; this.runEssence = 0; this.runItems = { ration: 1, potion: 1 };
+      this.runMobResources = { slimeGel: 0, orcTusk: 0, vampireDust: 0 };
+      this.classicStats = { maxHp: 100, damage: 10, keys: 0 };
+      this.pendingStart = false; this.pendingFreshSeed = false;
       this.inventory = new GardenInventory(); this.messageTimer = 0; this.lastTime = 0;
       this.ready = false;
       this.bind(); new ResizeObserver(() => this.resize()).observe(canvas.parentElement);
@@ -263,7 +298,10 @@
       this.ready = true;
       const startButton = document.getElementById('start-run');
       startButton.disabled = false; startButton.textContent = 'Commencer l’expédition';
-      if (parent !== window) parent.postMessage({ type: 'chroniques:request-garden-consumables' }, '*');
+      if (parent !== window) {
+        parent.postMessage({ type: 'chroniques:request-garden-consumables' }, '*');
+        parent.postMessage({ type: 'chroniques:request-classic-player-snapshot' }, '*');
+      }
       this.resize(); this.renderInventory(); requestAnimationFrame(time => this.loop(time));
     }
 
@@ -278,9 +316,22 @@
         if (direction) this.tryMove(direction);
       });
       addEventListener('message', event => {
-        if (event.source !== parent || event.data?.type !== 'chroniques:garden-consumables-snapshot') return;
-        this.inventory.setSnapshot(event.data);
-        this.renderInventory();
+        if (event.source !== parent) return;
+        if (event.data?.type === 'chroniques:garden-consumables-snapshot') {
+          this.inventory.setSnapshot(event.data);
+          this.renderInventory();
+          return;
+        }
+        if (event.data?.type === 'chroniques:classic-player-snapshot') {
+          this.setClassicStats(event.data);
+          return;
+        }
+        if (event.data?.type === 'chroniques:mystery-expedition-result') {
+          this.pendingStart = false;
+          this.setClassicStats(event.data);
+          if (!event.data.allowed) return this.showStartError(event.data.message || 'Aucune clé disponible.');
+          this.beginStart(this.pendingFreshSeed);
+        }
       });
       this.canvas.addEventListener('pointerdown', () => this.canvas.focus());
       document.getElementById('start-run').onclick = () => this.start();
@@ -292,8 +343,33 @@
 
     start(freshSeed = false) {
       if (!this.ready) return this.message('Chargement des sprites en cours…');
+      if (this.pendingStart) return;
+      if (parent !== window) {
+        this.pendingStart = true; this.pendingFreshSeed = freshSeed;
+        parent.postMessage({ type: 'chroniques:request-mystery-expedition' }, '*');
+        return;
+      }
+      this.beginStart(freshSeed);
+    }
+
+    setClassicStats(data = {}) {
+      const maxHp = Number(data.maxHp); const damage = Number(data.damage); const keys = Number(data.keys);
+      this.classicStats = {
+        maxHp: Number.isFinite(maxHp) && maxHp > 0 ? maxHp : 100,
+        damage: Number.isFinite(damage) && damage > 0 ? damage : 10,
+        keys: Number.isFinite(keys) && keys >= 0 ? Math.floor(keys) : 0
+      };
+    }
+
+    showStartError(text) {
+      const intro = document.getElementById('intro'); intro.classList.remove('hidden');
+      intro.querySelector('p').textContent = text;
+    }
+
+    beginStart(freshSeed = false) {
       if (freshSeed) this.seed = Date.now() >>> 0;
       this.floor = 1; this.turn = 0; this.runGold = 0; this.runEssence = 0;
+      this.runMobResources = { slimeGel: 0, orcTusk: 0, vampireDust: 0 };
       this.runItems = { ration: 1, potion: 1 }; this.powerTurns = 0; this.guardTurns = 0;
       this.savedHp = null;
       this.started = true; document.getElementById('intro').classList.add('hidden');
@@ -303,7 +379,7 @@
     generateFloor() {
       this.busy = false;
       this.map = new DungeonGenerator(this.seed, this.floor).generate(); this.rng = new RNG(this.map.seed);
-      this.player = new Actor('player', this.map.start.x, this.map.start.y, this.sprites.player, { hp: 120, damage: 21 });
+      this.player = new Actor('player', this.map.start.x, this.map.start.y, this.sprites.player, { hp: this.classicStats.maxHp, damage: this.classicStats.damage });
       if (this.floor > 1 && this.savedHp) this.player.hp = Math.min(this.player.maxHp, this.savedHp + 18);
       this.objects = []; this.items = []; this.enemies = []; this.doors = []; this.gates = []; this.explored.clear();
       this.doors = this.buildDoors();
@@ -457,14 +533,19 @@
       const cells = this.rng.shuffle(this.map.rooms.slice(1).flatMap(room => this.roomCells(room)).filter(cell => !this.occupied(cell.x, cell.y) && distance(cell, this.map.start) > 8));
       for (let i = 0; i < count; i += 1) {
         const cell = cells.pop(); if (!cell) break;
-        const variant = this.floor >= 4 && this.rng.chance(.35) ? 'slime3' : this.floor >= 2 && this.rng.chance(.45) ? 'slime2' : 'slime1';
+        const family = this.rng.pick(Object.keys(ENEMY_FAMILIES));
+        const tier = this.floor >= 4 && this.rng.chance(.35) ? 2 : this.floor >= 2 && this.rng.chance(.45) ? 1 : 0;
+        const variant = ENEMY_FAMILIES[family][tier];
         const scale = 1 + (this.floor - 1) * .13;
-        this.enemies.push(new Actor(variant, cell.x, cell.y, this.sprites[variant], { hp: Math.round((35 + (variant === 'slime3' ? 18 : variant === 'slime2' ? 8 : 0)) * scale), damage: Math.round((7 + this.floor * 1.5) * scale) }));
+        this.enemies.push(new Actor(variant, cell.x, cell.y, this.sprites[variant], { hp: Math.round((35 + (tier === 2 ? 18 : tier === 1 ? 8 : 0)) * scale), damage: Math.round((7 + this.floor * 1.5) * scale), family }));
       }
       if (this.floor === MAX_FLOOR) {
         const room = this.map.rooms.find(candidate => this.map.stairs.x >= candidate.x && this.map.stairs.x < candidate.x + candidate.w && this.map.stairs.y >= candidate.y && this.map.stairs.y < candidate.y + candidate.h) || this.map.rooms[this.map.rooms.length - 1];
         const cell = this.roomCells(room).sort((a, b) => distance(b, this.map.stairs) - distance(a, this.map.stairs)).find(candidate => !this.occupied(candidate.x, candidate.y));
-        if (cell) this.enemies.push(new Actor('boss', cell.x, cell.y, this.sprites.slime3, { hp: 145, damage: 18 }));
+        if (cell) {
+          const family = this.rng.pick(Object.keys(ENEMY_FAMILIES));
+          this.enemies.push(new Actor('boss', cell.x, cell.y, this.sprites[ENEMY_FAMILIES[family][2]], { hp: 145, damage: 18, family }));
+        }
       }
     }
 
@@ -515,8 +596,14 @@
       const vector = DIRECTIONS[this.player.direction]; this.player.face(vector.x, vector.y); this.player.setState('attack');
       const power = this.powerTurns > 0 ? 1.25 : 1;
       const damage = Math.round(this.player.damage * power * (.9 + this.rng.next() * .2)); enemy.hp -= damage;
-      this.message(`${enemy.type === 'boss' ? 'Slime royal' : 'Slime'} : -${damage} PV`);
-      if (enemy.hp <= 0) { enemy.hp = 0; enemy.dead = true; enemy.setState('death'); this.runGold += enemy.type === 'boss' ? 80 : 6 + this.floor * 2; this.runEssence += enemy.type === 'boss' ? 5 : this.rng.chance(.25) ? 1 : 0; }
+      this.message(`${enemy.type === 'boss' ? 'Boss' : 'Monstre'} : -${damage} PV`);
+      if (enemy.hp <= 0) {
+        enemy.hp = 0; enemy.dead = true; enemy.setState('death');
+        this.runGold += enemy.type === 'boss' ? 80 : 6 + this.floor * 2;
+        this.runEssence += enemy.type === 'boss' ? 5 : this.rng.chance(.25) ? 1 : 0;
+        const resource = MOB_RESOURCE_BY_FAMILY[enemy.family];
+        if (resource && (enemy.type === 'boss' || this.rng.chance(.45))) this.runMobResources[resource] += enemy.type === 'boss' ? 2 : 1;
+      }
       this.completePlayerTurn();
     }
 
@@ -620,7 +707,8 @@
       setTimeout(() => this.showEnd(false, true), 420);
     }
     showEnd(won, escaped = false) {
-      if (won || escaped) parent.postMessage({ type: 'chroniques:mystery-reward', gold: this.runGold, essence: this.runEssence, slimeGel: Math.floor(this.turn / 18) }, '*');
+      if (won || escaped) parent.postMessage({ type: 'chroniques:mystery-reward', gold: this.runGold, essence: this.runEssence, resources: { ...this.runMobResources } }, '*');
+      this.started = false;
       const intro = document.getElementById('intro'); intro.classList.remove('hidden');
       intro.querySelector('h1').textContent = won ? 'Expédition réussie !' : escaped ? 'Retour à la maison' : 'Expédition échouée';
       intro.querySelector('p').textContent = won || escaped ? `Butin sécurisé : ${this.runGold} or et ${this.runEssence} essence.` : 'Les récompenses de l’expédition sont perdues. Prépare davantage de nourriture au jardin.';
