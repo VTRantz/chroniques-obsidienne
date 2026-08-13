@@ -214,23 +214,23 @@ const CLASSIC_LOOT = {
 const LUCK_DROP_BONUS = { perPoint:.002, max:.10 };
 const BOSS_KEY_DROP_CHANCE = .25;
 const ROUTE_LENGTH = 10;
-const ELITE_SPAWN_CHANCE = .05;
-const ROUTE_STEP_HP_GROWTH = .07;
-const ROUTE_STEP_ATTACK_GROWTH = .035;
+const ELITE_SPAWN_CHANCE = 0.05;
+const ROUTE_STEP_HP_GROWTH = 1.09;
+const ROUTE_STEP_ATTACK_GROWTH = 1.055;
 const GEAR_RANKS = {
-  1: { label:'T1', statMultiplier:1 },
-  2: { label:'T2', statMultiplier:2.2 },
-  3: { label:'T3', statMultiplier:3.8 }
+  1: { label: 'T1', statMultiplier: 1 },
+  2: { label: 'T2', statMultiplier: 2.2 },
+  3: { label: 'T3', statMultiplier: 3.8 }
 };
 const CLASSIC_DIFFICULTIES = {
-  normal: { label:'Normal', hp:1, attack:1, reward:1, gold:1, itemRank:1 },
-  hard: { label:'Hard', hp:6.2, attack:6.5, reward:4, gold:2.5, itemRank:2 },
-  hell: { label:'Hell', hp:18, attack:15, reward:12, gold:6, itemRank:3 }
+  normal: { label: 'Normal', hp: 1, attack: 1, reward: 1, gold: 1, itemRank: 1 },
+  hard:   { label: 'Hard',   hp: 6.2, attack: 6.5, reward: 4, gold: 2.5, itemRank: 2 },
+  hell:   { label: 'Hell',   hp: 18, attack: 15, reward: 12, gold: 6, itemRank: 3 }
 };
 const CLASSIC_ROUTES = [
-  { family:'slime', name:'Marais des slimes', boss:'Roi slime', bossGold:105, level:'Débutant', hpMultiplier:.65, attackMultiplier:.65 },
-  { family:'orc', name:'Camp des orcs', boss:'Chef de guerre orc', bossGold:210, level:'Requiert un set commun', hpMultiplier:1.85, attackMultiplier:1.70 },
-  { family:'vampire', name:'Manoir vampirique', boss:'Seigneur vampire', bossGold:360, level:'Requiert un build rare', hpMultiplier:2.80, attackMultiplier:2.50 }
+  { family: 'slime',   name: 'Marais des slimes',   boss: 'Roi slime',          bossGold: 105, level: 'Débutant',               hpMultiplier: 0.75, attackMultiplier: 0.75 },
+  { family: 'orc',     name: 'Camp des orcs',       boss: 'Chef de guerre orc', bossGold: 210, level: 'Requiert un set commun',  hpMultiplier: 2.40, attackMultiplier: 2.20 },
+  { family: 'vampire', name: 'Manoir vampirique',   boss: 'Seigneur vampire',   bossGold: 360, level: 'Requiert un build rare',  hpMultiplier: 3.60, attackMultiplier: 3.20 }
 ];
 
 // Nouveau système de stuff : chaque rareté possède un nombre de bonus fixe.
@@ -779,9 +779,9 @@ function spawn() {
   const a = routePool.find(monster => (pick -= monster.weight) < 0) || routePool[0];
   // Les élites sont rares, mais valent toujours un objet à leur défaite.
   const elite = !miniBoss && Math.random() < ELITE_SPAWN_CHANCE;
-  const variant = miniBoss ? 2 : elite ? 1.6 : 1;
-  const stepHpMultiplier = 1 + (currentStep - 1) * ROUTE_STEP_HP_GROWTH;
-  const stepAttackMultiplier = 1 + (currentStep - 1) * ROUTE_STEP_ATTACK_GROWTH;
+  const variant = miniBoss ? 2 : elite ? 1.75 : 1;
+  const stepHpMultiplier = Math.pow(ROUTE_STEP_HP_GROWTH, currentStep - 1);
+  const stepAttackMultiplier = Math.pow(ROUTE_STEP_ATTACK_GROWTH, currentStep - 1);
 
   state.enemy = {
     name: miniBoss ? route.boss : a.name,
