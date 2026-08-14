@@ -290,7 +290,7 @@ h1, h2, h3, p { margin: 0; }
 }
 
 .hero-sprite {
-  background: url('../assets/sprites/Hero/idle/right/1.png') no-repeat center / contain;
+  background: url('../assets/sprites/hero/idle/right/1.png') no-repeat center / contain;
 }
 
 .fighter-icon {

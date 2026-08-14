@@ -144,8 +144,7 @@ function animateDeath(who){
 
 // Les sprites sont des images séparées : cette fonction les joue dans l'ordre.
 function spriteFrame(folder, action, direction, frame){
-  const assetFolder = folder === 'hero' ? 'Hero' : folder;
-  return `assets/sprites/${assetFolder}/${action}/${direction}/${frame}.png`;
+  return `assets/sprites/${folder}/${action}/${direction}/${frame}.png`;
 }
 
 function placeHeroSprite(image){
