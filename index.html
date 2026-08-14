@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chroniques d'Obsidienne</title>
-  <link rel="stylesheet" href="css/style.css?v=14" />
+  <link rel="stylesheet" href="css/style.css?v=15" />
   <link rel="stylesheet" href="css/rpg-items.css?v=9" />
-  <link rel="stylesheet" href="css/design-system.css?v=5" />
+  <link rel="stylesheet" href="css/design-system.css?v=6" />
 </head>
 <body>
   <main class="app-shell">
@@ -82,7 +82,7 @@
           <div class="battle-area" id="battle-area">
             <!-- HÉROS -->
             <div class="fighter player" id="player-fighter">
-                <img src="assets/sprites/hero/idle/right/1.png" alt="Héros" class="fighter-sprite" id="player-sprite">
+                <img src="assets/sprites/Hero/idle/right/1.png" alt="Héros" class="fighter-sprite" id="player-sprite">
               <div class="fighter-icon" style="display:none">🧙</div>
               <h3>Ton héros</h3>
               <p><span id="player-hp-text">100 / 100</span> PV</p>
@@ -222,27 +222,27 @@
           <section class="stat-group">
             <h3>Combat</h3>
             <div class="stats">
-              <div><small>Dégâts réels</small><b id="power">10.00</b></div>
-              <div><small>Critique</small><b id="crit">5%</b></div>
-              <div><small>Dégâts crit.</small><b id="crit-damage-stat">+0%</b></div>
-              <div><small>Vol de vie</small><b id="lifesteal-stat">0%</b></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/ATTACK.png" alt=""><span><small>Dégâts réels</small><b id="power">10.00</b></span></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/CRITCHANCE.png" alt=""><span><small>Critique</small><b id="crit">5%</b></span></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/CRITDOMAGE.png" alt=""><span><small>Dégâts crit.</small><b id="crit-damage-stat">+0%</b></span></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/VOLDEVIE.png" alt=""><span><small>Vol de vie</small><b id="lifesteal-stat">0%</b></span></div>
             </div>
           </section>
           <section class="stat-group">
             <h3>Survie</h3>
             <div class="stats">
-              <div><small>PV maximum</small><b id="max-hp-stat">100</b></div>
-              <div><small>Armure</small><b id="armor">0</b></div>
-              <div><small>Parade</small><b id="parry-stat">0%</b></div>
-              <div><small>Esquive</small><b id="dodge-stat">0%</b></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/HP.png" alt=""><span><small>PV maximum</small><b id="max-hp-stat">100</b></span></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/ARMURE.png" alt=""><span><small>Armure</small><b id="armor">0</b></span></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/PARADE.png" alt=""><span><small>Parade</small><b id="parry-stat">0%</b></span></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/ESQUIVE.png" alt=""><span><small>Esquive</small><b id="dodge-stat">0%</b></span></div>
             </div>
           </section>
           <section class="stat-group">
             <h3>Progression</h3>
             <div class="stats">
-              <div><small>Vitesse combat</small><b id="speed">+0%</b></div>
-              <div><small>Bonus d'or</small><b id="gold-bonus-stat">+0%</b></div>
-              <div><small>Bonus d'XP</small><b id="xp-bonus-stat">+0%</b></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/VITESSE.png" alt=""><span><small>Vitesse combat</small><b id="speed">+0%</b></span></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/GAINOR.png" alt=""><span><small>Bonus d'or</small><b id="gold-bonus-stat">+0%</b></span></div>
+              <div class="hero-stat-card"><img class="hero-stat-icon" src="assets/sprites/Icons/Icon_Stat/GAINXP.png" alt=""><span><small>Bonus d'XP</small><b id="xp-bonus-stat">+0%</b></span></div>
             </div>
           </section>
         </div>
@@ -336,7 +336,7 @@
   <script src="js/modules/garden.js?v=1"></script>
   <script src="js/modules/combat.js?v=9"></script>
   <script src="js/modules/ui.js?v=5"></script>
-  <script src="js/modules/rpg-items.js?v=9"></script>
+  <script src="js/modules/rpg-items.js?v=10"></script>
   <script src="js/modules/main.js?v=2"></script>
 </body>
 </html>

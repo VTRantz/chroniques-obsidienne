@@ -172,6 +172,9 @@ h2 { line-height: 1.15; letter-spacing: -.02em; }
 .status { border: 1px solid rgba(111, 224, 173, .22); }
 .stats div { min-width: 0; border: 1px solid rgba(91, 111, 146, .68); background: rgba(17, 25, 39, .68); }
 .stats small { line-height: 1.35; }
+.stats .hero-stat-card { display: flex; align-items: center; gap: 12px; }
+.hero-stat-card > span { min-width: 0; }
+.hero-stat-icon { width: 42px; height: 42px; flex: 0 0 auto; object-fit: contain; image-rendering: pixelated; }
 .inventory-item, .slot.equipped, .slot.empty-slot { border-color: #526886; background: linear-gradient(145deg, #202c42, #182236); }
 .inventory-item:hover, .slot.equipped:hover { border-color: color-mix(in srgb, var(--rarity, #7890b8) 64%, #40516d); }
 .isometric-garden-frame, .dungeon-game-frame { border: 1px solid var(--obsidian-600); box-shadow: inset 0 0 0 1px rgba(255,255,255,.018); }
@@ -673,6 +676,7 @@ button:focus-visible, [tabindex]:focus-visible, iframe:focus-visible { outline: 
   .stat-group .stats,
   .stat-group:last-child .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat-group .stats div { padding: 10px; }
+  .hero-stat-icon { width: 34px; height: 34px; }
   .slot.equipped .equipment-actions { gap: 5px; }
   .slot.equipped .equipment-actions button { padding: 5px 6px; font-size: 8px; }
   .inventory-grid { grid-template-columns: 1fr; }

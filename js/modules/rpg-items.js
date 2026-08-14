@@ -115,7 +115,7 @@ function renderEquipmentCards(){
   container.innerHTML = '';
   const hero = document.createElement('div');
   hero.className = 'equipment-hero';
-  hero.innerHTML = `<img src="assets/sprites/hero/idle/down/1.png" alt="Ton héros, vue de face"><strong>Ton héros</strong><small>Niv. ${state.level}</small>`;
+  hero.innerHTML = `<img src="assets/sprites/Hero/idle/down/1.png" alt="Ton héros, vue de face"><strong>Ton héros</strong><small>Niv. ${state.level}</small>`;
   container.append(hero);
   const slotClass = {Arme:'slot-weapon', Casque:'slot-helmet', Armure:'slot-armor', Gants:'slot-gloves', Bottes:'slot-boots', Amulette:'slot-amulet'};
   slots.forEach(slot => {
