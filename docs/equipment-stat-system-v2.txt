@@ -1,0 +1,99 @@
+SYSTÈME DE STATS V2 — PROPOSITION DE RÉPARTITION
+=================================================
+
+Source des totaux : equipment_sets_totals.json.
+Cette fiche prépare les nouvelles pièces sans modifier encore le jeu actif.
+
+PRINCIPE
+--------
+1. Le fichier equipment_sets_totals.json définit le total des six pièces d’un
+   set T1. Les bonus de set sont exclus de ces totaux.
+2. Chaque pièce reçoit une partie du total selon son rôle.
+3. T2 et T3 appliquent uniquement les multiplicateurs globaux : T2 ×2,2,
+   T3 ×3,8. Les sets ne donnent pas de bonus supplémentaire.
+4. Les améliorations sont calculées pièce par pièce ; la somme retombe donc
+   toujours sur le total attendu du set.
+
+AMÉLIORATIONS +1 À +20
+----------------------
+Pour ATK, PV, Défense, dégâts critiques, vitesse, or, XP et vol de vie :
+
+  valeur(niveau) = valeur(+0) × (1 + niveau × 0,035)
+
+Ainsi :
+- +1 = 103,5 % de la valeur +0 ;
+- +2 = 107 % ;
+- +3 = 110,5 % ;
+- +10 = 135 % ;
+- +20 = 170 %.
+
+La chance critique est interpolée séparément entre les valeurs +0 et +20 du
+fichier de référence :
+
+  critique(niveau) = critique(+0) + niveau × (critique(+20) - critique(+0)) / 20
+
+Exemple Sentinelle : 2,5 % à +0, 2,575 % à +1, 2,65 % à +2,
+2,725 % à +3 et 4 % à +20.
+
+RÉPARTITION PAR EMPLACEMENT
+---------------------------
+SP = statistique principale : elle définit le rôle de l'objet.
+SS = statistique secondaire : elle complète ce rôle sans le remplacer.
+Une case vide signifie que l'objet ne peut pas recevoir cette statistique.
+
+Statistique       Arme  Casque  Armure  Gants  Bottes  Amulette
+ATK                SP                      SS             SS
+PV                         SP      SS            SS         
+Défense                    SS      SP            SS        
+Chance critique    SS                                     SS
+Dégâts critiques   SS                                     SS
+Vitesse                     SS             SP    SP    
+Or                                         SS             SP
+XP                                         SS             SS
+Vol de vie         SS                      SS             
+
+RÈGLES DE PARTAGE DES TOTAUX
+----------------------------
+Chaque total de set est réparti selon les proportions suivantes. Les valeurs
+restent internes avec leurs décimales : l'interface peut les arrondir.
+
+Statistique       Arme  Casque  Armure  Gants  Bottes  Amulette
+ATK                70 %   —      —      15 %    —      15 %
+PV                  —    70 %   15 %     —     15 %     —
+Défense             —    15 %   70 %     —     15 %     —
+Chance critique    60 %   —      —       —      —      40 %
+Dégâts critiques   60 %   —      —       —      —      40 %
+Vitesse             —    10 %    —      45 %   45 %     —
+Or                  —     —      —      25 %    —      75 %
+XP                  —     —      —      50 %    —      50 %
+Vol de vie         60 %   —      —      40 %    —       —
+
+Cette distribution garde une identité immédiatement lisible : l'arme porte
+l'offensive, le casque la survie, l'armure la défense, les gants la cadence et
+les gains, les bottes la cadence, et l'amulette les compléments polyvalents.
+
+EXEMPLE DE DISTRIBUTION — SENTINELLE T1 +0
+------------------------------------------
+Total de référence : 20 ATK, 100 PV, 10 Défense, 2,5 % critique,
+15 % dégâts critiques, 5 % vitesse, 5 % or, 5 % XP, 2 % vol de vie.
+
+Arme      : 14 ATK, 1,5 % critique, 9 % dégâts critiques, 1,2 % vol de vie
+Casque    : 70 PV, 1,5 Défense, 0,5 % vitesse
+Armure    : 15 PV, 7 Défense
+Gants     : 3 ATK, 2,25 % vitesse, 1,25 % or, 2,5 % XP, 0,8 % vol de vie
+Bottes    : 15 PV, 1,5 Défense, 2,25 % vitesse
+Amulette  : 3 ATK, 1 % critique, 6 % dégâts critiques, 3,75 % or, 2,5 % XP
+
+Les six pièces additionnées redonnent exactement le total Sentinelle +0.
+
+SETS
+----
+Les sets conservent leur nom, leur rareté et leur identité visuelle, mais ils
+ne donnent aucun bonus supplémentaire. Toute la puissance vient des six objets.
+
+ORDRE D’IMPLÉMENTATION
+----------------------
+1. Remplacer les anciennes statistiques par cette distribution.
+2. Vérifier les totals +0 / +20 de chaque set contre le fichier JSON.
+3. Ajouter les multiplicateurs T2 et T3.
+4. Régler les monstres, routes et coûts d’amélioration.

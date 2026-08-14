@@ -1,0 +1,186 @@
+.item-meta .slot-icon,
+.inventory-icon {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+}
+
+.rpg-stat-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.item-slot-icon {
+  width: 23px;
+  height: 23px;
+}
+
+.item-set-icon {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.slot.equipped,
+.inventory-item {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: start;
+}
+
+.rpg-item-art {
+  display: grid;
+  width: 78px;
+  min-height: 78px;
+  place-items: start center;
+}
+
+.rpg-item-art .item-set-icon {
+  width: 74px;
+  height: 74px;
+}
+
+.rpg-item-body {
+  min-width: 0;
+}
+
+.inventory-item .rpg-item-body {
+  display: flex;
+  min-height: 166px;
+  flex-direction: column;
+}
+
+.slot.equipped .upgrade {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  margin-top: 3px;
+}
+
+/* Chaque pièce garde la même taille minimale, quelle que soit sa ligne dans
+   la grille. Une carte reste libre de s'agrandir si elle reçoit plus de stats. */
+.slot.equipped {
+  min-height: 190px;
+}
+
+.inventory-item .inventory-actions {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.item-stats {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 10px;
+}
+
+.item-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #aebdd4;
+  font-size: 10px;
+  line-height: 1.15;
+}
+
+.item-stat.primary-stat {
+  color: #f1f5ff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@media (max-width:750px) {
+  .slot.equipped,
+  .inventory-item { grid-template-columns: 58px minmax(0, 1fr); column-gap: 7px; }
+  .slot.equipped { min-height: 154px; }
+  .rpg-item-art { width: 58px; min-height: 58px; }
+  .rpg-item-art .item-set-icon { width: 56px; height: 56px; }
+  .inventory-item .rpg-item-body { min-height: 142px; }
+}
+
+.slot.equipped .item-stats,
+.inventory-item .item-stats,
+.loot-item .item-stats {
+  min-height: 0;
+}
+
+.inventory-item .item-stats {
+  margin: 8px 0 10px;
+}
+
+.loot-item .item-stats {
+  margin: 7px 0 0;
+}
+
+/* Historique de butin : chaque objet garde sa fiche lisible, même après le
+   dernier drop. */
+.loot-list {
+  gap: 12px;
+}
+
+.loot-item,
+.loot-item:not(.latest-loot) {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 10px;
+  margin: 0 12px;
+  padding: 12px 14px;
+  opacity: 1;
+}
+
+.loot-item .rpg-item-art {
+  width: 62px;
+  min-height: 62px;
+}
+
+.loot-item .rpg-item-art .item-set-icon {
+  width: 56px;
+  height: 56px;
+}
+
+.loot-item:not(.latest-loot) .item-title-row h3,
+.latest-loot .item-title-row h3 {
+  font-size: 14px;
+}
+
+.loot-item:not(.latest-loot) .item-stats {
+  display: grid;
+}
+
+.latest-loot {
+  grid-template-columns: 80px minmax(0, 1fr);
+  margin: 0;
+  padding: 16px;
+}
+
+.latest-loot .rpg-item-art {
+  width: 80px;
+  min-height: 80px;
+}
+
+.latest-loot .rpg-item-art .item-set-icon {
+  width: 74px;
+  height: 74px;
+}
+
+.latest-loot .item-title-row h3 {
+  font-size: 18px;
+}
+
+.latest-loot .item-stat {
+  font-size: 11px;
+}
+
+@media (max-width:750px) {
+  .loot-item,
+  .loot-item:not(.latest-loot) { grid-template-columns: 50px minmax(0, 1fr); gap: 7px; margin: 0 5px; padding: 9px; }
+  .loot-item .rpg-item-art { width: 50px; min-height: 50px; }
+  .loot-item .rpg-item-art .item-set-icon { width: 46px; height: 46px; }
+  .latest-loot { grid-template-columns: 62px minmax(0, 1fr); padding: 12px; }
+  .latest-loot .rpg-item-art { width: 62px; min-height: 62px; }
+  .latest-loot .rpg-item-art .item-set-icon { width: 58px; height: 58px; }
+}

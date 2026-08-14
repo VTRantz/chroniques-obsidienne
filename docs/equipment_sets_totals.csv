@@ -1,0 +1,17 @@
+set_id,set_name,rarity,upgrade,attack,hp,defense,crit_chance_pct,crit_damage_pct,speed_pct,gold_pct,xp_pct,lifesteal_pct
+sentinelle,Gelée Royale,Commun,+0,20,100,10,2.5,15,5,5,5,2
+sentinelle,Gelée Royale,Commun,+20,34,170,17,4,25.5,8.5,8.5,8.5,3.4
+vagabond,Horde Sauvage,Peu commun,+0,34,170,17,4,25.5,8.5,8.5,8.5,3.4
+vagabond,Horde Sauvage,Peu commun,+20,57.8,289,28.9,6,43.4,14.5,14.5,14.5,5.6
+eclaireur,Cour Sanguine,Rare,+0,57.8,289,28.9,6,43.4,14.5,14.5,14.5,5.6
+eclaireur,Cour Sanguine,Rare,+20,98.3,491.3,49.1,9,73.7,24.6,24.6,24.6,9.1
+mycelien,Mycélium Ancien,Très rare,+0,98.3,491.3,49.1,9,73.7,24.6,24.6,24.6,9.1
+mycelien,Mycélium Ancien,Très rare,+20,167,835.2,83.5,13,125.3,41.8,41.8,41.8,14.6
+obsidienne,Obsidienne,Épique,+0,183.7,793.4,79.3,14,137.8,41.8,41.8,41.8,13.9
+obsidienne,Obsidienne,Épique,+20,312.4,1348.9,134.9,19,234.3,71,71,71,21.4
+granit,Colosse de Granit,Épique,+0,150.3,918.7,91.9,12,119,39.7,41.8,41.8,14.6
+granit,Colosse de Granit,Épique,+20,255.6,1561.9,156.2,17,202.4,67.5,71,71,22.5
+eclipse,Éclipse,Légendaire,+0,269.8,1348.9,134.9,19,223.7,78.1,71,71,21.4
+eclipse,Éclipse,Légendaire,+20,458.7,2293.1,229.3,25,380.2,132.8,120.7,120.7,31.4
+necrotique,Archiliche,Légendaire,+0,255.6,1561.9,149.1,18,202.4,67.5,71,71,27
+necrotique,Archiliche,Légendaire,+20,434.5,2655.2,253.5,24,344,114.7,120.7,120.7,39.6

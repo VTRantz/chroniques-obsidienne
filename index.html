@@ -4,15 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chroniques d'Obsidienne</title>
-  <link rel="stylesheet" href="css/style.css?v=13" />
+  <link rel="stylesheet" href="css/style.css?v=14" />
+  <link rel="stylesheet" href="css/rpg-items.css?v=9" />
+  <link rel="stylesheet" href="css/design-system.css?v=5" />
 </head>
 <body>
   <main class="app-shell">
     <!-- HEADER -->
-    <header>
-      <div>
-        <p class="eyebrow">IDLE RPG • PROTOTYPE</p>
-        <h1>Chroniques d'Obsidienne</h1>
+    <header class="site-header">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">◆</span>
+        <div>
+          <p class="eyebrow">IDLE RPG • PROTOTYPE</p>
+          <h1>Chroniques d'Obsidienne</h1>
+        </div>
       </div>
       <div class="header-actions">
         <div class="currencies">
@@ -37,23 +42,15 @@
         <span class="tab-group-label">MODES DE JEU</span>
         <button class="tab-active" data-tab="combat">⚔ Combat idle</button>
         <button data-tab="donjon">🗝 Donjon</button>
+        <button data-tab="jardin">Jardin</button>
       </div>
       <div class="tab-group">
         <span class="tab-group-label">GESTION</span>
         <button data-tab="personnage">Personnage</button>
         <button data-tab="talents">Talents</button>
         <button data-tab="classement">Classement</button>
-        <button data-tab="jardin">Jardin</button>
       </div>
     </nav>
-
-    <aside class="mode-indicator" aria-live="polite">
-      <span class="mode-pill" id="mode-kind">MODE IDLE</span>
-      <div>
-        <strong id="mode-title">Combat automatique</strong>
-        <small id="mode-description">Ton héros combat seul et récolte du butin.</small>
-      </div>
-    </aside>
 
     <!-- ===================== ONGLET COMBAT ===================== -->
     <section id="tab-combat">
@@ -221,15 +218,33 @@
           </div>
           <div class="bar"><i id="xp-bar"></i></div>
         </div>
-        <div class="stats">
-          <div><small>Dégâts réels</small><b id="power">10.00</b></div>
-          <div><small>PV maximum</small><b id="max-hp-stat">100</b></div>
-          <div><small>Armure</small><b id="armor">0</b></div>
-          <div><small>Critique</small><b id="crit">5%</b></div>
-          <div><small>Vitesse combat</small><b id="speed">+0%</b></div>
-          <div><small>Esquive</small><b id="dodge-stat">0%</b></div>
-          <div><small>Parade</small><b id="parry-stat">0%</b></div>
-          <div><small>Vol de vie</small><b id="lifesteal-stat">0%</b></div>
+        <div class="stat-groups">
+          <section class="stat-group">
+            <h3>Combat</h3>
+            <div class="stats">
+              <div><small>Dégâts réels</small><b id="power">10.00</b></div>
+              <div><small>Critique</small><b id="crit">5%</b></div>
+              <div><small>Dégâts crit.</small><b id="crit-damage-stat">+0%</b></div>
+              <div><small>Vol de vie</small><b id="lifesteal-stat">0%</b></div>
+            </div>
+          </section>
+          <section class="stat-group">
+            <h3>Survie</h3>
+            <div class="stats">
+              <div><small>PV maximum</small><b id="max-hp-stat">100</b></div>
+              <div><small>Armure</small><b id="armor">0</b></div>
+              <div><small>Parade</small><b id="parry-stat">0%</b></div>
+              <div><small>Esquive</small><b id="dodge-stat">0%</b></div>
+            </div>
+          </section>
+          <section class="stat-group">
+            <h3>Progression</h3>
+            <div class="stats">
+              <div><small>Vitesse combat</small><b id="speed">+0%</b></div>
+              <div><small>Bonus d'or</small><b id="gold-bonus-stat">+0%</b></div>
+              <div><small>Bonus d'XP</small><b id="xp-bonus-stat">+0%</b></div>
+            </div>
+          </section>
         </div>
       </section>
 
@@ -239,7 +254,7 @@
             <p class="eyebrow">BUILD ACTIF</p>
             <h2>Équipement</h2>
           </div>
-          <span id="set-bonus">0 / 5 emplacements</span>
+          <span id="set-bonus" hidden></span>
         </div>
         <div id="equipment" class="equipment-grid"></div>
       </section>
@@ -260,8 +275,11 @@
           <button data-tier="commun">Commun</button>
           <button data-tier="peuCommun">Peu commun</button>
           <button data-tier="rare">Rare</button>
+          <button data-tier="tresRare">Très rare</button>
           <button data-tier="epique">Épique</button>
           <button data-tier="legendaire">Légendaire</button>
+          <button data-tier="mythique">Mythique</button>
+          <button data-tier="exotique">Exotique</button>
           <button id="recycle-all-btn" class="recycle-all">Recycler tout</button>
         </div>
         <div id="inventory" class="inventory-grid"></div>
@@ -312,6 +330,13 @@
     </article>
   </template>
 
-  <script src="js/game.js?v=18"></script>
+  <script src="js/modules/data.js?v=13"></script>
+  <script src="js/modules/state.js?v=10"></script>
+  <script src="js/modules/talents.js?v=1"></script>
+  <script src="js/modules/garden.js?v=1"></script>
+  <script src="js/modules/combat.js?v=9"></script>
+  <script src="js/modules/ui.js?v=5"></script>
+  <script src="js/modules/rpg-items.js?v=9"></script>
+  <script src="js/modules/main.js?v=2"></script>
 </body>
 </html>

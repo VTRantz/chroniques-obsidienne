@@ -1,101 +1,70 @@
-CHRONIQUES D'OBSIDENNE — ITEMS, SETS ET STATS
-==============================================
+CHRONIQUES D’OBSIDIENNE — ITEMS, SETS ET STATS
+===============================================
 
-STATISTIQUES
+Statistiques
 ------------
-Puissance   : augmente les dégâts du héros.
-Armure      : réduit les dégâts reçus et améliore la parade.
-Vitalité    : augmente les PV maximum.
-Critique    : chance d'infliger 70 % de dégâts supplémentaires.
-Vitesse     : augmente l'esquive et la vitesse des combats.
-Vol de vie  : rend un pourcentage des dégâts infligés.
-Chance      : augmente le taux de drop total en mode Classique.
+- Puissance : dégâts du héros.
+- Armure : réduction des dégâts et progression de la parade.
+- Vitalité : PV maximum.
+- Critique : chance de dégâts critiques.
+- Vitesse : vitesse des combats et esquive.
+- Vol de vie : soin basé sur les dégâts infligés.
+- Chance : taux de drop en mode Classique.
 
-RÈGLE DE VITESSE
-----------------
-La vitesse de base est 1,00. Seule la partie au-dessus de 1,00 accélère le
-combat : chaque +0,10 de vitesse donne exactement +1 % de vitesse de combat.
+Défense
+-------
+- Réduction d’armure : `armure / (armure + 100 × multiplicateur du palier)`.
+- Parade : 3 % de base, puis jusqu’à 17 points supplémentaires selon cette
+  réduction ; le total est donc plafonné à 20 % environ.
+- Esquive : 2 % de base, vitesse au-dessus de 1,00 et talents, plafonnée à 25 %.
+- Critique : chance totale plafonnée à 75 %.
 
-1,00 vitesse = +0 % combat
-1,10 vitesse = +1 % combat
-1,60 vitesse = +6 % combat
-2,00 vitesse = +10 % combat
+Raretés et essence de base
+--------------------------
+Commun 8 ; Peu commun 13 ; Rare 20 ; Très rare 35 ; Épique 55 ;
+Légendaire 150 ; Mythique 300 ; Exotique 600.
+Les couleurs d’interface sont définies dans `tiers` (`js/modules/data.js`).
 
-ESQUIVE ET PARADE
------------------
-Le héros commence avec 2 % d'esquive et 3 % de parade.
-Chaque +0,10 de vitesse au-dessus de 1,00 ajoute +1 % d'esquive.
-Chaque point d'armure ajoute +0,5 % de parade.
-L'esquive et la parade sont toutes les deux limitées à 25 %.
-Plafond : +50 % de vitesse de combat.
+Recyclage et amélioration
+-------------------------
+Le remboursement est la valeur de base de la rareté plus 50 % de l’essence
+investie dans les améliorations :
 
-PALIERS D'ÉQUIPEMENT
---------------------
-Normal donne des objets T1 : statistiques x1.
-Hard donne des objets T2 : statistiques x2,2.
-Hell donne des objets T3 : statistiques x3,8.
-Chaque amélioration +1 ajoute +15 % aux statistiques de la pièce.
-Un bonus de set complet utilise le palier le plus bas des six pièces.
+`invested = somme(10 + (niveau + 1) × 12)` pour chaque niveau atteint.
+`refund = tiers[tier].sell + floor(invested × 0,5)`.
 
-SETS (le bonus demande les 6 pièces du même set)
-------------------------------------------------
-Set de la Sentinelle (commun)
-Bonus : +10 Armure, +30 Vitalité.
+Un stack recyclé multiplie le remboursement par sa quantité. Les objets
+identiques se stackent par nom, emplacement, rareté, rang et niveau d’upgrade.
 
-Set du Vagabond (peu commun)
-Bonus : +8 Puissance, +3 % Critique, +0,4 % Vitesse combat, +7 Chance.
+Paliers
+-------
+- T1 (Normal) : ×1.
+- T2 (Hard) : ×2,2.
+- T3 (Hell) : ×3,8.
+- Une amélioration ajoute 3,5 % des statistiques de base de la pièce par niveau.
+- Le niveau d’amélioration est limité à +20. Les anciennes sauvegardes qui
+  contiennent une valeur supérieure sont automatiquement ramenées à +20.
 
-Set de l'Éclaireur (rare)
-Bonus : +10 Puissance, +7 % Critique, +0,7 % Vitesse combat, +10 Chance.
+Sets
+----
+Les sets servent à identifier la famille et la rareté des objets. Ils ne donnent
+aucun bonus de statistiques, quel que soit le nombre de pièces équipées.
 
-Set d'Obsidienne (épique)
-Bonus : +15 Puissance, +13 Armure, +25 Vitalité, +3 % Vol de vie.
+Sets actuels :
+- Gelée Royale — Commun.
+- Horde Sauvage — Peu commun.
+- Cour Sanguine — Rare.
+- Obsidienne — Épique.
+- Éclipse — Légendaire.
+- Mycélium Ancien — Très rare.
+- Colosse de Granit — Épique.
+- Archiliche — Légendaire.
 
-Set de l'Éclipse (légendaire)
-Bonus : +22 Puissance, +18 Armure, +35 Vitalité, +10 % Critique,
-+1 % Vitesse combat, +7 % Vol de vie, +20 Chance.
+Les 18 objets de chapitre 2 sont déclarés dans `CHAPTER_TWO_ITEMS` et portent
+leur famille de drop (`mushroom`, `golem` ou `lich`).
 
-ITEMS DU SET DE LA SENTINELLE (commun)
----------------------------------------
-Arme      — Épée d'apprenti       : +7 Puissance
-Casque    — Casque de recrue      : +6 Armure
-Armure    — Tunique renforcée     : +18 Vitalité
-Gants     — Gants de cuir         : +0,4 % Vitesse combat
-Bottes    — Bottes de marche      : +0,5 % Vitesse combat
-Amulette  — Amulette de cuivre    : +8 Chance
-
-ITEMS DU SET DU VAGABOND (peu commun)
----------------------------------------
-Arme      — Dague du vagabond     : +9 Puissance, +2 % Critique
-Casque    — Capuche du vagabond   : +7 Armure, +0,3 % Vitesse combat
-Armure    — Gilet du vagabond     : +8 Armure, +10 Vitalité
-Gants     — Gants du vagabond     : +0,6 % Vitesse combat, +3 Chance
-Bottes    — Bottes du vagabond    : +0,7 % Vitesse combat, +3 Armure
-Amulette  — Médaillon du vagabond : +12 Vitalité, +6 Chance
-
-ITEMS DU SET DE L'ÉCLAIREUR (rare)
------------------------------------
-Arme      — Sabre de duel         : +11 Puissance, +4 % Critique
-Casque    — Heaume du guetteur    : +9 Armure, +12 Vitalité
-Armure    — Cotte du garde        : +13 Armure, +20 Vitalité
-Gants     — Gants du bretteur     : +0,8 % Vitesse combat, +4 % Critique
-Bottes    — Bottes de pisteur     : +1 % Vitesse combat, +6 Chance
-Amulette  — Pendentif vital       : +22 Vitalité, +3 % Vol de vie
-
-ITEMS DU SET D'OBSIDIENNE (épique)
-----------------------------------
-Arme      — Lame runique          : +16 Puissance, +6 % Critique, +5 Chance
-Casque    — Couronne du faucon    : +12 Armure, +5 % Critique, +8 Chance
-Armure    — Cuirasse solaire      : +18 Armure, +30 Vitalité, +5 Puissance
-Gants     — Gantelets d'obsidienne: +8 Puissance, +6 Armure, +5 % Critique
-Bottes    — Bottes de foudre      : +1,3 % Vitesse combat, +5 % Critique, +5 Armure
-Amulette  — Œil du corbeau        : +7 % Critique, +14 Chance, +6 Puissance
-
-ITEMS DU SET DE L'ÉCLIPSE (légendaire)
-----------------------------------------
-Arme      — Épée du troisième coup : +23 Puissance, +8 % Critique, +3 % Vol de vie
-Casque    — Diadème de survie       : +16 Armure, +26 Vitalité, +12 Chance
-Armure    — Égide du phénix         : +22 Armure, +40 Vitalité, +4 % Vol de vie
-Gants     — Mains du vampire        : +12 Puissance, +7 % Critique, +7 % Vol de vie
-Bottes    — Pas de l'éclipse        : +1,7 % Vitesse combat, +7 % Critique, +14 Chance
-Amulette  — Cœur de dragon          : +14 Puissance, +32 Vitalité, +6 % Vol de vie
+Sauvegarde
+----------
+Les anciens objets sans `count` sont normalisés en quantité 1. Les objets
+équipés restent toujours unitaires. L’historique de vente est limité aux
+30 dernières entrées.

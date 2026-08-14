@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "description": "Totaux cumulés des six équipements par set. Les bonus de set ne sont pas inclus.",
+  "tierMultipliers": {
+    "T1": 1.0,
+    "T2": 2.2,
+    "T3": 3.8
+  },
+  "stats": {
+    "attack": "ATK",
+    "hp": "PV",
+    "defense": "Défense",
+    "critChancePct": "Chance critique (%)",
+    "critDamagePct": "Dégâts critiques (%)",
+    "speedPct": "Vitesse (%)",
+    "goldPct": "Gold (%)",
+    "xpPct": "XP (%)",
+    "lifestealPct": "Vol de vie (%)"
+  },
+  "sets": [
+    {
+      "id": "sentinelle",
+      "name": "Gelée Royale",
+      "rarity": "Commun",
+      "rarityOrder": 1,
+      "totals": {
+        "plus0": { "attack": 20, "hp": 100, "defense": 10, "critChancePct": 2.5, "critDamagePct": 15, "speedPct": 5, "goldPct": 5, "xpPct": 5, "lifestealPct": 2 },
+        "plus20": { "attack": 34, "hp": 170, "defense": 17, "critChancePct": 4, "critDamagePct": 25.5, "speedPct": 8.5, "goldPct": 8.5, "xpPct": 8.5, "lifestealPct": 3.4 }
+      }
+    },
+    {
+      "id": "vagabond",
+      "name": "Horde Sauvage",
+      "rarity": "Peu commun",
+      "rarityOrder": 2,
+      "totals": {
+        "plus0": { "attack": 34, "hp": 170, "defense": 17, "critChancePct": 4, "critDamagePct": 25.5, "speedPct": 8.5, "goldPct": 8.5, "xpPct": 8.5, "lifestealPct": 3.4 },
+        "plus20": { "attack": 57.8, "hp": 289, "defense": 28.9, "critChancePct": 6, "critDamagePct": 43.4, "speedPct": 14.5, "goldPct": 14.5, "xpPct": 14.5, "lifestealPct": 5.6 }
+      }
+    },
+    {
+      "id": "eclaireur",
+      "name": "Cour Sanguine",
+      "rarity": "Rare",
+      "rarityOrder": 3,
+      "totals": {
+        "plus0": { "attack": 57.8, "hp": 289, "defense": 28.9, "critChancePct": 6, "critDamagePct": 43.4, "speedPct": 14.5, "goldPct": 14.5, "xpPct": 14.5, "lifestealPct": 5.6 },
+        "plus20": { "attack": 98.3, "hp": 491.3, "defense": 49.1, "critChancePct": 9, "critDamagePct": 73.7, "speedPct": 24.6, "goldPct": 24.6, "xpPct": 24.6, "lifestealPct": 9.1 }
+      }
+    },
+    {
+      "id": "mycelien",
+      "name": "Mycélium Ancien",
+      "rarity": "Très rare",
+      "rarityOrder": 4,
+      "totals": {
+        "plus0": { "attack": 98.3, "hp": 491.3, "defense": 49.1, "critChancePct": 9, "critDamagePct": 73.7, "speedPct": 24.6, "goldPct": 24.6, "xpPct": 24.6, "lifestealPct": 9.1 },
+        "plus20": { "attack": 167, "hp": 835.2, "defense": 83.5, "critChancePct": 13, "critDamagePct": 125.3, "speedPct": 41.8, "goldPct": 41.8, "xpPct": 41.8, "lifestealPct": 14.6 }
+      }
+    },
+    {
+      "id": "obsidienne",
+      "name": "Obsidienne",
+      "rarity": "Épique",
+      "rarityOrder": 5,
+      "totals": {
+        "plus0": { "attack": 183.7, "hp": 793.4, "defense": 79.3, "critChancePct": 14, "critDamagePct": 137.8, "speedPct": 41.8, "goldPct": 41.8, "xpPct": 41.8, "lifestealPct": 13.9 },
+        "plus20": { "attack": 312.4, "hp": 1348.9, "defense": 134.9, "critChancePct": 19, "critDamagePct": 234.3, "speedPct": 71, "goldPct": 71, "xpPct": 71, "lifestealPct": 21.4 }
+      }
+    },
+    {
+      "id": "granit",
+      "name": "Colosse de Granit",
+      "rarity": "Épique",
+      "rarityOrder": 5,
+      "totals": {
+        "plus0": { "attack": 150.3, "hp": 918.7, "defense": 91.9, "critChancePct": 12, "critDamagePct": 119, "speedPct": 39.7, "goldPct": 41.8, "xpPct": 41.8, "lifestealPct": 14.6 },
+        "plus20": { "attack": 255.6, "hp": 1561.9, "defense": 156.2, "critChancePct": 17, "critDamagePct": 202.4, "speedPct": 67.5, "goldPct": 71, "xpPct": 71, "lifestealPct": 22.5 }
+      }
+    },
+    {
+      "id": "eclipse",
+      "name": "Éclipse",
+      "rarity": "Légendaire",
+      "rarityOrder": 6,
+      "totals": {
+        "plus0": { "attack": 269.8, "hp": 1348.9, "defense": 134.9, "critChancePct": 19, "critDamagePct": 223.7, "speedPct": 78.1, "goldPct": 71, "xpPct": 71, "lifestealPct": 21.4 },
+        "plus20": { "attack": 458.7, "hp": 2293.1, "defense": 229.3, "critChancePct": 25, "critDamagePct": 380.2, "speedPct": 132.8, "goldPct": 120.7, "xpPct": 120.7, "lifestealPct": 31.4 }
+      }
+    },
+    {
+      "id": "necrotique",
+      "name": "Archiliche",
+      "rarity": "Légendaire",
+      "rarityOrder": 6,
+      "totals": {
+        "plus0": { "attack": 255.6, "hp": 1561.9, "defense": 149.1, "critChancePct": 18, "critDamagePct": 202.4, "speedPct": 67.5, "goldPct": 71, "xpPct": 71, "lifestealPct": 27 },
+        "plus20": { "attack": 434.5, "hp": 2655.2, "defense": 253.5, "critChancePct": 24, "critDamagePct": 344, "speedPct": 114.7, "goldPct": 120.7, "xpPct": 120.7, "lifestealPct": 39.6 }
+      }
+    }
+  ]
+}

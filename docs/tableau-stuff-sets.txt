@@ -1,0 +1,149 @@
+ARCHIVE — ANCIEN TABLEAU DE STUFF ET SETS
+==========================================
+
+But : conserver les valeurs de l’ancien système avant sa reconstruction. Les
+bonus de set indiqués plus bas ne sont plus actifs dans le jeu.
+
+RÈGLES ACTUELLES
+----------------
+- 6 emplacements : Arme, Casque, Armure, Gants, Bottes, Amulette.
+- Bonus de set : 50 % avec 3 à 5 pièces ; 100 % avec les 6 pièces.
+- Le bonus de set est fixe : il ne reçoit ni bonus T1/T2/T3 ni amélioration.
+- T1 : statistiques d’objet ×1 ; T2 : ×2,2 ; T3 : ×3,8.
+- Amélioration actuelle : statistique de l’objet × (1 + niveau × 8 %).
+  Donc +10 = ×1,8 et +20 = ×2,6 sur les statistiques propres aux objets.
+- +20 est le niveau maximum. Les améliorations ne multiplient pas les bonus
+  fixes de set.
+- Le critique total est plafonné à 75 % (équipement, bonus de set, critique de
+  base et talents inclus).
+
+COÛT D’AMÉLIORATION D’UNE PIÈCE
+--------------------------------
+Rang       +10         +20
+T1          760         2 720
+T2          1 672       5 984
+T3          2 888       10 336
+
+COÛT D’AMÉLIORATION D’UN SET COMPLET (6 PIÈCES)
+-------------------------------------------------
+Rang       +10         +20
+T1          4 560       16 320
+T2          10 032      35 904
+T3          17 328      62 016
+
+RECYCLAGE D’UNE PIÈCE
+---------------------
+Remboursement = essence de rareté × rang + 50 % de l’essence investie.
+
+Rareté          T1 +0 / +10 / +20       T2 +0 / +10 / +20       T3 +0 / +10 / +20
+Commun          8 / 388 / 1 368          18 / 854 / 3 010         30 / 1 474 / 5 198
+Peu commun      13 / 393 / 1 373         29 / 865 / 3 021         49 / 1 493 / 5 217
+Rare            20 / 400 / 1 380         44 / 880 / 3 036         76 / 1 520 / 5 244
+Très rare       35 / 415 / 1 395         77 / 913 / 3 069         133 / 1 577 / 5 301
+Épique          55 / 435 / 1 415         121 / 957 / 3 113        209 / 1 653 / 5 377
+Légendaire      150 / 530 / 1 510        330 / 1 166 / 3 322      570 / 2 014 / 5 738
+
+SETS ET OBJETS — STATISTIQUES DE BASE
+--------------------------------------
+
+Sentinelle — Commun
+Bonus 6 pièces : +10 Armure, +30 Vitalité.
+Arme      Épée d’apprenti       : +7 Puissance
+Casque    Casque de recrue      : +6 Armure
+Armure    Tunique renforcée     : +18 Vitalité
+Gants     Gants de cuir         : +0,04 Vitesse
+Bottes    Bottes de marche      : +0,05 Vitesse
+Amulette  Amulette de cuivre    : +8 Chance
+
+Vagabond — Peu commun
+Bonus 6 pièces : +16 Puissance, +10 Armure, +60 Vitalité, +4 Critique,
++0,04 Vitesse, +6 % Vol de vie, +7 Chance.
+Arme      Dague du vagabond     : +9 Puissance, +2 Critique
+Casque    Capuche du vagabond   : +7 Armure, +0,03 Vitesse
+Armure    Gilet du vagabond     : +8 Armure, +10 Vitalité
+Gants     Gants du vagabond     : +0,06 Vitesse, +3 Chance
+Bottes    Bottes du vagabond    : +3 Armure, +0,07 Vitesse
+Amulette  Médaillon du vagabond : +12 Vitalité, +6 Chance
+
+Éclaireur — Rare
+Bonus 6 pièces : +22 Puissance, +12 Armure, +70 Vitalité, +7 Critique,
++0,07 Vitesse, +6 % Vol de vie, +10 Chance.
+Arme      Sabre de duel         : +11 Puissance, +4 Critique
+Casque    Heaume du guetteur    : +9 Armure, +12 Vitalité
+Armure    Cotte du garde        : +13 Armure, +20 Vitalité
+Gants     Gants du bretteur     : +0,08 Vitesse, +4 Critique
+Bottes    Bottes de pisteur     : +0,10 Vitesse, +6 Chance
+Amulette  Pendentif vital       : +22 Vitalité, +3 % Vol de vie
+
+Obsidienne — Épique
+Bonus 6 pièces : +15 Puissance, +13 Armure, +25 Vitalité, +3 % Vol de vie.
+Arme      Lame runique          : +16 Puissance, +6 Critique, +5 Chance
+Casque    Couronne du faucon    : +12 Armure, +5 Critique, +8 Chance
+Armure    Cuirasse solaire      : +18 Armure, +30 Vitalité, +5 Puissance
+Gants     Gantelets d’obsidienne: +8 Puissance, +6 Armure, +5 Critique
+Bottes    Bottes de foudre      : +0,13 Vitesse, +5 Critique, +5 Armure
+Amulette  Œil du corbeau        : +7 Critique, +14 Chance, +6 Puissance
+
+Éclipse — Légendaire
+Bonus 6 pièces : +22 Puissance, +18 Armure, +35 Vitalité, +10 Critique,
++0,10 Vitesse, +7 % Vol de vie, +20 Chance.
+Arme      Épée du troisième coup: +23 Puissance, +8 Critique, +3 % Vol de vie
+Casque    Diadème de survie     : +16 Armure, +26 Vitalité, +12 Chance
+Armure    Égide du phénix       : +22 Armure, +40 Vitalité, +4 % Vol de vie
+Gants     Mains du vampire      : +12 Puissance, +7 Critique, +7 % Vol de vie
+Bottes    Pas de l’éclipse      : +0,17 Vitesse, +7 Critique, +14 Chance
+Amulette  Cœur de dragon        : +14 Puissance, +32 Vitalité, +6 % Vol de vie
+
+Mycélien — Très rare
+Bonus 6 pièces : +22 Puissance, +12 Armure, +55 Vitalité, +4 Critique,
++0,05 Vitesse, +4 % Vol de vie, +8 Chance.
+Arme      Lame mycélienne       : +14 Puissance
+Casque    Capuchon mycélien     : +9 Armure, +14 Vitalité
+Armure    Tunique mycélienne    : +13 Armure, +24 Vitalité, +6 Puissance
+Gants     Gants de spores       : +4 Puissance, +0,07 Vitesse, +3 Critique
+Bottes    Bottes de sous-bois   : +4 Puissance, +0,08 Vitesse, +6 Armure
+Amulette  Cœur de mycélium      : +8 Puissance, +20 Vitalité, +8 Chance
+
+Granit — Épique
+Bonus 6 pièces : +35 Puissance, +24 Armure, +95 Vitalité, +5 Critique,
++0,05 Vitesse, +5 % Vol de vie, +10 Chance.
+Arme      Marteau de granit     : +20 Puissance
+Casque    Heaume de granit      : +16 Armure, +22 Vitalité
+Armure    Cuirasse de granit    : +24 Armure, +38 Vitalité, +8 Puissance
+Gants     Poings de granit      : +7 Puissance, +10 Armure, +3 Critique
+Bottes    Bottes telluriques    : +6 Puissance, +11 Armure, +0,08 Vitesse
+Amulette  Noyau de granit       : +10 Puissance, +32 Vitalité, +8 Armure
+
+Nécrotique — Légendaire
+Bonus 6 pièces : +48 Puissance, +28 Armure, +125 Vitalité, +10 Critique,
++0,08 Vitesse, +7 % Vol de vie, +16 Chance.
+Arme      Sceptre nécrotique    : +30 Puissance, +7 Critique
+Casque    Couronne nécrotique   : +22 Armure, +30 Vitalité, +5 Critique
+Armure    Robe nécrotique       : +30 Armure, +48 Vitalité, +12 Puissance
+Gants     Mains du sépulcre     : +10 Puissance, +12 Armure, +6 Critique
+Bottes    Pas funestes          : +8 Puissance, +13 Armure, +0,11 Vitesse
+Amulette  Phylactère brisé      : +14 Puissance, +42 Vitalité, +4 % Vol de vie
+
+TOTALS DE SET COMPLET — T1, AVEC BONUS DE SET
+----------------------------------------------
+Format : Puissance / Armure / Vitalité / Critique / Vitesse / Vol de vie / Chance.
+
+Set             +0                                      +10                                      +20
+Sentinelle      7 / 16 / 48 / 0 / .09 / 0 / 8           12,6 / 20,8 / 62,4 / 0 / .162 / 0 / 14,4  18,2 / 25,6 / 76,8 / 0 / .234 / 0 / 20,8
+Vagabond        25 / 28 / 82 / 6 / .20 / 6 / 16         32,2 / 42,4 / 99,6 / 7,6 / .328 / 6 / 23,2 39,4 / 56,8 / 117,2 / 9,2 / .456 / 6 / 30,4
+Éclaireur       33 / 34 / 124 / 15 / .25 / 9 / 16       41,8 / 51,6 / 167,2 / 21,4 / .394 / 11,4 / 20,8 50,6 / 69,2 / 210,4 / 27,8 / .538 / 13,8 / 25,6
+Obsidienne      50 / 54 / 55 / 28 / .13 / 3 / 27        78 / 86,8 / 79 / 50,4 / .234 / 3 / 48,6   106 / 119,6 / 103 / 72,8 / .338 / 3 / 70,2
+Éclipse         71 / 56 / 133 / 32 / .27 / 27 / 46      110,2 / 86,4 / 211,4 / 49,6 / .406 / 43 / 66,8 149,4 / 116,8 / 289,8 / 67,2 / .542 / 59 / 87,6
+Mycélien        58 / 40 / 113 / 7 / .20 / 4 / 16        86,8 / 62,4 / 159,4 / 9,4 / .32 / 4 / 22,4 115,6 / 84,8 / 205,8 / 11,8 / .44 / 4 / 28,8
+Granit          86 / 93 / 187 / 8 / .13 / 5 / 10        126,8 / 148,2 / 260,6 / 10,4 / .194 / 5 / 10 167,6 / 203,4 / 334,2 / 12,8 / .258 / 5 / 10
+Nécrotique      122 / 105 / 245 / 28 / .19 / 11 / 16    181,2 / 166,6 / 341 / 42,4 / .278 / 14,2 / 16 240,4 / 228,2 / 437 / 56,8 / .366 / 17,4 / 16
+
+POINTS À CORRIGER PENDANT LE RÉÉQUILIBRAGE
+-------------------------------------------
+1. Le +20 multiplie maintenant les statistiques d’objet par ×2,6. La montée en
+   puissance est plus progressive et laisse de la place aux rangs T2/T3.
+2. Le critique total est plafonné à 75 %. Aucun set ne peut donc obtenir un
+   critique garanti, même avec talents et améliorations.
+3. Les sets Obsidienne et Éclipse ont encore beaucoup plus de critique, chance et vol
+   de vie que les sets de chapitre 2 ; leurs profils devront être harmonisés.
+4. Les routes et les coûts seront réglés à partir de cette nouvelle référence.

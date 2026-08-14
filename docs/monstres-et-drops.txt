@@ -1,78 +1,46 @@
-CHRONIQUES D'OBSIDENNE — ROUTES CLASSIQUES ET BUTIN
-====================================================
+CHRONIQUES D’OBSIDIENNE — MONSTRES ET BUTIN
+============================================
 
-FONCTIONNEMENT DES ROUTES
--------------------------
-Une route contient 10 combats d'une même famille. Le boss est toujours à
-l'étape 10. Après un boss, le jeu passe à la route suivante, ou recommence la
-même route si le mode Farm est activé.
+Familles et routes
+------------------
+- Slime : Marais des slimes.
+- Orc : Camp des orcs.
+- Vampire : Manoir vampirique.
+- Champignon : Bosquet mycélien.
+- Golem : Carrière des golems.
+- Liche : Nécropole des liches.
 
-Si le héros meurt, il revient toujours à l'étape 1 de la route actuelle.
-Après chaque victoire, le héros récupère tous ses PV.
-
-Ordre : Marais des slimes, Camp des orcs, Manoir vampirique, puis retour aux
-slimes. Les routes peuvent aussi être choisies directement dans le menu.
-
-ÉLITES
-------
-- 5 % de chance d'apparaître à chaque étape hors boss.
-- Une élite a x1,6 PV et dégâts.
-- Une élite donne toujours un objet.
-
-DIFFICULTÉS ET PALIERS DE BUTIN
--------------------------------
-Normal : PV x1 ; dégâts x1 ; XP x1 ; or x1 ; objets T1.
-Hard   : PV x6,2 ; dégâts x6,5 ; XP x4 ; or x2,5 ; objets T2.
-Hell   : PV x18 ; dégâts x15 ; XP x12 ; or x6 ; objets T3.
-
-Les objets T1, T2 et T3 sont détaillés dans docs/items-et-stats.txt.
-Le niveau du héros ne modifie jamais les PV, dégâts ou l'or des monstres.
-
-OR FIXE PAR MONSTRE EN NORMAL
------------------------------
-Slimes : azur 20, mousseux 26, cristallin 34. Loup gris : 30. Boss slime : 105.
-Orcs : guerrier 48, berserker 62, chef 78. Boss orc : 210.
-Vampires : nocturne 95, sanguinaire 118, seigneur 145. Boss vampire : 360.
-
-Hard multiplie cet or par 2,5. Hell le multiplie par 6.
-Les talents de gain d'or peuvent ensuite augmenter ce montant en pourcentage.
-
-ROUTE 1 — MARAIS DES SLIMES
+Chance de drop par victoire
 ---------------------------
-Monstres : Slime azur, Slime mousseux, Slime cristallin, Loup gris (test).
-Chaque monstre a 25 % de chance d'apparaître sur cette route.
-Butin par victoire : 18 % de drop total.
-- Commun : 16,56 %
-- Peu commun : 1,44 %
-- Rare, épique, légendaire : 0 %
+- Slime : 18 %.
+- Orc : 22 %.
+- Vampire : 26 %.
+- Champignon : 28 %.
+- Golem : 30 %.
+- Liche : 32 %.
 
-ROUTE 2 — CAMP DES ORCS
------------------------
-Monstres : Orc guerrier, Orc berserker, Orc chef.
-Chaque orc a 33,33 % de chance d'apparaître.
-Butin par victoire : 22 % de drop total.
-- Commun : 15,40 %
-- Peu commun : 6,16 %
-- Rare : 0,44 %
-- Épique, légendaire : 0 %
+Répartition de la rareté
+------------------------
+- Slime : Commun 92 %, Peu commun 8 %.
+- Orc : Commun 35 %, Peu commun 60 %, Rare 5 %.
+- Vampire : Peu commun 35 %, Rare 60 %, Très rare 5 %.
+- Champignon : Rare 35 %, Très rare 60 %, Épique 5 %.
+- Golem : Très rare 35 %, Épique 60 %, Légendaire 5 %.
+- Liche : Épique 35 %, Légendaire 65 %.
 
-ROUTE 3 — MANOIR VAMPIRIQUE
-----------------------------
-Monstres : Vampire nocturne, Vampire sanguinaire, Seigneur vampire.
-Chaque vampire a 33,33 % de chance d'apparaître.
-Butin par victoire : 26 % de drop total.
-- Commun : 11,70 %
-- Peu commun : 10,40 %
-- Rare : 3,90 %
-- Épique, légendaire : 0 %
+Le tirage choisit ensuite un objet dans le catalogue de la rareté obtenue.
+Les pools actuels sont globaux par rareté ; les champs `dropFamily` des objets
+de chapitre 2 sont prêts pour une spécialisation familiale ultérieure.
 
-MINI-BOSS ET CLÉS
------------------
-Le 10e combat est un mini-boss. Il a x2 PV et dégâts, donne x3 XP et a 25 %
-de chance de laisser une clé de coffre. Son or correspond au montant fixe du
-boss de sa famille, multiplié par la difficulté.
+Élites et boss
+--------------
+- Une élite a 5 % de chance d’apparaître hors boss et utilise le variant ×1,75.
+- Les élites garantissent un objet.
+- Le boss est le combat 10 et utilise le `bossVariant` de sa route.
+- Les mini-boss peuvent fournir une clé (`state.keys`) pour le Donjon Mystère.
 
-CHANCE
-------
-Chaque point de Chance ajoute 0,2 % au taux de drop total de la route, avec un
-bonus maximum de +10 %. La Chance ne change pas la rareté interne.
+Ressources
+----------
+Les ressources actuellement gérées sont le gel de slime, la défense d’orc et la
+poussière vampirique. Elles sont réservées au Donjon Mystère et renvoyées au
+mode Classique à la fin de l’expédition pour les crafts du jardin.

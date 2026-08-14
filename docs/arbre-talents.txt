@@ -1,97 +1,50 @@
 ARBRE DE TALENTS — CHRONIQUES D’OBSIDIENNE
-==========================================
+===========================================
 
-VERSION 3 — PRINCIPES
----------------------
+État actuel
+----------
 - Le Cœur d’obsidienne est le point de départ gratuit.
-- L’arbre comporte 77 nœuds et 212 rangs achetables.
-- Il existe 8 familles : PV, armure, critique, butin, vitesse, XP, or et dégâts.
-- Les familles sont regroupées dans 4 disciplines proches du centre.
-- Un nœud suivant devient disponible uniquement lorsque son parent est au rang maximum.
-- Chaque famille se divise maintenant en deux voies, puis en quatre spécialisations.
-- Les petits passifs possèdent jusqu’à 5 rangs.
-- Les notables possèdent généralement 3 rangs et combinent de petits bonus spécialisés.
-- Un nœud plus éloigné ne donne plus simplement un pourcentage supérieur : son intérêt
-  vient d’une combinaison de statistiques ou d’une mécanique différente.
-- Les 16 clés de voûte sont en bout de branche, possèdent un seul rang et donnent
-  un avantage puissant accompagné d’une contrepartie.
-- Aucun talent de dégâts contre une famille ou contre les boss n’est présent.
-- Le jardin et l’artisanat auront leur propre arbre plus tard.
+- 77 nœuds et 213 rangs achetables.
+- 8 branches : PV, armure, critique, butin, vitesse, XP, or et dégâts.
+- Un nœud suivant devient achetable lorsque le parent est au rang maximum.
+- Les nœuds restent multi-rangs ; les effets sont volontairement faibles par rang.
+- Aucun bonus « dégâts contre une famille » ni « dégâts contre les boss ».
+- Le jardin aura son propre arbre séparé plus tard.
 
-PRIX ET REVENTE
+Coûts et revente
 ----------------
-- Première discipline : 100 or.
-- Chaque rang d’un nœud coûte 15 % de plus que le rang précédent.
-- Le premier rang du nœud suivant coûte 3 % de plus que la somme de tous les
-  rangs de son parent.
-- Revendre le dernier rang rend 75 % de son prix d’achat.
-- Réinitialiser tout l’arbre rend 70 % de tout l’or investi.
-- Une clé de voûte coûte actuellement 31 805 or après avoir terminé toute sa branche.
+- Le premier rang coûte 100 or.
+- Chaque rang suivant coûte 15 % de plus que le précédent.
+- Le premier rang d’un nœud enfant coûte 3 % de plus que le total investi dans son parent.
+- Revendre un rang rend 75 % de son prix d’achat.
+- Réinitialiser l’arbre rend 70 % de l’or investi.
 
-TYPES DE NŒUDS
----------------
-Passif : petit bonus régulier qui construit le chemin.
-Notable : bonus intermédiaire plus fort ou combinaison de deux statistiques.
-Clé de voûte : transformation majeure avec avantage et sacrifice.
+Bonus avec 100 % de l’arbre
+---------------------------
+Les valeurs ci-dessous sont la somme réelle de tous les rangs, sans plafond
+artificiel ajouté par le code :
+- PV : +22,3 % ;
+- armure : +16 % ;
+- critique : +5 % ;
+- vitesse de combat : +5 % ;
+- chance de butin : +5 % ;
+- XP : +27,3 % ;
+- or : +21,3 % ;
+- dégâts : +15,3 % ;
+- dégâts critiques : +29 % ;
+- chance de clé : +10 %.
 
-CLÉS DE VOÛTE — PV
--------------------
-Colosse : +10 % PV, mais -4 % dégâts.
-Pacte vital : +8 % PV, mais -2 % vitesse.
+Les autres branches restent cumulables selon leurs nœuds (PV, XP, or, dégâts,
+dégâts critiques, esquive, vol de vie et chance de clé). Les contreparties des
+clés de voûte sont conservées et s’appliquent comme des modificateurs séparés.
 
-CLÉS DE VOÛTE — ARMURE
------------------------
-Forteresse : +12 % armure équipée, mais -2 % vitesse de combat.
-Gardien absolu : +18 % armure, mais -3 % dégâts.
+Types visuels
+-------------
+- Passif : petit bonus régulier, souvent 3 à 5 rangs.
+- Notable : bonus intermédiaire ou combinaison de statistiques.
+- Clé de voûte : nœud majeur à un rang, avec avantage et contrepartie.
 
-CLÉS DE VOÛTE — CRITIQUE
--------------------------
-Précision absolue : +3 % critique, mais -4 % dégâts.
-Impact brutal : +20 % dégâts critiques, mais -1,5 % critique.
-
-CLÉS DE VOÛTE — BUTIN
-----------------------
-Abondance : +3 % chance de butin, mais -5 % or.
-Serrurier : +10 % chance de clé, mais -4 % or.
-
-CLÉS DE VOÛTE — VITESSE
-------------------------
-Frénésie : +3 % vitesse de combat, mais -4 % armure.
-Élan constant : +4 % vitesse, mais -3 % dégâts.
-
-CLÉS DE VOÛTE — XP
--------------------
-Érudit : +12 % XP, mais -6 % or.
-Apprentissage martial : +7 % XP, mais -3 % dégâts.
-
-CLÉS DE VOÛTE — OR
--------------------
-Avarice : +12 % or, mais -6 % XP.
-Trésorier : +10 % or, mais -3 % vitesse.
-
-CLÉS DE VOÛTE — DÉGÂTS
------------------------
-Canon de verre : +10 % dégâts, mais -10 % PV.
-Furie maîtrisée : +8 % dégâts, mais -1,5 % critique.
-
-MÉCANIQUES AJOUTÉES
---------------------
-- Dégâts critiques supplémentaires.
-- Bonus d’armure proportionnel à l’armure réellement équipée.
-- Chance supplémentaire d’obtenir une clé de boss.
-- Résumé permanent des bonus actifs au-dessus de l’arbre.
-- Différence visuelle entre passifs, notables et clés de voûte.
-
-INSPIRATIONS RETENUES
-----------------------
-- Path of Exile : petits passifs, notables et clés de voûte à effets structurants.
-- Last Epoch : talents multi-rangs et spécialisation progressive d’une branche.
-- Diablo IV : nœuds légendaires marquants et résumé clair de la puissance choisie.
-- Grim Dawn : groupes thématiques reliés et re-spécialisation contre une ressource.
-
-Sources officielles consultées :
-https://www.pathofexile.com/passive-skill-tree
-https://www.pathofexile.com/forum/view-thread/3531661
-https://support.lastepoch.com/hc/en-us/articles/46363194853915-Unlocking-Skills
-https://news.blizzard.com/en-us/article/23746639/diablo-iv-quarterly-updatedecember-2021
-https://www.grimdawn.com/guide/character/devotion/
+Règle de cohérence
+------------------
+Les valeurs affichées dans l’interface proviennent de `TALENT_NODES` dans
+`js/modules/data.js`. Le calcul effectif est centralisé dans `js/modules/state.js`.
