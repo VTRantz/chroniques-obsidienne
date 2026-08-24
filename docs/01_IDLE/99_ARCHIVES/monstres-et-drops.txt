@@ -1,0 +1,39 @@
+CHRONIQUES D’OBSIDIENNE — MONSTRES ET BUTIN
+============================================
+
+Familles et routes
+------------------
+- Slime : Marais des slimes.
+- Orc : Camp des orcs.
+- Vampire : Manoir vampirique.
+- Champignon : Bosquet mycélien.
+- Golem : Carrière des golems.
+- Liche : Nécropole des liches.
+
+Chance de drop par victoire
+---------------------------
+- Slime : 20 % (Commun).
+- Orc : 25 % (Peu commun).
+- Vampire : 25 % (Rare).
+- Champignon : 25 % (Très rare).
+- Golem : 25 % (Épique).
+- Liche : 25 % (Légendaire).
+
+Le tirage filtre toujours dans cet ordre : famille de la route, rareté, puis
+emplacement de l'objet. Chaque route fournit donc son set associé. Un pool
+global de même rareté n'est utilisé que si un set de route était incomplet.
+
+Élites et boss
+--------------
+- Une élite a 5 % de chance d’apparaître hors boss et utilise le variant ×1,75.
+- Les élites garantissent un objet.
+- Le boss est le combat 10, utilise le `bossVariant` de sa route et garantit un objet.
+- Il a 10 % de chance de donner un second objet du même set.
+- Chaque boss donne aussi de l'essence : 5, 8, 12, 18, 25 puis 35 selon la route.
+- Les mini-boss peuvent fournir une clé (`state.keys`) pour le Donjon Mystère.
+
+Ressources
+----------
+Les ressources actuellement gérées sont le gel de slime, la défense d’orc et la
+poussière vampirique. Elles sont réservées au Donjon Mystère et renvoyées au
+mode Classique à la fin de l’expédition pour les crafts du jardin.

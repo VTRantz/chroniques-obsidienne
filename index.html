@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chroniques d'Obsidienne</title>
-  <link rel="stylesheet" href="css/style.css?v=16" />
-  <link rel="stylesheet" href="css/rpg-items.css?v=9" />
-  <link rel="stylesheet" href="css/design-system.css?v=6" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111b31'/%3E%3Cpath d='M32 10 51 32 32 54 13 32Z' fill='%23b78cff'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="modes/idle-classic/css/style.css?v=70" />
+  <link rel="stylesheet" href="modes/idle-classic/css/rpg-items.css?v=9" />
+  <link rel="stylesheet" href="modes/idle-classic/css/design-system.css?v=6" />
 </head>
 <body>
   <main class="app-shell">
@@ -52,6 +53,25 @@
       </div>
     </nav>
 
+    <div class="mode-switcher">
+      <button id="mode-switcher-toggle" class="mode-switcher-toggle" type="button"
+              aria-label="Ouvrir le menu des modes de jeu" aria-expanded="false"
+              aria-controls="mode-switcher-menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
+      <div id="mode-switcher-menu" class="mode-switcher-menu" hidden>
+        <p>Changer de mode</p>
+        <button type="button" data-tab="combat">Combat idle</button>
+        <button type="button" data-tab="donjon">Donjon Mystère</button>
+        <button type="button" data-tab="jardin">Jardin</button>
+        <button type="button" data-tab="personnage">Personnage</button>
+        <button type="button" data-tab="talents">Talents</button>
+        <button type="button" data-tab="classement">Classement</button>
+      </div>
+    </div>
+
     <!-- ===================== ONGLET COMBAT ===================== -->
     <section id="tab-combat">
       <section class="battle-grid">
@@ -65,6 +85,7 @@
           </div>
 
           <div class="classic-route" aria-label="Route de progression classique">
+            <div id="route-map" class="route-map" aria-label="Carte des routes d'exploration"></div>
             <div class="route-heading">
               <span>ROUTE D'EXPLORATION</span>
               <small id="route-label">Étape 1 sur 10</small>
@@ -74,35 +95,23 @@
             <div id="route-actions" class="route-actions">
               <span id="route-mode">Mode : route suivante</span>
               <div id="route-picker" class="route-picker" aria-label="Choisir une route"></div>
+              <div id="tier-picker" class="route-picker tier-picker" aria-label="Choisir un tier"></div>
               <div id="difficulty-picker" class="difficulty-picker" aria-label="Choisir une difficulté"></div>
               <button id="toggle-farm-route-btn">Farmer cette route : NON</button>
             </div>
           </div>
 
-          <div class="battle-area" id="battle-area">
-            <!-- HÉROS -->
-            <div class="fighter player" id="player-fighter">
-                <img src="assets/sprites/hero/idle/right/1.png" alt="Héros" class="fighter-sprite" id="player-sprite">
-              <div class="fighter-icon" style="display:none">🧙</div>
-              <h3>Ton héros</h3>
-              <p><span id="player-hp-text">100 / 100</span> PV</p>
-              <div class="enemy-hp"><i id="player-hp"></i></div>
+          <div class="battle-area immersive-battle" id="battle-area" aria-label="Arène de combat idle">
+            <div class="battle-parallax" aria-hidden="true">
+              <div class="battle-layer battle-sky" data-parallax="0.08"></div>
+              <div class="battle-layer battle-far" data-parallax="0.18"></div>
+              <div class="battle-layer battle-mid" data-parallax="0.36"></div>
+              <div class="battle-layer battle-road" data-parallax="0.62"></div>
+              <div class="battle-layer battle-foreground" data-parallax="0.9"></div>
             </div>
-
-            <div class="versus">VS</div>
-
-            <!-- ENNEMI -->
-            <div class="fighter enemy" id="enemy-fighter">
-              <img src="" alt="Ennemi" class="fighter-sprite" id="enemy-sprite"
-                   onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'">
-              <div class="fighter-icon" style="display:none">💀</div>
-              <h3 id="enemy-name">Aucun monstre</h3>
-              <p>
-                <span id="enemy-style">Normal</span> ·
-                <span id="enemy-hp-text">100 / 100</span> PV
-              </p>
-              <div class="enemy-hp"><i id="enemy-hp"></i></div>
-            </div>
+            <div class="battle-vignette" aria-hidden="true"></div>
+            <div class="battle-team battle-team-heroes" id="hero-team" aria-label="Équipe des héros"></div>
+            <div class="battle-team battle-team-enemies" id="enemy-team" aria-label="Équipe ennemie"></div>
 
             <div id="damage-layer" class="damage-layer"></div>
           </div>
@@ -157,7 +166,7 @@
             <p class="sub">Déplace-toi avec ZQSD ou clique une case pour marcher et agir.</p>
           </div>
         </div>
-        <iframe class="isometric-garden-frame" src="isometric-garden.html?v=47" title="Ferme pixel art jouable"></iframe>
+        <iframe class="isometric-garden-frame" src="isometric-garden.html?v=55" title="Ferme pixel art jouable"></iframe>
       </section>
       <section class="garden-section">
         <div class="section-heading">
@@ -202,6 +211,13 @@
 
     <!-- ===================== ONGLET PERSONNAGE ===================== -->
     <section id="tab-personnage" class="hidden">
+      <section class="hero-roster-section">
+        <div class="section-heading">
+          <div><p class="eyebrow">ÉQUIPE ACTIVE</p><h2>Héros</h2><p class="sub">Sélectionne un héros pour voir son équipement. Choisis aussi sa position dans la formation.</p></div>
+          <span id="party-count" class="party-count">3 / 3</span>
+        </div>
+        <div id="hero-roster" class="hero-roster"></div>
+      </section>
       <section class="hero-card">
         <div class="hero-title">
           <span class="portrait">⚔</span>
@@ -271,17 +287,25 @@
           </div>
         </div>
         <div class="recycle-bar">
-          <span>Filtre de recyclage :</span>
-          <button data-tier="commun">Commun</button>
-          <button data-tier="peuCommun">Peu commun</button>
-          <button data-tier="rare">Rare</button>
-          <button data-tier="tresRare">Très rare</button>
-          <button data-tier="epique">Épique</button>
-          <button data-tier="legendaire">Légendaire</button>
-          <button data-tier="mythique">Mythique</button>
-          <button data-tier="exotique">Exotique</button>
-          <button id="recycle-all-btn" class="recycle-all">Recycler tout</button>
+          <span>Recyclage :</span>
+          <span class="recycle-filter-hint">utilise les filtres de l’inventaire ci-dessous</span>
+          <button id="recycle-all-btn" class="recycle-all">Recycler les objets filtrés</button>
         </div>
+        <section class="inventory-filter-panel" aria-label="Filtres de l’inventaire">
+          <div class="inventory-filter-topline">
+            <label class="inventory-search"><span>⌕</span><input id="inventory-search" type="search" placeholder="Rechercher un objet, un set ou une stat"></label>
+            <button id="inventory-filter-reset" type="button">Réinitialiser les filtres</button>
+          </div>
+          <div class="inventory-filter-grid">
+            <label>Tier<select id="inventory-tier-filter"><option value="all">Tous les tiers</option><option value="1">T1</option><option value="2">T2</option><option value="3">T3</option><option value="4">T4</option><option value="5">T5</option><option value="6">T6</option></select></label>
+            <label>Rareté<select id="inventory-rarity-filter"><option value="all">Toutes les raretés</option><option value="commun">Commun</option><option value="peuCommun">Peu commun</option><option value="rare">Rare</option><option value="epique">Épique</option><option value="legendaire">Légendaire</option></select></label>
+            <label>Emplacement<select id="inventory-slot-filter"><option value="all">Tous les emplacements</option><option value="Arme">Arme</option><option value="Casque">Casque</option><option value="Armure">Armure</option><option value="Gants">Gants</option><option value="Bottes">Bottes</option><option value="Amulette">Amulette</option></select></label>
+            <label>Set<select id="inventory-set-filter"><option value="all">Tous les sets</option></select></label>
+            <label>Statistique<select id="inventory-stat-filter"><option value="all">Toutes les statistiques</option><option value="power">ATQ fixe</option><option value="vitality">PV fixes</option><option value="armor">DEF fixe</option><option value="powerPct">ATQ %</option><option value="hpPct">PV %</option><option value="armorPct">DEF %</option><option value="crit">Critique</option><option value="critDamage">Dégâts critiques</option><option value="speed">Vitesse</option></select></label>
+            <label>Trier par<select id="inventory-sort"><option value="recent">Plus récent</option><option value="tier-desc">Tier décroissant</option><option value="rarity-desc">Rareté décroissante</option><option value="upgrade-desc">Amélioration décroissante</option><option value="main-stat-desc">Stat principale décroissante</option></select></label>
+          </div>
+          <p id="inventory-filter-count" class="inventory-filter-count"></p>
+        </section>
         <div id="inventory" class="inventory-grid"></div>
       </section>
 
@@ -330,13 +354,13 @@
     </article>
   </template>
 
-  <script src="js/modules/data.js?v=13"></script>
-  <script src="js/modules/state.js?v=10"></script>
-  <script src="js/modules/talents.js?v=1"></script>
-  <script src="js/modules/garden.js?v=1"></script>
-  <script src="js/modules/combat.js?v=11"></script>
-  <script src="js/modules/ui.js?v=6"></script>
-  <script src="js/modules/rpg-items.js?v=11"></script>
-  <script src="js/modules/main.js?v=2"></script>
+    <script src="modes/idle-classic/js/data.js?v=23"></script>
+    <script src="modes/idle-classic/js/state.js?v=39"></script>
+<script src="modes/idle-classic/js/talents.js?v=1"></script>
+<script src="modes/idle-classic/js/garden-bridge.js?v=1"></script>
+  <script src="modes/idle-classic/js/combat.js?v=64"></script>
+  <script src="modes/idle-classic/js/ui.js?v=22"></script>
+    <script src="modes/idle-classic/js/rpg-items.js?v=27"></script>
+  <script src="modes/idle-classic/js/main.js?v=8"></script>
 </body>
 </html>

@@ -1,0 +1,90 @@
+ÉQUILIBRAGE DES ROUTES — CHRONIQUES D’OBSIDIENNE
+=================================================
+
+Règles communes
+---------------
+- Une route contient 10 combats ; le combat 10 est le boss.
+- Une victoire soigne entièrement le héros.
+- Une défaite renvoie à l’étape 1 de la route actuelle.
+- Croissance par étape : PV ×1,09 et attaque ×1,055, appliquées avec
+  `Math.pow(multiplier, étape - 1)`.
+- Les routes peuvent posséder un renforcement tardif propre : il ne s’applique
+  qu’aux étapes 5 à 9. Les quatre premières étapes et le boss conservent leur
+  calcul normal ; le boss utilise son `bossVariant` propre.
+- Les élites apparaissent à 5 % hors boss et utilisent le variant ×1,75.
+- Le boss utilise le `bossVariant` propre à sa route.
+
+Routes rééquilibrées
+--------------------
+Route                         Set principal                 PV       Attaque  Boss
+Marais des slimes             Gelée Royale                 ×1,25    ×1,35    ×2,00
+Camp des orcs                 Horde Sauvage                ×2,40    ×1,80    ×1,50
+Manoir vampirique             Cour Sanguine                ×6,00    ×1,80    ×2,10
+Bois mycélien                 Mycélium Ancien              ×7,00    ×3,50    ×2,00
+Fonderie de granit            Colosse de Granit            ×9,00    ×7,00    ×2,20
+Nécropole des liches          Archiliche                   ×17,00   ×15,00   ×3,30
+
+Repères plats des boss en Normal
+---------------------------------
+Les valeurs varient parce que le boss reprend aléatoirement l’un des trois
+profils de base de sa famille.
+
+Route                         PV du boss       Attaque du boss
+Marais des slimes             391 à 576        22 à 31
+Camp des orcs                 923 à 1 267      31 à 44
+Manoir vampirique             2 627 à 4 050    49 à 67
+Bois mycélien                 4 743 à 6 811    119 à 158
+Fonderie de granit            9 891 à 13 847   349 à 459
+Nécropole des liches          23 394 à 32 654  1 543 à 2 034
+
+Les trois boss avancés reçoivent un multiplicateur d'attaque ×0,875 : leurs
+PV et les monstres normaux de leur route ne changent pas.
+
+Objectifs de progression en Normal
+-----------------------------------
+- Le set précédent à +20 atteint en moyenne les étapes 4 à 6 de la route
+  suivante, sans pouvoir tuer son boss.
+- Le set principal à +10 atteint les étapes 7 à 9, avec très peu de victoires
+  sur le boss.
+- Le set principal à +20 donne environ 45 à 55 % de réussite sur le boss,
+  sans talents de combat.
+- Les talents restent une optimisation complémentaire, pas un raccourci qui
+  remplace les améliorations d’équipement.
+- Le soin complet entre les combats est conservé : le boss reste le principal
+  test d’équipement de chaque route.
+
+Résultats des simulations de boss — Normal
+------------------------------------------
+Route                         Set précédent +20   Set actuel +10   Set actuel +20
+Marais des slimes             —                    15 % clear       54 % clear
+Camp des orcs                 Étape 5,3            Étape 8,1         50 % clear
+Manoir vampirique             Étape 5,6            Étape 8,2         50 % clear
+Bois mycélien                 Étape 4,7            Étape 7,6         45 % clear
+Fonderie de granit            Étape 4,3            Étape 7,9         53 % clear
+Nécropole des liches          Étape 4,6            Étape 8,7         45 % clear
+
+Ces résultats viennent de simulations sans talent avec les formules réelles :
+critique, dégâts critiques, esquive, parade, armure, vol de vie et variantes
+aléatoires des monstres.
+
+Hard et Hell
+-------------
+Les multiplicateurs Hard/Hell restent inchangés pour ce réglage. Ils devront
+être simulés séparément après le rééquilibrage de l’essence, car ce dernier
+détermine le temps réel nécessaire pour atteindre les rangs T2 et T3.
+
+Difficultés globales conservées
+-------------------------------
+- Normal : PV ×1 ; attaque ×1 ; récompense ×1 ; or ×1 ; objets T1.
+- Hard : PV ×6,2 ; attaque ×6,5 ; récompense ×4 ; or ×2,5 ; objets T2.
+- Hell : PV ×18 ; attaque ×15 ; récompense ×12 ; or ×6 ; objets T3.
+
+Rangs d’équipement conservés
+-----------------------------
+- T1 : statistiques ×1.
+- T2 : statistiques ×2,2.
+- T3 : statistiques ×4,5.
+
+Les multiplicateurs Hard/Hell, les récompenses, les talents et les
+statistiques de base des monstres n’ont pas été modifiés pendant ce réglage.
+Les drops sont désormais liés au set de la route ; voir `monstres-et-drops.txt`.

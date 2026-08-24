@@ -1,0 +1,51 @@
+ARBRE DE TALENTS — CHRONIQUES D’OBSIDIENNE
+===========================================
+
+État actuel
+----------
+- Le Cœur d’obsidienne est le point de départ gratuit.
+- 77 nœuds et 213 rangs achetables.
+- 8 branches : PV, armure, critique, butin, vitesse, XP, or et dégâts.
+- Un nœud suivant devient achetable lorsque le parent est au rang maximum.
+- Les nœuds restent multi-rangs ; les effets sont volontairement faibles par rang.
+- Aucun bonus « dégâts contre une famille » ni « dégâts contre les boss ».
+- Le jardin aura son propre arbre séparé plus tard.
+
+Coûts et revente
+----------------
+- Le premier rang coûte 100 or.
+- Chaque rang suivant coûte 15 % de plus que le précédent.
+- Le premier rang d’un nœud enfant coûte 3 % de plus que le total investi dans son parent.
+- Revendre un rang rend 75 % de son prix d’achat.
+- Réinitialiser l’arbre rend 70 % de l’or investi.
+
+Bonus avec 100 % de l’arbre
+---------------------------
+Les valeurs ci-dessous sont la somme réelle de tous les rangs, sans plafond
+artificiel ajouté par le code :
+- PV : +22,3 % ;
+- armure : +16 % ;
+- critique : +5 % ;
+- vitesse de combat : +5 % ;
+- chance de butin : +5 % ;
+- XP : +27,3 % ;
+- or : +21,3 % ;
+- dégâts : +15,3 % ;
+- dégâts critiques : +29 % ;
+- chance de clé : +10 %.
+
+Les autres branches restent cumulables selon leurs nœuds (PV, XP, or, dégâts,
+dégâts critiques, esquive, vol de vie et chance de clé). Les contreparties des
+clés de voûte sont conservées et s’appliquent comme des modificateurs séparés.
+
+Types visuels
+-------------
+- Passif : petit bonus régulier, souvent 3 à 5 rangs.
+- Notable : bonus intermédiaire ou combinaison de statistiques.
+- Clé de voûte : nœud majeur à un rang, avec avantage et contrepartie.
+
+Règle de cohérence
+------------------
+Les valeurs affichées dans l’interface proviennent de `TALENT_NODES` dans
+`modes/idle-classic/js/data.js`. Le calcul effectif est centralisé dans
+`modes/idle-classic/js/state.js`.

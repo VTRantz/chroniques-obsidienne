@@ -1,3 +1,9 @@
 *.log
 Thumbs.db
 Desktop.ini
+.playwright-cli/
+output/playwright/
+assets/sprites/_archive_unused_animations/
+assets/sprites/**/Source Art/
+*-check.png
+t.includes('startXPx'))

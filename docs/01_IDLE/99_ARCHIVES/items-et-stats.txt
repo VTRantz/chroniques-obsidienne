@@ -1,0 +1,71 @@
+CHRONIQUES D’OBSIDIENNE — ITEMS, SETS ET STATS
+===============================================
+
+Statistiques
+------------
+- Puissance : dégâts du héros.
+- Armure : réduction des dégâts et progression de la parade.
+- Vitalité : PV maximum.
+- Critique : chance de dégâts critiques.
+- Vitesse : vitesse des combats et esquive.
+- Vol de vie : soin basé sur les dégâts infligés.
+- Chance : taux de drop en mode Classique.
+
+Défense
+-------
+- Réduction d’armure : `armure / (armure + 100 × multiplicateur du palier)`.
+- Parade : 3 % de base, puis jusqu’à 17 points supplémentaires selon cette
+  réduction ; le total est donc plafonné à 20 % environ.
+- Esquive : 2 % de base, vitesse au-dessus de 1,00 et talents, plafonnée à 25 %.
+- Critique : chance totale plafonnée à 75 %.
+
+Raretés et essence de base
+--------------------------
+Commun 8 ; Peu commun 13 ; Rare 20 ; Très rare 35 ; Épique 55 ;
+Légendaire 150 ; Mythique 300 ; Exotique 600.
+Les couleurs d’interface sont définies dans `tiers`
+(`modes/idle-classic/js/data.js`).
+
+Recyclage et amélioration
+-------------------------
+Le remboursement est la valeur de base de la rareté plus 50 % de l’essence
+investie dans les améliorations :
+
+`invested = somme(10 + (niveau + 1) × 12)` pour chaque niveau atteint.
+`refund = tiers[tier].sell + floor(invested × 0,5)`.
+
+Un stack recyclé multiplie le remboursement par sa quantité. Les objets
+identiques se stackent par nom, emplacement, rareté, rang et niveau d’upgrade.
+
+Paliers
+-------
+- T1 (Normal) : ×1.
+- T2 (Hard) : ×2,2.
+- T3 (Hell) : ×4,5.
+- Une amélioration ajoute 3,5 % des statistiques de base de la pièce par niveau.
+- Le niveau d’amélioration est limité à +20. Les anciennes sauvegardes qui
+  contiennent une valeur supérieure sont automatiquement ramenées à +20.
+
+Sets
+----
+Les sets servent à identifier la famille et la rareté des objets. Ils ne donnent
+aucun bonus de statistiques, quel que soit le nombre de pièces équipées.
+
+Sets actuels :
+- Gelée Royale — Commun.
+- Horde Sauvage — Peu commun.
+- Cour Sanguine — Rare.
+- Obsidienne — Épique.
+- Éclipse — Légendaire.
+- Mycélium Ancien — Très rare.
+- Colosse de Granit — Épique.
+- Archiliche — Légendaire.
+
+Les 18 objets de chapitre 2 sont déclarés dans `CHAPTER_TWO_ITEMS` et portent
+leur famille de drop (`mushroom`, `golem` ou `lich`).
+
+Sauvegarde
+----------
+Les anciens objets sans `count` sont normalisés en quantité 1. Les objets
+équipés restent toujours unitaires. L’historique de vente est limité aux
+30 dernières entrées.
