@@ -783,7 +783,9 @@ const CLASSIC_HERO_VISUALS = {
   barbarian:{folder:'Barbarian Warrior', attack:'Slashing', spellAttack:'Spell', spellFrames:12},
   mage:{folder:'Medieval Mage', attack:'Throwing Spell'},
   priest:{folder:'Priest', attack:'Slashing', spellAttack:'Healing', filePrefix:'0_Priest_'},
-  knight:{folder:'White Armored Knight', attack:'Slashing', spellAttack:'Spell', spellFrames:12}
+  knight:{folder:'White Armored Knight', attack:'Slashing', spellAttack:'Spell', spellFrames:12},
+  paladin:{folder:'Paladin', attack:'Slashing', spellAttack:'Blessed', spellFrames:30, filePrefix:'0_Paladin_'},
+  ninja:{folder:'White Ninja', attack:'Slashing'}
 };
 const FORMATION_ORDER = ['front','middle','back'];
 // 15 frames de mort à 72 ms, plus un court temps de lecture avant la prochaine rencontre.
@@ -859,10 +861,13 @@ function battleArenaPoint(area, point){
   };
 }
 function spellVfxPath(spell, frame){
-  const index = frame + 1;
+  // Certaines animations commencent à 000 (Paladin), d'autres à 1 : ne pas
+  // traiter 0 comme une valeur absente, sinon la première frame serait perdue.
+  const index = frame + (spell.vfxFrameStart ?? 1);
   const file = spell.vfxFramePrefix
     ? `${spell.vfxFramePrefix}${String(index).padStart(spell.vfxFramePadding || 0,'0')}.png`
     : `${index}.png`;
+  if(spell.vfxBasePath) return `${spell.vfxBasePath}/${file}`;
   const subfolder = spell.vfxSubfolder ? `/${spell.vfxSubfolder}` : '';
   return `assets/sprites/Characters/craftpix/Sort/${spell.vfx}${subfolder}/${file}`;
 }
