@@ -341,7 +341,24 @@ function syncGardenMobResources(){
   gardenFrame()?.contentWindow?.postMessage({type:'chroniques:mob-resources',resources:{...state.mobResources}},'*');
 }
 function mysteryPlayerSnapshot(){
-  return {maxHp:maxHp(),damage:baseDamage()};
+  const heroes=state.party.filter(isHeroUnlocked).map(hero=>{
+    const visual=CLASSIC_HERO_VISUALS[hero.id];
+    const root=`assets/sprites/Characters/craftpix/${visual.folder}`;
+    const prefix=visual.filePrefix || '';
+    const frame=(folder,file=folder)=>`${root}/${folder}/${prefix}${file}_000.png`;
+    return {
+      id:hero.id,name:hero.name,title:hero.title,level:hero.level,portrait:hero.portrait,
+      equipment:hero.equipment,stats:heroCombatStats(hero),
+      spell:hero.spell,spellLevel:heroSpellLevel(hero),spellMultiplier:heroSpellMultiplier(hero),
+      sprites:{idle:frame('Idle'),walk:frame('Walking'),attack:frame(visual.attack,visual.attackFile || visual.attack),death:frame('Dying')}
+    };
+  });
+  const rewardTier=Math.min(6,Math.max(1,...(state.route.unlockedTiers || [1]).map(value=>Number(value)||1)));
+  return {heroes,activeHeroId:activeIdleHero()?.id,rewardProfile:{
+    tier:rewardTier,
+    goldMultiplier:ENEMY_TIER_GOLD_MULTIPLIER[rewardTier] || 1,
+    essenceMultiplier:(BOSS_ESSENCE_REWARDS[rewardTier-1] || 20)/(BOSS_ESSENCE_REWARDS[0] || 20)
+  }};
 }
 function sendMysteryPlayerSnapshot(target,type='chroniques:classic-player-snapshot',extra={}){
   target?.postMessage({type,...mysteryPlayerSnapshot(),...extra},'*');

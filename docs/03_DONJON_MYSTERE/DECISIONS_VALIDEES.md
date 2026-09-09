@@ -1,3 +1,15 @@
 # Décisions validées — Donjon Mystère
 
-Aucune décision détaillée n’est actuellement enregistrée.
+## Demande du joueur — 9 septembre 2026
+
+- Mode solo inspiré du fonctionnement de Pokémon Donjon Mystère.
+- Choisir son personnage parmi ceux du mode idle et utiliser l’équipement actuellement porté par ce personnage.
+- Reprendre les attaques de base et les sorts déjà présents dans le jeu.
+- Conserver la carte procédurale, les coffres et les petites récompenses existantes.
+
+Les portées, la commande F, l’orientation gratuite et les adaptations solo des sorts sont des choix d’implémentation décrits dans `REGLES_ACTUELLES.md`, à ajuster avec les retours de jeu.
+
+## Récompenses — précision du joueur
+
+- « Je voudrais juste qu’elles soient cohérentes pour le temps investi. »
+- Le réglage effectué conserve or, essence et ressources. Coffres garantis, augmentation du boss et adaptation au palier idle sont des choix d’implémentation ; les montants doivent être confrontés aux durées réellement jouées.

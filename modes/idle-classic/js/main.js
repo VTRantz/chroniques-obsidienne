@@ -19,11 +19,16 @@ window.addEventListener('message',event=>{
   const dungeonFrame=dungeonMysteryFrame();
   if(dungeonFrame&&event.source===dungeonFrame.contentWindow){
     if(event.data?.type==='chroniques:request-classic-player-snapshot'){
+      if(!window.idleUiReady) return;
       sendMysteryPlayerSnapshot(event.source);
       return;
     }
     if(event.data?.type==='chroniques:request-mystery-expedition'){
-      sendMysteryPlayerSnapshot(event.source,'chroniques:mystery-expedition-result',{allowed:true});
+      if(!window.idleUiReady) return;
+      const hero=state.party.find(hero=>hero.id===event.data.heroId && isHeroUnlocked(hero));
+      sendMysteryPlayerSnapshot(event.source,'chroniques:mystery-expedition-result',{
+        allowed:!!hero,heroId:hero?.id,message:hero?'':'Choisis un héros débloqué pour partir.'
+      });
       return;
     }
     if(event.data?.type==='chroniques:request-garden-consumables'){
@@ -86,6 +91,7 @@ function switchGameTab(tab){
   if(modeMenu)modeMenu.hidden=true;
   if(modeToggle)modeToggle.setAttribute('aria-expanded','false');
   if(window.idleUiReady) render();
+  if(tab==='donjon' && window.idleUiReady) sendMysteryPlayerSnapshot(dungeonMysteryFrame()?.contentWindow);
 }
 
 document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>switchGameTab(button.dataset.tab)));
@@ -169,6 +175,7 @@ async function startIdleGame(){
   spawn();
   render();
   window.idleUiReady=true;
+  sendMysteryPlayerSnapshot(dungeonMysteryFrame()?.contentWindow);
   setInterval(refreshLiveMissions,250);
   setInterval(()=>{
     const gardenTab=$('tab-jardin');

@@ -5,6 +5,12 @@
   const MAP_W = 30;
   const MAP_H = 20;
   const MAX_FLOOR = 5;
+  // Calibration T1 : nettoyage complet ~1 950 or / 85 essences.
+  // Le palier idle multiplie ces montants, jamais la durée de la partie.
+  const REWARDS = {
+    chestGoldBase: 50, chestGoldPerFloor: 10, chestEssenceBase: 2, chestEssencePerFloor: 1,
+    bossGold: 300, bossEssence: 20
+  };
   const FARM_KEY = 'chroniques-obsidienne-farm-v2';
   const ASSET_ROOT = 'assets/sprites/Dungeon_Mystere/';
   const FRAME = 64;
@@ -53,16 +59,16 @@
     attack: `${root}/Slashing/${prefix}Slashing_000.png`, death: `${root}/Dying/${prefix}Dying_000.png`
   });
   const SPRITES = {
-    player: craftpixFrames('assets/sprites/Characters/craftpix/White Armored Knight'),
-    slime1: craftpixFrames('assets/sprites/Monsters/craftpix/Mycelium/Elemental_Spirits_1','0_Elemental_Spirits_'),
-    slime2: craftpixFrames('assets/sprites/Monsters/craftpix/Mycelium/Elemental_Spirits_2','0_Elemental_Spirits_'),
-    slime3: craftpixFrames('assets/sprites/Monsters/craftpix/Mycelium/Elemental_Spirits_3','0_Elemental_Spirits_'),
-    orc1: craftpixFrames('assets/sprites/Monsters/craftpix/Orc/Goblin_1','0_Goblin_'),
-    orc2: craftpixFrames('assets/sprites/Monsters/craftpix/Orc/Goblin_2','0_Goblin_'),
-    orc3: craftpixFrames('assets/sprites/Monsters/craftpix/Orc/Goblin_3','0_Goblin_'),
-    vampires1: craftpixFrames('assets/sprites/Monsters/craftpix/Vampire/Vampire_1','0_Vampire_'),
-    vampires2: craftpixFrames('assets/sprites/Monsters/craftpix/Vampire/Vampire_2','0_Vampire_'),
-    vampires3: craftpixFrames('assets/sprites/Monsters/craftpix/Vampire/Vampire_3','0_Vampire_')
+    player: craftpixFrames('assets/sprites/Characters/craftpix/Gareth'),
+    slime1: craftpixFrames('assets/sprites/Monsters/craftpix/Mycelium/Esprit_Mycelien','0_Elemental_Spirits_'),
+    slime2: craftpixFrames('assets/sprites/Monsters/craftpix/Mycelium/Esprit_Sporifere','0_Elemental_Spirits_'),
+    slime3: craftpixFrames('assets/sprites/Monsters/craftpix/Mycelium/Esprit_Primordial','0_Elemental_Spirits_'),
+    orc1: craftpixFrames('assets/sprites/Monsters/craftpix/Orc/Gobelin_Pillard','0_Goblin_'),
+    orc2: craftpixFrames('assets/sprites/Monsters/craftpix/Orc/Gobelin_Berserker','0_Goblin_'),
+    orc3: craftpixFrames('assets/sprites/Monsters/craftpix/Orc/Gobelin_Chef','0_Goblin_'),
+    vampires1: craftpixFrames('assets/sprites/Monsters/craftpix/Vampire/Vampire_Nocturne','0_Vampire_'),
+    vampires2: craftpixFrames('assets/sprites/Monsters/craftpix/Vampire/Vampire_Sanguinaire','0_Vampire_'),
+    vampires3: craftpixFrames('assets/sprites/Monsters/craftpix/Vampire/Noble_Vampire','0_Vampire_')
   };
 
   const ENEMY_FAMILIES = {
@@ -239,7 +245,11 @@
       this.powerTurns = 0; this.guardTurns = 0;
       this.runGold = 0; this.runEssence = 0; this.runItems = { ration: 1, potion: 1 };
       this.runMobResources = { slimeGel: 0, orcTusk: 0, vampireDust: 0 };
-      this.classicStats = { maxHp: 100, damage: 10, keys: 0 };
+      this.heroes = []; this.selectedHeroId = null; this.runHero = null;
+      this.spellReadyTurn = 0; this.summons = []; this.runSerial = 0;
+      this.effects = [];
+      this.rewardProfile = { tier: 1, goldMultiplier: 1, essenceMultiplier: 1 };
+      this.runRewardProfile = { ...this.rewardProfile }; this.runStartedAt = 0;
       this.pendingStart = false; this.pendingFreshSeed = false;
       this.inventory = new GardenInventory(); this.messageTimer = 0; this.lastTime = 0;
       this.ready = false;
@@ -253,6 +263,7 @@
       };
       const assets = await Promise.all(Object.entries(assetPaths).map(async ([key, path]) => [key, await loadImage(ASSET_ROOT + path)]));
       this.assets = Object.fromEntries(assets);
+      this.assets.skull = await loadImage('assets/sprites/Characters/craftpix/Sort/Invocation_Necromancienne/Skull 01/Idle/Idle_000.png');
       for (const [name, set] of Object.entries(SPRITES)) {
         const loaded = await Promise.all(Object.entries(set).map(async ([state, path]) => [state, await loadImage(path)]));
         this.sprites[name] = Object.fromEntries(loaded);
@@ -270,22 +281,28 @@
       if (missingSprites.length) throw new Error(`Animations introuvables : ${missingSprites.join(', ')}`);
       this.ready = true;
       const startButton = document.getElementById('start-run');
-      startButton.disabled = false; startButton.textContent = 'Commencer l’expédition';
+      startButton.disabled = !this.heroes.length; startButton.textContent = 'Commencer l’expédition';
       if (parent !== window) {
         parent.postMessage({ type: 'chroniques:request-garden-consumables' }, '*');
         parent.postMessage({ type: 'chroniques:request-classic-player-snapshot' }, '*');
+      } else {
+        document.getElementById('hero-select').options[0].textContent = 'Ouvre le donjon depuis le jeu';
+        document.getElementById('idle-link').hidden = false;
       }
       this.resize(); this.renderInventory(); requestAnimationFrame(time => this.loop(time));
     }
 
     bind() {
       addEventListener('keydown', event => {
+        if (event.target.closest?.('select,input,textarea,button,a') || !document.getElementById('intro').classList.contains('hidden')) return;
         const key = event.key.toLowerCase();
-        if (['z', 'q', 's', 'd', 'w', 'a', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'i', '.'].includes(key)) event.preventDefault();
+        if (['z', 'q', 's', 'd', 'w', 'a', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'i', '.', 'f'].includes(key)) event.preventDefault();
         if (key === 'i') return this.toggleBag();
+        if (key === 'f') { if (!event.repeat) this.castSpell(); return; }
         if (key === ' ' || key === 'enter') return this.tryAttack();
         if (key === '.') return this.waitTurn();
         const direction = { z: 'up', w: 'up', arrowup: 'up', s: 'down', arrowdown: 'down', q: 'left', a: 'left', arrowleft: 'left', d: 'right', arrowright: 'right' }[key];
+        if (direction && event.shiftKey && this.canAct()) { this.player.direction = direction; return; }
         if (direction) this.tryMove(direction);
       });
       addEventListener('message', event => {
@@ -300,51 +317,114 @@
           return;
         }
         if (event.data?.type === 'chroniques:mystery-expedition-result') {
-          this.pendingStart = false;
+          if (!this.pendingStart) return;
           this.setClassicStats(event.data);
-          if (!event.data.allowed) return this.showStartError(event.data.message || 'Aucune clé disponible.');
-          this.beginStart(this.pendingFreshSeed);
+          if (!event.data.allowed) { this.pendingStart = false; return this.showStartError(event.data.message || 'Héros indisponible.'); }
+          const hero = this.heroes.find(hero => hero.id === event.data.heroId);
+          this.prepareHero(hero, this.pendingFreshSeed);
         }
       });
       this.canvas.addEventListener('pointerdown', () => this.canvas.focus());
       document.getElementById('start-run').onclick = () => this.start();
-      document.getElementById('new-run').onclick = () => this.start(true);
+      document.getElementById('new-run').onclick = () => this.prepareExpedition();
+      document.getElementById('basic-attack').onclick = () => { this.tryAttack(); this.canvas.focus(); };
+      document.getElementById('cast-spell').onclick = () => { this.castSpell(); this.canvas.focus(); };
+      document.getElementById('hero-select').onchange = event => { this.selectedHeroId = event.target.value; this.renderHeroPreview(); };
       document.getElementById('bag-toggle').onclick = () => this.toggleBag(true);
       document.getElementById('bag-close').onclick = () => this.toggleBag(false);
-      document.getElementById('wait-turn').onclick = () => this.waitTurn();
+      document.getElementById('wait-turn').onclick = () => { this.waitTurn(); this.canvas.focus(); };
     }
 
     start(freshSeed = false) {
       if (!this.ready) return this.message('Chargement des sprites en cours…');
-      if (this.pendingStart) return;
+      if (this.pendingStart || this.started || !this.selectedHeroId) return;
       if (parent !== window) {
         this.pendingStart = true; this.pendingFreshSeed = freshSeed;
-        parent.postMessage({ type: 'chroniques:request-mystery-expedition' }, '*');
+        document.getElementById('start-run').disabled = true;
+        parent.postMessage({ type: 'chroniques:request-mystery-expedition', heroId: this.selectedHeroId }, '*');
         return;
       }
-      this.beginStart(freshSeed);
+      this.showStartError('Ouvre le donjon depuis le mode idle pour utiliser ton héros.');
     }
 
     setClassicStats(data = {}) {
-      const maxHp = Number(data.maxHp); const damage = Number(data.damage); const keys = Number(data.keys);
-      this.classicStats = {
-        maxHp: Number.isFinite(maxHp) && maxHp > 0 ? maxHp : 100,
-        damage: Number.isFinite(damage) && damage > 0 ? damage : 10,
-        keys: Number.isFinite(keys) && keys >= 0 ? Math.floor(keys) : 0
-      };
+      if (!Array.isArray(data.heroes)) return;
+      if (data.rewardProfile) this.rewardProfile = { ...data.rewardProfile };
+      this.heroes = data.heroes.filter(hero => hero?.stats?.maxHp > 0 && hero?.stats?.damage > 0);
+      if (!this.heroes.some(hero => hero.id === this.selectedHeroId)) this.selectedHeroId = this.heroes.find(hero => hero.id === data.activeHeroId)?.id || this.heroes[0]?.id;
+      const select = document.getElementById('hero-select');
+      select.replaceChildren(...this.heroes.map(hero => new Option(`${hero.name} — ${hero.title} · niv. ${hero.level}`, hero.id)));
+      select.value = this.selectedHeroId || ''; select.disabled = !this.heroes.length || this.pendingStart;
+      document.getElementById('start-run').disabled = !this.ready || !this.heroes.length || this.pendingStart;
+      this.renderHeroPreview();
+    }
+
+    renderHeroPreview() {
+      const box = document.getElementById('hero-preview'); box.replaceChildren();
+      const hero = this.heroes.find(hero => hero.id === this.selectedHeroId); if (!hero) return;
+      const summary = document.createElement('div'); summary.className = 'hero-summary';
+      const portrait = document.createElement('img'); portrait.src = hero.portrait; portrait.alt = hero.name;
+      const details = document.createElement('div');
+      const stats = document.createElement('p');
+      stats.textContent = `${hero.stats.maxHp} PV · ${Math.round(hero.stats.damage)} ATQ · ${Math.round(hero.stats.armor)} DEF · ${Math.round(hero.stats.crit * 100)} % critique`;
+      const spell = document.createElement('p'); spell.textContent = `${hero.spell.name} · niv. ${hero.spellLevel} · recharge ${hero.spell.cooldownTurns} tours`;
+      details.append(stats, spell); summary.append(portrait, details); box.append(summary);
+      const equipment = document.createElement('ul'); equipment.className = 'hero-equipment';
+      Object.entries(hero.equipment).forEach(([slot, item]) => {
+        const row = document.createElement('li'); const label = document.createElement('b'); label.textContent = slot;
+        row.append(label, document.createTextNode(item ? `${item.name}${item.upgrade ? ` +${item.upgrade}` : ''}` : 'Vide')); equipment.append(row);
+      });
+      const note = document.createElement('small'); note.textContent = 'Niveau, équipement et bonus de sets de l’idle appliqués au départ. Une action = un tour. Aucun équipement perdu en cas de défaite.';
+      box.append(equipment, note);
+      const rewards = document.createElement('p');
+      const profile = this.rewardProfile;
+      const gold = value => Math.round(value * profile.goldMultiplier);
+      const essence = value => Math.round(value * profile.essenceMultiplier);
+      rewards.className = 'reward-preview';
+      rewards.textContent = `Récompenses T${profile.tier} · Coffre : ${gold(REWARDS.chestGoldBase + REWARDS.chestGoldPerFloor)}–${gold(REWARDS.chestGoldBase + MAX_FLOOR * REWARDS.chestGoldPerFloor)} or + ${essence(REWARDS.chestEssenceBase + REWARDS.chestEssencePerFloor)}–${essence(REWARDS.chestEssenceBase + MAX_FLOOR * REWARDS.chestEssencePerFloor)} essences. Boss : ${gold(REWARDS.bossGold)} or + ${essence(REWARDS.bossEssence)} essences. Butin conservé si tu ressors vivant.`;
+      box.append(rewards);
+    }
+
+    async prepareHero(hero, freshSeed) {
+      try {
+        if (!hero) throw new Error('Ce héros est indisponible.');
+        const snapshot = structuredClone(hero);
+        const rewardProfile = { ...this.rewardProfile };
+        const images = Object.fromEntries(await Promise.all(Object.entries(snapshot.sprites).map(async ([key, path]) => [key, await loadImage(path)])));
+        if (Object.values(images).some(image => !image)) throw new Error(`Sprites de ${hero.name} introuvables.`);
+        this.runHero = snapshot; this.sprites.player = images; this.runRewardProfile = rewardProfile;
+        this.beginStart(freshSeed);
+      } catch (error) { this.showStartError(error.message); }
+      finally {
+        this.pendingStart = false; document.getElementById('hero-select').disabled = !this.heroes.length;
+        document.getElementById('start-run').disabled = !this.heroes.length;
+      }
+    }
+
+    prepareExpedition() {
+      if (this.pendingStart) return;
+      if (this.started) { this.message('Termine l’expédition ou regagne la porte de sortie pour changer de héros.'); this.canvas.focus(); return; }
+      document.getElementById('intro').classList.remove('hidden');
+      if (parent !== window) parent.postMessage({ type: 'chroniques:request-classic-player-snapshot' }, '*');
     }
 
     showStartError(text) {
       const intro = document.getElementById('intro'); intro.classList.remove('hidden');
       intro.querySelector('p').textContent = text;
+      document.getElementById('start-run').disabled = !this.ready || !this.heroes.length;
+      document.getElementById('hero-select').disabled = !this.heroes.length;
     }
 
     beginStart(freshSeed = false) {
+      this.runSerial += 1; this.spellReadyTurn = 0; this.summons = [];
+      this.effects = [];
+      this.runStartedAt = performance.now();
       if (freshSeed) this.seed = Date.now() >>> 0;
       this.floor = 1; this.turn = 0; this.runGold = 0; this.runEssence = 0;
       this.runMobResources = { slimeGel: 0, orcTusk: 0, vampireDust: 0 };
       this.runItems = { ration: 1, potion: 1 }; this.powerTurns = 0; this.guardTurns = 0;
       this.savedHp = null;
+      document.getElementById('inventory-panel').hidden = true;
       this.started = true; document.getElementById('intro').classList.add('hidden');
       this.generateFloor(); this.canvas.focus(); this.message('Trouve l’escalier. Chaque déplacement joue un tour.');
     }
@@ -352,7 +432,7 @@
     generateFloor() {
       this.busy = false;
       this.map = new DungeonGenerator(this.seed, this.floor).generate(); this.rng = new RNG(this.map.seed);
-      this.player = new Actor('player', this.map.start.x, this.map.start.y, this.sprites.player, { hp: this.classicStats.maxHp, damage: this.classicStats.damage });
+      this.player = new Actor('player', this.map.start.x, this.map.start.y, this.sprites.player, { hp: this.runHero.stats.maxHp, damage: this.runHero.stats.damage });
       if (this.floor > 1 && this.savedHp) this.player.hp = Math.min(this.player.maxHp, this.savedHp + 18);
       this.objects = []; this.items = []; this.enemies = []; this.doors = []; this.gates = []; this.explored.clear();
       this.doors = this.buildDoors();
@@ -550,14 +630,14 @@
       const door = this.doors.find(candidate => candidate.x === x && candidate.y === y);
       if (door) door.openness = 3;
       this.player.moveTo(x, y); this.collectAt(x, y);
-      const reachedStairs = x === this.map.stairs.x && y === this.map.stairs.y;
+      const reachedStairs = x === this.map.stairs.x && y === this.map.stairs.y && !this.enemies.some(enemy => enemy.type === 'boss' && !enemy.dead);
       this.completePlayerTurn(!reachedStairs, reachedStairs ? () => this.descend() : null);
     }
 
     tryAttack() {
       if (!this.canAct()) return;
       const vector = DIRECTIONS[this.player.direction]; const x = this.player.x + vector.x; const y = this.player.y + vector.y;
-      const enemy = this.enemyAt(x, y); if (enemy) return this.attackEnemy(enemy);
+      const enemy = this.lineTarget(this.attackRange()); if (enemy) return this.attackEnemy(enemy);
       const object = this.objectAt(x, y);
       if (object?.kind === 'vase') return this.breakVase(object);
       if (object?.kind === 'chest') return this.openChest(object);
@@ -568,23 +648,98 @@
     attackEnemy(enemy) {
       const vector = DIRECTIONS[this.player.direction]; this.player.face(vector.x, vector.y); this.player.setState('attack');
       const power = this.powerTurns > 0 ? 1.25 : 1;
-      const damage = Math.round(this.player.damage * power * (.9 + this.rng.next() * .2)); enemy.hp -= damage;
+      const stats = this.runHero.stats; const crit = this.rng.chance(stats.crit);
+      const damage = this.damageEnemy(enemy, this.player.damage * power * (crit ? stats.critDamage : 1), crit ? 'Critique' : '');
+      if (stats.lifesteal > 0) this.healPlayer(damage * stats.lifesteal / 100);
+      this.completePlayerTurn();
+    }
+
+    damageEnemy(enemy, amount, label = '') {
+      if (!enemy || enemy.dead) return 0;
+      const damage = Math.min(enemy.hp, Math.max(1, Math.round(amount))); enemy.hp -= damage;
+      this.effects.push({x:enemy.x, y:enemy.y, text:`${label ? label + ' ' : ''}−${damage}`, color:'#ffd68a', until:performance.now() + 1000});
       this.message(`${enemy.type === 'boss' ? 'Boss' : 'Monstre'} : -${damage} PV`);
       if (enemy.hp <= 0) {
         enemy.hp = 0; enemy.dead = true; enemy.setState('death');
-        this.runGold += enemy.type === 'boss' ? 80 : 6 + this.floor * 2;
-        this.runEssence += enemy.type === 'boss' ? 5 : this.rng.chance(.25) ? 1 : 0;
+        this.grantRunReward(enemy.type === 'boss' ? REWARDS.bossGold : 6 + this.floor * 2,
+          enemy.type === 'boss' ? REWARDS.bossEssence : this.rng.chance(.25) ? 1 : 0);
         const resource = MOB_RESOURCE_BY_FAMILY[enemy.family];
         if (resource && (enemy.type === 'boss' || this.rng.chance(.45))) this.runMobResources[resource] += enemy.type === 'boss' ? 2 : 1;
       }
-      this.completePlayerTurn();
+      return damage;
+    }
+
+    healPlayer(amount) {
+      const healed = Math.min(this.player.maxHp - this.player.hp, Math.max(0, Math.round(amount)));
+      this.player.hp += healed;
+      if (healed) this.effects.push({x:this.player.x,y:this.player.y,text:`+${healed}`,color:'#71efba',until:performance.now()+1000});
+      return healed;
+    }
+
+    attackRange() { return ['archer', 'mage', 'necromancer'].includes(this.runHero?.id) ? 4 : 1; }
+
+    lineTarget(range) {
+      const vector = DIRECTIONS[this.player.direction];
+      for (let step = 1; step <= range; step += 1) {
+        const x = this.player.x + vector.x * step; const y = this.player.y + vector.y * step;
+        if (this.tile(x, y) !== FLOOR || this.objectAt(x, y) || (this.gateAt(x, y) && !this.gateAt(x, y).opened)) return null;
+        const enemy = this.enemyAt(x, y); if (enemy) return enemy;
+      }
+      return null;
+    }
+
+    spellDescription() {
+      const spell = this.runHero?.spell; if (!spell) return '';
+      if (spell.type === 'heal') return `Soin personnel : ${Math.round(spell.multiplier * this.runHero.spellMultiplier * 100)} % des PV max.`;
+      if (spell.type === 'aoe') return 'Zone : ennemis visibles à 2 cases, sans traverser les obstacles.';
+      if (spell.type === 'summon') return `Crâne : ${spell.summonAttacks || 2} attaques sur un ennemi visible à 4 cases.`;
+      return spell.projectile ? 'Projectile : première cible devant toi, jusqu’à 4 cases.' : 'Frappe : ennemi sur la case devant toi.';
+    }
+
+    castSpell() {
+      if (!this.canAct()) return;
+      const spell = this.runHero.spell;
+      if (this.turn < this.spellReadyTurn) return this.message(`Sort disponible dans ${this.spellReadyTurn - this.turn} tour(s).`);
+      const multiplier = this.runHero.spellMultiplier;
+      if (spell.type === 'heal') {
+        if (this.player.hp >= this.player.maxHp) return this.message('Tes PV sont déjà au maximum.');
+        this.healPlayer(this.player.maxHp * spell.multiplier * multiplier);
+      } else if (spell.type === 'summon') {
+        if (this.summons.length) return this.message('Ton crâne est encore actif.');
+        this.summons = Array.from({length:Math.max(1,spell.summonCount || 1)}, () => ({attacks:spell.summonAttacks || 2,multiplier:spell.summonDamageMultiplier || .45}));
+      } else {
+        const targets = spell.type === 'aoe'
+          ? this.enemies.filter(enemy => !enemy.dead && distance(enemy, this.player) <= 2 && this.hasLineOfSight(this.player.x, this.player.y, enemy.x, enemy.y))
+          : [this.lineTarget(spell.projectile ? 4 : 1)].filter(Boolean);
+        if (!targets.length) return this.message('Aucune cible à portée. Maintiens Maj + une direction pour viser.');
+        targets.forEach(enemy => this.damageEnemy(enemy, this.player.damage * spell.multiplier * multiplier * (this.powerTurns > 0 ? 1.25 : 1), spell.name));
+      }
+      this.player.setState('attack');
+      // Le tour de lancement ne compte pas dans la recharge.
+      this.spellReadyTurn = this.turn + 1 + Math.max(1, Number(spell.cooldownTurns) || 1);
+      this.message(spell.name); this.completePlayerTurn();
+    }
+
+    summonTurn() {
+      for (const summon of this.summons) {
+        const targets = this.enemies.filter(enemy => !enemy.dead && distance(enemy, this.player) <= 4 && this.hasLineOfSight(this.player.x, this.player.y, enemy.x, enemy.y));
+        targets.sort((a, b) => distance(a, this.player) - distance(b, this.player));
+        if (!targets.length) continue;
+        this.damageEnemy(targets[0], this.player.damage * summon.multiplier * this.runHero.spellMultiplier, 'Crâne');
+        summon.attacks -= 1;
+      }
+      this.summons = this.summons.filter(summon => summon.attacks > 0);
     }
 
     openChest(object) {
       if (object.opened) { this.message('Ce coffre est déjà ouvert.'); return; }
       object.opened = true; object.animationTime = 0;
-      const reward = this.rng.pick(['gold', 'gold', 'ration', 'potion', 'essence']);
-      this.message('Coffre ouvert !'); this.items.push({ x: object.x, y: object.y, kind: reward }); this.collectAt(object.x, object.y);
+      const reward = this.grantRunReward(REWARDS.chestGoldBase + this.floor * REWARDS.chestGoldPerFloor,
+        REWARDS.chestEssenceBase + this.floor * REWARDS.chestEssencePerFloor);
+      // Même fréquence de consommables qu’avant : 20 % ration, 20 % potion.
+      const roll = this.rng.next(); const supply = roll < .2 ? 'ration' : roll < .4 ? 'potion' : null;
+      if (supply) this.runItems[supply] += 1;
+      this.message(`Coffre : +${reward.gold} or · +${reward.essence} essences${supply ? ` · ${supply === 'ration' ? 'ration' : 'potion'}` : ''}`);
       this.completePlayerTurn();
     }
 
@@ -606,11 +761,20 @@
       this.completePlayerTurn();
     }
 
+    grantRunReward(gold = 0, essence = 0) {
+      const reward = {
+        gold: Math.round(gold * this.runRewardProfile.goldMultiplier),
+        essence: Math.round(essence * this.runRewardProfile.essenceMultiplier)
+      };
+      this.runGold += reward.gold; this.runEssence += reward.essence;
+      return reward;
+    }
+
     collectAt(x, y) {
       const found = this.items.filter(item => item.x === x && item.y === y);
       found.forEach(item => {
-        if (item.kind === 'gold') { const amount = this.rng.int(7, 16) + this.floor * 2; this.runGold += amount; this.message(`+${amount} or`); }
-        if (item.kind === 'essence') { this.runEssence += 2; this.message('+2 essence'); }
+        if (item.kind === 'gold') { const reward = this.grantRunReward(this.rng.int(7, 16) + this.floor * 2); this.message(`+${reward.gold} or`); }
+        if (item.kind === 'essence') { const reward = this.grantRunReward(0, 2); this.message(`+${reward.essence} essences`); }
         if (item.kind === 'ration') { this.runItems.ration += 1; this.message('Ration trouvée'); }
         if (item.kind === 'potion') { this.runItems.potion += 1; this.message('Potion trouvée'); }
       });
@@ -622,9 +786,12 @@
 
     completePlayerTurn(monstersAct = true, afterTurn = null) {
       this.busy = true; this.turn += 1;
-      if (this.powerTurns > 0) this.powerTurns -= 1; if (this.guardTurns > 0) this.guardTurns -= 1;
+      this.summonTurn();
       if (monstersAct) this.enemyTurn(); this.updateFov(); this.updateHud();
+      if (this.powerTurns > 0) this.powerTurns -= 1; if (this.guardTurns > 0) this.guardTurns -= 1;
+      const serial = this.runSerial;
       setTimeout(() => {
+        if (serial !== this.runSerial || !this.started) return;
         if (this.player.hp <= 0) return this.defeat();
         this.busy = false; if (afterTurn) afterTurn();
       }, 145);
@@ -633,10 +800,17 @@
     enemyTurn() {
       const reserved = new Set(this.enemies.filter(enemy => !enemy.dead).map(enemy => keyOf(enemy.x, enemy.y)));
       this.enemies.filter(enemy => !enemy.dead).forEach(enemy => {
+        if (this.player.hp <= 0) return;
         if (distance(enemy, this.player) === 1) {
           enemy.face(this.player.x - enemy.x, this.player.y - enemy.y); enemy.setState('attack');
-          const guard = this.guardTurns > 0 ? .75 : 1; const damage = Math.max(1, Math.round(enemy.damage * guard * (.85 + this.rng.next() * .3)));
-          this.player.hp -= damage; this.message(`Le slime vous inflige ${damage} dégâts.`); return;
+          const stats = this.runHero.stats;
+          const dodged = this.rng.chance(stats.dodge); const parried = !dodged && this.rng.chance(stats.parry);
+          const guard = this.guardTurns > 0 ? .75 : 1;
+          const damage = dodged ? 0 : Math.max(1, Math.round(enemy.damage * (1 - stats.reduction) * guard * (parried ? .5 : 1)));
+          this.player.hp = Math.max(0, this.player.hp - damage);
+          const text = dodged ? 'Esquive' : `${parried ? 'Parade ' : ''}−${damage}`;
+          this.effects.push({x:this.player.x,y:this.player.y,text,color:'#ff8298',until:performance.now()+1000});
+          this.message(dodged ? 'Attaque esquivée !' : `Le monstre inflige ${damage} dégâts${parried ? ' (parade)' : ''}.`); return;
         }
         let step = null;
         if (distance(enemy, this.player) <= 10 && this.hasLineOfSight(enemy.x, enemy.y, this.player.x, this.player.y)) step = this.findStep(enemy, this.player);
@@ -680,18 +854,24 @@
       setTimeout(() => this.showEnd(false, true), 420);
     }
     showEnd(won, escaped = false) {
+      if (!this.started) return;
       if (won || escaped) parent.postMessage({ type: 'chroniques:mystery-reward', gold: this.runGold, essence: this.runEssence, resources: { ...this.runMobResources } }, '*');
       this.started = false;
       const intro = document.getElementById('intro'); intro.classList.remove('hidden');
       intro.querySelector('h1').textContent = won ? 'Expédition réussie !' : escaped ? 'Retour à la maison' : 'Expédition échouée';
-      intro.querySelector('p').textContent = won || escaped ? `Butin sécurisé : ${this.runGold} or et ${this.runEssence} essence.` : 'Les récompenses de l’expédition sont perdues. Prépare davantage de nourriture au jardin.';
-      const button = intro.querySelector('button'); button.textContent = 'Nouvelle expédition'; button.onclick = () => this.start(true);
+      const seconds = Math.max(0, Math.floor((performance.now() - this.runStartedAt) / 1000));
+      const duration = `${Math.floor(seconds / 60)} min ${String(seconds % 60).padStart(2, '0')} s · ${this.turn} tour${this.turn > 1 ? 's' : ''}`;
+      intro.querySelector('p').textContent = won || escaped
+        ? `Butin sécurisé : ${this.runGold} or et ${this.runEssence} essences. Durée totale : ${duration}.`
+        : `Butin perdu : ${this.runGold} or et ${this.runEssence} essences. Durée totale : ${duration}. Regagne la porte de sortie pour sécuriser tes prochaines trouvailles.`;
+      const button = document.getElementById('start-run'); button.textContent = 'Nouvelle expédition'; button.onclick = () => this.start(true);
+      this.prepareExpedition();
     }
 
     hasLineOfSight(x0, y0, x1, y1) {
       let dx = Math.abs(x1 - x0); let sx = x0 < x1 ? 1 : -1; let dy = -Math.abs(y1 - y0); let sy = y0 < y1 ? 1 : -1; let error = dx + dy;
       while (true) {
-        if (!(x0 === x1 && y0 === y1) && this.tile(x0, y0) === WALL) return false;
+        if (!(x0 === x1 && y0 === y1) && (this.tile(x0, y0) === WALL || this.objectAt(x0, y0) || (this.gateAt(x0, y0) && !this.gateAt(x0, y0).opened))) return false;
         if (x0 === x1 && y0 === y1) return true; const e2 = 2 * error;
         if (e2 >= dy) { error += dy; x0 += sx; } if (e2 <= dx) { error += dx; y0 += sy; }
       }
@@ -714,7 +894,7 @@
 
     readGardenCount(type, id) { return this.inventory.entries().find(entry => entry.type === type && entry.id === id)?.count || 0; }
     useGardenItem(type, id) {
-      if (!this.started || !this.player || this.player.dead) return;
+      if (!this.started || this.busy || !this.player || this.player.dead) return;
       const definition = type === 'food' ? FOOD[id] : POTIONS[id]; if (!definition) return;
       if (!this.inventory.consume(type, id)) { this.message('Objet indisponible dans le jardin.'); return; }
       if (definition.fullHeal) this.player.hp = this.player.maxHp;
@@ -725,13 +905,14 @@
     }
 
     useRunItem(type) {
-      if (!this.canAct() || this.runItems[type] < 1) return;
+      if (!this.started || this.busy || !this.player || this.player.dead || !['ration','potion'].includes(type) || this.runItems[type] < 1) return;
       this.runItems[type] -= 1;
       this.player.hp = Math.min(this.player.maxHp, this.player.hp + (type === 'ration' ? 36 : 45));
       this.renderInventory(); this.toggleBag(false); this.completePlayerTurn();
     }
 
     toggleBag(force) {
+      if (!this.started || this.busy || this.player?.dead) return;
       const panel = document.getElementById('inventory-panel'); const open = typeof force === 'boolean' ? force : panel.hidden;
       panel.hidden = !open; if (open) this.renderInventory(); else this.canvas.focus();
     }
@@ -745,7 +926,7 @@
         const card = document.createElement('article'); card.className = 'bag-item';
         if (entry.type === 'potion' || entry.id === 'potion') {
           const icon = document.createElement('span'); icon.className = 'potion-preview';
-          icon.style.setProperty('--image', `url("assets/sprites/Potion/Small Bottle/${entry.def.color}/Small Bottle - ${entry.def.color} - Spritesheet.png")`); card.append(icon);
+          icon.style.setProperty('--image', `url("${new URL(`assets/sprites/Potion/Small Bottle/${entry.def.color}/Small Bottle - ${entry.def.color} - Spritesheet.png`, document.baseURI).href}")`); card.append(icon);
         } else {
           const image = document.createElement('img'); image.src = `assets/sprites/Food/${entry.def.file}`; image.alt = ''; card.append(image);
         }
@@ -785,12 +966,21 @@
     }
     updateHud() {
       if (!this.player) return;
+      document.getElementById('hero-name').textContent = `${this.runHero.name} · niv. ${this.runHero.level}`;
+      const remaining = Math.max(0, this.spellReadyTurn - this.turn);
+      const spellButton = document.getElementById('cast-spell');
+      spellButton.textContent = `${this.runHero.spell.name} [F]${remaining ? ` · ${remaining} tour(s)` : ''}`;
+      spellButton.disabled = !this.canAct() || remaining > 0;
+      document.getElementById('basic-attack').disabled = !this.canAct();
+      document.getElementById('spell-description').textContent = this.spellDescription();
+      document.getElementById('summon-status').textContent = this.summons.length ? `Crâne actif · ${this.summons.reduce((sum, summon) => sum + summon.attacks, 0)} attaque(s)` : '';
       document.getElementById('floor-label').textContent = `Étage ${this.floor} / ${MAX_FLOOR}`;
       document.getElementById('hp-label').textContent = `${Math.max(0, Math.ceil(this.player.hp))} / ${this.player.maxHp} PV`;
       document.getElementById('hp-fill').style.width = `${clamp(this.player.hp / this.player.maxHp, 0, 1) * 100}%`;
       document.getElementById('turn-label').textContent = `Tour ${this.turn}`;
       const living = this.enemies.filter(enemy => !enemy.dead).length; document.getElementById('enemy-label').textContent = `${living} ennemi${living > 1 ? 's' : ''}`;
       document.getElementById('reward-label').textContent = `${this.runGold} or · ${this.runEssence} essence`;
+      document.getElementById('reward-label').title = `Récompenses T${this.runRewardProfile.tier}, fixées au départ. L’attente n’augmente pas le butin.`;
     }
     message(text) { const element = document.getElementById('message'); element.textContent = text; element.classList.remove('hidden'); this.messageTimer = 1.25; }
 
@@ -807,7 +997,18 @@
         ...this.enemies.filter(enemy => this.visible.has(keyOf(enemy.x, enemy.y)) || enemy.dead).map(enemy => ({ y: enemy.visualY * TILE + TILE, draw: () => enemy.draw(ctx) })),
         { y: this.player.visualY * TILE + TILE, draw: () => this.player.draw(ctx) }
       ].sort((a, b) => a.y - b.y);
-      drawables.forEach(item => item.draw()); this.drawFog(ctx); ctx.restore();
+      drawables.forEach(item => item.draw()); this.drawFog(ctx);
+      const direction = DIRECTIONS[this.player.direction];
+      ctx.strokeStyle = '#71efba'; ctx.lineWidth = 1;
+      ctx.strokeRect((this.player.x + direction.x) * TILE + 2, (this.player.y + direction.y) * TILE + 2, TILE - 4, TILE - 4);
+      if (this.summons.length && this.assets.skull) ctx.drawImage(this.assets.skull, this.player.visualX * TILE - 12, this.player.visualY * TILE - 22, 24, 24);
+      this.effects = this.effects.filter(effect => effect.until > performance.now());
+      ctx.font = 'bold 6px system-ui'; ctx.textAlign = 'center'; ctx.lineWidth = 2;
+      this.effects.forEach((effect, index) => {
+        const x = effect.x * TILE + 8; const y = effect.y * TILE - 8 - (1000 - effect.until + performance.now()) / 80 - index * 3;
+        ctx.strokeStyle = '#07101b'; ctx.strokeText(effect.text, x, y); ctx.fillStyle = effect.color; ctx.fillText(effect.text, x, y);
+      });
+      ctx.restore();
     }
 
     drawTiles(ctx) {

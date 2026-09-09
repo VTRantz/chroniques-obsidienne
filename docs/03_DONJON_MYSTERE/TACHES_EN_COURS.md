@@ -1,6 +1,11 @@
 # Tâches en cours — Donjon Mystère
 
-- [ ] Documenter les règles actuelles du donjon.
-- [ ] Documenter le système de combat.
-- [ ] Documenter la progression, les récompenses et les ressources.
-- [ ] Documenter les interactions avec le jardin et l’idle.
+- [x] Documenter les règles actuelles du donjon et ses interactions avec l’idle/jardin.
+- [x] Permettre de choisir un héros débloqué avec son équipement idle actuel.
+- [x] Intégrer les statistiques réelles, les attaques de base et les huit sorts adaptés au solo.
+- [x] Vérifier les tours, obstacles, soins, récompenses et le lancement des huit héros.
+- [ ] Recueillir les retours de jeu sur les portées, commandes et adaptations solo.
+- [x] Recalibrer les récompenses existantes selon l’investissement actif et la progression idle.
+- [x] Vérifier les gains aux six paliers et le versement réel au retour.
+- [ ] Comparer les durées humaines et le butin affichés au bilan ; affiner le rendement si nécessaire.
+- [ ] Équilibrer les ennemis selon la progression d’équipement souhaitée.

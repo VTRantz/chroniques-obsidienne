@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Chroniques d'Obsidienne — Donjon Mystère</title>
-  <link rel="stylesheet" href="modes/dungeon-mystery/css/dungeon-mystery.css?v=3">
+  <link rel="stylesheet" href="modes/dungeon-mystery/css/dungeon-mystery.css?v=5">
 </head>
 <body>
   <main id="mystery-app">
@@ -12,7 +12,7 @@
 
     <section class="top-hud">
       <div class="hero-card">
-        <strong>Épéiste</strong>
+        <strong id="hero-name">Choisis ton héros</strong>
         <span id="floor-label">Étage 1 / 5</span>
         <div class="meter hp"><i id="hp-fill"></i><b id="hp-label">100 / 100 PV</b></div>
       </div>
@@ -24,14 +24,19 @@
     </section>
 
     <aside class="side-panel">
+      <button id="basic-attack" type="button">Attaque [Espace]</button>
+      <button id="cast-spell" type="button" disabled>Sort [F]</button>
+      <small id="spell-description"></small>
+      <small id="summon-status"></small>
       <button id="bag-toggle" type="button">Sac du jardin [I]</button>
       <button id="wait-turn" type="button">Attendre un tour [.]</button>
-      <button id="new-run" type="button">Nouvelle expédition</button>
+      <button id="new-run" type="button">Préparer une expédition</button>
       <div class="legend">
         <b>Commandes</b>
         <span>ZQSD : avancer / attaquer</span>
         <span>Flèches : avancer / attaquer</span>
         <span>Espace : attaquer / interagir devant</span>
+        <span>F : sort · Maj + direction : s’orienter</span>
         <span>I : inventaire</span>
       </div>
     </aside>
@@ -50,9 +55,15 @@
       <span class="rune">◆</span>
       <h1>Donjon Mystère</h1>
       <p>À chaque action, les monstres jouent à leur tour. Trouve l'escalier et atteins le cinquième étage.</p>
+      <div id="hero-picker" class="hero-picker">
+        <label for="hero-select">Ton héros du mode idle</label>
+        <select id="hero-select" disabled><option>Connexion au mode idle…</option></select>
+        <div id="hero-preview" aria-live="polite"></div>
+      </div>
+      <a id="idle-link" href="index.html" hidden>Ouvrir le jeu et son onglet Donjon</a>
       <button id="start-run" type="button" disabled>Chargement…</button>
     </section>
   </main>
-  <script src="modes/dungeon-mystery/js/dungeon-mystery.js?v=20"></script>
+  <script src="modes/dungeon-mystery/js/dungeon-mystery.js?v=22"></script>
 </body>
 </html>
