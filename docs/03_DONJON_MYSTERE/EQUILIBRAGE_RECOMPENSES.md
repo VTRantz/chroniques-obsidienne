@@ -1,5 +1,7 @@
 # Récompenses du donjon — 9 septembre 2026
 
+> Mise à jour du 10 septembre : les montants ci-dessous restent la base économique, mais la durée de 9–15 minutes a été estimée avant l’ajout des diagonales et de la satiété. Elle ne valide pas le rendement de la nouvelle exploration ; des parties humaines sont nécessaires pour le mesurer. Le contrôle courant comprend désormais 133 vérifications.
+
 ## Résumé
 
 - Demande : des gains cohérents avec le temps investi, sans ajouter d’équipement ou de monnaie exclusive.

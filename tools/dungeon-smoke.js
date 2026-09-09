@@ -7,8 +7,8 @@ const root = path.resolve(__dirname, '..');
 const nodes = new Map(); const timers = []; const messages = [];
 function element() {
   return {hidden:true,disabled:false,value:'',textContent:'',style:{setProperty(){}},options:[{}],
-    classList:{add(){},remove(){},contains(){return true;}},
-    append(){},replaceChildren(){},addEventListener(){},focus(){},querySelector(){return element();},getContext(){return {};}};
+    classList:{add(){},remove(){},toggle(){},contains(){return true;}},
+    append(){},replaceChildren(){},setAttribute(){},addEventListener(){},focus(){},querySelector(){return element();},getContext(){return {};}};
 }
 const context = vm.createContext({console, structuredClone, URL, performance, crypto:require('node:crypto').webcrypto,
   document:{baseURI:'http://localhost/index.html',getElementById(id){if(!nodes.has(id)) nodes.set(id,element());return nodes.get(id);},
@@ -152,7 +152,80 @@ for(const id of ['priest','paladin']) {
   const collectedGold=game.runGold;game.collectAt(5,5);
   check(game.runGold===collectedGold && game.runEssence===essence+14,'Ground loot is scaled and collected once');
 }
-console.log(`Donjon : ${checks} vérifications réussies (8 héros, équipement, sorts, tours, obstacles, soins, butin).`);
+for(const [direction,dx,dy] of [['up',0,-1],['down',0,1],['left',-1,0],['right',1,0],['upLeft',-1,-1],['upRight',1,-1],['downLeft',-1,1],['downRight',1,1]]){
+  const game=gameFor();game.tryMove(direction);
+  check(game.player.x===5+dx && game.player.y===5+dy && game.player.direction===direction && game.turn===1,`${direction}: one move and one turn`);
+}
+for(const blocker of ['wall','vase','gate']){
+  const game=gameFor('barbarian');
+  if(blocker==='wall')game.map.grid[5][6]=0;
+  if(blocker==='vase')game.objects=[{kind:'vase',x:6,y:5}];
+  if(blocker==='gate')game.gates=[{cells:[{x:6,y:5}],opened:false}];
+  const target=enemy(game,6,6);game.tryMove('downRight');
+  check(game.turn===0 && target.hp===target.maxHp,`${blocker}: diagonal bump cannot cut corner`);
+  game.castSpell();check(game.turn===0 && target.hp===target.maxHp,`${blocker}: diagonal spell cannot cut corner`);
+  check(!game.hasLineOfSight(5,5,6,6),`${blocker}: diagonal line of sight blocked`);
+}
+{
+  const game=gameFor();game.player.direction='downRight';const target=enemy(game,8,8);
+  game.castSpell();check(target.hp<target.maxHp && game.turn===1,'Projectile travels on a clear diagonal');
+  const melee=gameFor('knight');const near=enemy(melee,6,6);melee.tryMove('downRight');
+  check(near.hp<near.maxHp,'Melee hits diagonally');
+}
+{
+  const game=gameFor();enemy(game,6,6);const hp=game.player.hp;game.waitTurn();
+  check(game.player.hp<hp,'Adjacent diagonal enemy attacks');
+  const blocked=gameFor();blocked.map.grid[5][6]=0;enemy(blocked,6,6);const hp2=blocked.player.hp;blocked.waitTurn();
+  check(blocked.player.hp===hp2,'Enemy cannot attack through a blocked corner');
+}
+{
+  const game=gameFor();const actor=enemy(game,8,8);const step=game.findStep(actor,game.player);
+  check(step.x===7 && step.y===7,'Pathfinding uses diagonals');
+  game.map.grid[8][7]=0;const detour=game.findStep(actor,game.player);
+  check(!(detour.x===7 && detour.y===7),'Pathfinding respects corner barriers');
+  game.map.grid[8][7]=1;game.waitTurn();settle();
+  check(actor.alertTurns>0 && actor.lastSeen.x===5,'Enemy records the visible hero position');
+  game.player.x=20;game.player.y=17;const before={x:actor.x,y:actor.y};game.waitTurn();
+  check(actor.x!==before.x || actor.y!==before.y,'Enemy briefly pursues the last known position');
+}
+{
+  const game=gameFor();const hp=game.player.maxHp-10;game.player.hp=hp;
+  game.toggleBag(true);check(game.hunger===100 && game.turn===0,'Opening inventory does not cost hunger or a turn');game.toggleBag(false);
+  for(let i=0;i<10;i++){game.waitTurn();settle();}
+  check(game.hunger===98.5,'Ten actions cost 1.5 satiety');
+  check(game.player.hp>hp,'Fed hero recovers health over turns');
+  game.hunger=0;const hungryHp=game.player.hp;game.waitTurn();settle();
+  check(game.player.hp<hungryHp,'Starvation damages the hero');
+  game.hunger=10;game.useRunItem('ration');settle();check(game.hunger===44.85,'Ration restores 35 satiety and spends one turn');
+  game.hunger=95;game.runItems.ration=1;game.useRunItem('ration');settle();check(game.hunger===99.85,'Food never exceeds 100 satiety');
+  game.hunger=10;game.runItems.potion=1;game.useRunItem('potion');settle();check(game.hunger===9.85,'Potion does not restore satiety');
+  game.hunger=10;game.inventory.consume=()=>true;game.useGardenItem('food','bread');settle();check(game.hunger===29.85,'Garden food restores 20 satiety');
+  const remaining=game.hunger;game.savedHp=33;game.floor=2;game.generateFloor();
+  check(game.hunger===remaining && game.player.hp===33,'Floor change preserves hunger and health without free healing');
+}
+{
+  const game=gameFor();game.map.stairs={x:6,y:5};game.tryMove('right');settle();
+  check(game.floor===1 && game.choicePending && game.turn===1,'Reaching stairs opens a choice after the movement turn');
+  const hunger=game.hunger;game.tryMove('right');game.castSpell();game.waitTurn();game.useRunItem('ration');
+  check(game.turn===1 && game.hunger===hunger,'Stair choice pauses all game actions');
+  game.closeStairs();check(game.canAct() && game.floor===1,'Canceling descent resumes same floor');
+  game.tryStairs();game.closeStairs();game.descend();
+  check(game.floor===2 && game.turn===1 && game.hunger===hunger,'Confirmed descent adds no extra turn');
+  const locked=gameFor();locked.floor=5;locked.map.stairs={x:5,y:5};const boss=enemy(locked,15,15);boss.type='boss';locked.tryStairs();
+  check(!locked.choicePending,'Living boss locks the final stair');
+}
+{
+  const game=gameFor();game.explored=new Set(['5,5']);game.visible=new Set(['5,5']);game.map.stairs={x:9,y:9};
+  game.objects=[{kind:'chest',x:10,y:10,opened:false}];const target=enemy(game,7,7);
+  check(game.minimapMarkers().length===1,'Unexplored map reveals only player');
+  game.explored.add('9,9');game.explored.add('10,10');game.explored.add('7,7');
+  check(game.minimapMarkers().length===3,'Explored stairs/chest remembered, unseen enemy hidden');
+  game.visible.add('7,7');check(game.minimapMarkers().length===4,'Visible enemy shown on map');
+  target.dead=true;game.objects[0].opened=true;check(game.minimapMarkers().length===2,'Dead enemies and opened chests disappear from map');
+  for(let i=0;i<10;i++)game.message(`Event ${i}`);game.message('Event 9');
+  check(game.journal.length===4 && game.journal[0]==='Event 6','Combat journal remains bounded and deduplicates messages');
+}
+console.log(`Donjon : ${checks} vérifications réussies (héros, sorts, récompenses, diagonales, faim, carte et escaliers).`);
 
 if(process.argv.includes('--rewards-audit')){
   const profiles=Array.from({length:6},(_,index)=>{

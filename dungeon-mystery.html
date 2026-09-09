@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Chroniques d'Obsidienne — Donjon Mystère</title>
-  <link rel="stylesheet" href="modes/dungeon-mystery/css/dungeon-mystery.css?v=5">
+  <link rel="stylesheet" href="modes/dungeon-mystery/css/dungeon-mystery.css?v=6">
 </head>
 <body>
   <main id="mystery-app">
@@ -15,6 +15,7 @@
         <strong id="hero-name">Choisis ton héros</strong>
         <span id="floor-label">Étage 1 / 5</span>
         <div class="meter hp"><i id="hp-fill"></i><b id="hp-label">100 / 100 PV</b></div>
+        <div id="hunger-meter" class="meter hunger" title="La satiété baisse avec les tours. Mange pour éviter la faim et récupérer progressivement des PV."><i id="hunger-fill"></i><b id="hunger-label">Satiété 100 / 100</b></div>
       </div>
       <div class="run-card">
         <span id="turn-label">Tour 0</span>
@@ -23,6 +24,22 @@
       </div>
     </section>
 
+    <section id="map-panel" class="map-panel" aria-label="Carte des zones explorées">
+      <strong>CARTE DE L’ÉTAGE</strong>
+      <canvas id="minimap" width="180" height="120" aria-label="Mini-carte : héros crème, ennemis roses, coffres dorés, escalier violet"></canvas>
+      <small><span class="map-hero">◆ Toi</span> · <span class="map-enemy">◆ Ennemi</span><br><span class="map-chest">◆ Coffre</span> · <span class="map-stairs">◆ Escalier</span></small>
+    </section>
+
+    <ol id="combat-log" class="combat-log" aria-label="Derniers événements"></ol>
+    <nav class="movement-controls" aria-label="Déplacements en huit directions">
+      <div class="movement-pad">
+        <button type="button" data-direction="upLeft" aria-label="Nord-ouest">↖</button><button type="button" data-direction="up" aria-label="Nord">↑</button><button type="button" data-direction="upRight" aria-label="Nord-est">↗</button>
+        <button type="button" data-direction="left" aria-label="Ouest">←</button><button type="button" id="pad-wait" aria-label="Attendre un tour">·</button><button type="button" data-direction="right" aria-label="Est">→</button>
+        <button type="button" data-direction="downLeft" aria-label="Sud-ouest">↙</button><button type="button" data-direction="down" aria-label="Sud">↓</button><button type="button" data-direction="downRight" aria-label="Sud-est">↘</button>
+      </div>
+      <button id="aim-toggle" type="button" aria-pressed="false">Viser sans avancer</button>
+    </nav>
+
     <aside class="side-panel">
       <button id="basic-attack" type="button">Attaque [Espace]</button>
       <button id="cast-spell" type="button" disabled>Sort [F]</button>
@@ -30,6 +47,8 @@
       <small id="summon-status"></small>
       <button id="bag-toggle" type="button">Sac du jardin [I]</button>
       <button id="wait-turn" type="button">Attendre un tour [.]</button>
+      <button id="map-toggle" type="button" aria-expanded="true" aria-controls="map-panel">Carte [M]</button>
+      <button id="stairs-action" type="button" hidden>Prendre l’escalier [R]</button>
       <button id="new-run" type="button">Préparer une expédition</button>
       <div class="legend">
         <b>Commandes</b>
@@ -37,6 +56,7 @@
         <span>Flèches : avancer / attaquer</span>
         <span>Espace : attaquer / interagir devant</span>
         <span>F : sort · Maj + direction : s’orienter</span>
+        <span>Pavé numérique : 8 directions · 5 : attendre</span>
         <span>I : inventaire</span>
       </div>
     </aside>
@@ -46,15 +66,24 @@
         <div><small>INVENTAIRE PARTAGÉ</small><h2>Cuisine & alchimie du jardin</h2></div>
         <button id="bag-close" type="button">Fermer</button>
       </div>
-      <p>Consommer un objet retire réellement une unité de ton inventaire du jardin.</p>
+      <p>Les rations et les plats restaurent la satiété. Les potions soignent. Consommer un objet fait passer un tour et retire une unité de ton inventaire.</p>
       <div id="inventory-list" class="inventory-list"></div>
+    </section>
+
+    <section id="stairs-dialog" class="stairs-dialog" role="dialog" aria-modal="true" aria-labelledby="stairs-title" aria-describedby="stairs-detail" hidden>
+      <div class="stairs-card">
+        <small>UN NOUVEAU PASSAGE</small>
+        <h2 id="stairs-title">Descendre à l’étage suivant ?</h2>
+        <p id="stairs-detail">Tu peux encore explorer cet étage.</p>
+        <div><button id="stairs-cancel" type="button">Continuer à explorer</button><button id="stairs-confirm" type="button">Descendre</button></div>
+      </div>
     </section>
 
     <div id="message" class="message hidden"></div>
     <section id="intro" class="intro">
       <span class="rune">◆</span>
       <h1>Donjon Mystère</h1>
-      <p>À chaque action, les monstres jouent à leur tour. Trouve l'escalier et atteins le cinquième étage.</p>
+      <p>Explore les salles, surveille ta satiété et choisis ton placement. Chaque action fait jouer les monstres. Trouve l’escalier et terrasse le gardien du cinquième étage.</p>
       <div id="hero-picker" class="hero-picker">
         <label for="hero-select">Ton héros du mode idle</label>
         <select id="hero-select" disabled><option>Connexion au mode idle…</option></select>
@@ -64,6 +93,6 @@
       <button id="start-run" type="button" disabled>Chargement…</button>
     </section>
   </main>
-  <script src="modes/dungeon-mystery/js/dungeon-mystery.js?v=22"></script>
+  <script src="modes/dungeon-mystery/js/dungeon-mystery.js?v=23"></script>
 </body>
 </html>

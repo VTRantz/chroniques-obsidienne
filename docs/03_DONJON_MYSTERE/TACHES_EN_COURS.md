@@ -9,3 +9,7 @@
 - [x] Vérifier les gains aux six paliers et le versement réel au retour.
 - [ ] Comparer les durées humaines et le butin affichés au bilan ; affiner le rendement si nécessaire.
 - [ ] Équilibrer les ennemis selon la progression d’équipement souhaitée.
+- [x] Ajouter huit directions et appliquer les mêmes contraintes d’angle aux déplacements, attaques et ennemis.
+- [x] Ajouter mini-carte, satiété, récupération de PV et choix aux escaliers.
+- [x] Améliorer lisibilité, journal, visée et commandes ordinateur/mobile.
+- [ ] Recueillir des durées de parties après ces changements de déplacement et de survie.

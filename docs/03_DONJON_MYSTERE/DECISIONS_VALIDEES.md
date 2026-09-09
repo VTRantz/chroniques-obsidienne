@@ -13,3 +13,8 @@ Les portées, la commande F, l’orientation gratuite et les adaptations solo de
 
 - « Je voudrais juste qu’elles soient cohérentes pour le temps investi. »
 - Le réglage effectué conserve or, essence et ressources. Coffres garantis, augmentation du boss et adaptation au palier idle sont des choix d’implémentation ; les montants doivent être confrontés aux durées réellement jouées.
+
+## Rapprochement de Donjon Mystère — 10 septembre 2026
+
+- Le joueur demande de renforcer le gameplay et l’ambiance visuelle, avec le gameplay en priorité.
+- Mise en œuvre : huit directions, exploration avec mini-carte, satiété et récupération, poursuite limitée des ennemis, choix aux escaliers et interface plus lisible. Les valeurs précises sont des choix d’implémentation documentés dans les règles actuelles.
