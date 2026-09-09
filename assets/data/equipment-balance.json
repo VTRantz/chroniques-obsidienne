@@ -1,0 +1,461 @@
+{
+  "version": 1,
+  "description": "Raretés, sets, statistiques et coûts des équipements.",
+  "maxUpgrade": 15,
+  "mainStatPerUpgrade": 0.2,
+  "rarities": {
+    "commun": {
+      "label": "Commun",
+      "color": "#b4bdcb",
+      "sell": 10
+    },
+    "peuCommun": {
+      "label": "Peu commun",
+      "color": "#65d69b",
+      "sell": 16
+    },
+    "rare": {
+      "label": "Rare",
+      "color": "#6ba9ff",
+      "sell": 25
+    },
+    "epique": {
+      "label": "Epique",
+      "color": "#b684ff",
+      "sell": 70
+    },
+    "legendaire": {
+      "label": "Légendaire",
+      "color": "#ffbf55",
+      "sell": 190
+    }
+  },
+  "sets": {
+    "zombie": {
+      "name": "Set du Fléau",
+      "family": "zombie",
+      "bonus3": "PV maximum +15 %",
+      "bonus6": "PV maximum +35 %",
+      "effects": {
+        "3": {
+          "hpPct": 0.15
+        },
+        "6": {
+          "hpPct": 0.35
+        }
+      }
+    },
+    "orc": {
+      "name": "Set du Carnage",
+      "family": "orc",
+      "bonus3": "Dégâts +15 %",
+      "bonus6": "Dégâts +35 %",
+      "effects": {
+        "3": {
+          "powerPct": 0.15
+        },
+        "6": {
+          "powerPct": 0.35
+        }
+      }
+    },
+    "skeleton": {
+      "name": "Set du Bastion d’Os",
+      "family": "skeleton",
+      "bonus3": "Défense +25 %",
+      "bonus6": "Défense +60 %",
+      "effects": {
+        "3": {
+          "armorPct": 0.25
+        },
+        "6": {
+          "armorPct": 0.6
+        }
+      }
+    },
+    "vampire": {
+      "name": "Set de la Soif Rouge",
+      "family": "vampire",
+      "bonus3": "Vol de vie +8 %",
+      "bonus6": "Vol de vie +18 %",
+      "effects": {
+        "3": {
+          "lifesteal": 8
+        },
+        "6": {
+          "lifesteal": 18
+        }
+      }
+    },
+    "desert": {
+      "name": "Set des Sables Vifs",
+      "family": "desert",
+      "bonus3": "Vitesse +5 %",
+      "bonus6": "Vitesse +12 %",
+      "effects": {
+        "3": {
+          "speed": 0.5
+        },
+        "6": {
+          "speed": 1.2
+        }
+      }
+    },
+    "mycelium": {
+      "name": "Set du Mycélium Féral",
+      "family": "mycelium",
+      "bonus3": "Critique +8 % · dégâts crit. +15 %",
+      "bonus6": "Critique +20 % · dégâts crit. +40 %",
+      "effects": {
+        "3": {
+          "crit": 8,
+          "critDamage": 0.15
+        },
+        "6": {
+          "crit": 20,
+          "critDamage": 0.4
+        }
+      }
+    }
+  },
+  "substatCount": {
+    "commun": 0,
+    "peuCommun": 1,
+    "rare": 2,
+    "epique": 3,
+    "legendaire": 4
+  },
+  "mainStats": {
+    "1": {
+      "power": 6,
+      "vitality": 30,
+      "armor": 4,
+      "pct": 4,
+      "crit": 3,
+      "critDamage": 0.06,
+      "speed": 0.3
+    },
+    "2": {
+      "power": 10,
+      "vitality": 50,
+      "armor": 7,
+      "pct": 6,
+      "crit": 4,
+      "critDamage": 0.08,
+      "speed": 0.4
+    },
+    "3": {
+      "power": 16,
+      "vitality": 85,
+      "armor": 11,
+      "pct": 8,
+      "crit": 5,
+      "critDamage": 0.11,
+      "speed": 0.5
+    },
+    "4": {
+      "power": 26,
+      "vitality": 145,
+      "armor": 18,
+      "pct": 11,
+      "crit": 7,
+      "critDamage": 0.15,
+      "speed": 0.7
+    },
+    "5": {
+      "power": 42,
+      "vitality": 240,
+      "armor": 30,
+      "pct": 15,
+      "crit": 9,
+      "critDamage": 0.2,
+      "speed": 0.9
+    },
+    "6": {
+      "power": 68,
+      "vitality": 390,
+      "armor": 48,
+      "pct": 20,
+      "crit": 12,
+      "critDamage": 0.27,
+      "speed": 1.2
+    }
+  },
+  "substatRolls": {
+    "1": {
+      "power": [
+        1,
+        2
+      ],
+      "vitality": [
+        5,
+        9
+      ],
+      "armor": [
+        1,
+        2
+      ],
+      "hpPct": [
+        1,
+        2
+      ],
+      "powerPct": [
+        1,
+        2
+      ],
+      "armorPct": [
+        1,
+        2
+      ],
+      "crit": [
+        1,
+        2
+      ],
+      "critDamage": [
+        0.02,
+        0.03
+      ],
+      "speed": [
+        0.1,
+        0.2
+      ]
+    },
+    "2": {
+      "power": [
+        2,
+        3
+      ],
+      "vitality": [
+        8,
+        14
+      ],
+      "armor": [
+        1,
+        3
+      ],
+      "hpPct": [
+        2,
+        3
+      ],
+      "powerPct": [
+        2,
+        3
+      ],
+      "armorPct": [
+        2,
+        3
+      ],
+      "crit": [
+        1,
+        2
+      ],
+      "critDamage": [
+        0.02,
+        0.04
+      ],
+      "speed": [
+        0.15,
+        0.25
+      ]
+    },
+    "3": {
+      "power": [
+        3,
+        5
+      ],
+      "vitality": [
+        13,
+        22
+      ],
+      "armor": [
+        2,
+        4
+      ],
+      "hpPct": [
+        2,
+        4
+      ],
+      "powerPct": [
+        2,
+        4
+      ],
+      "armorPct": [
+        2,
+        4
+      ],
+      "crit": [
+        1,
+        3
+      ],
+      "critDamage": [
+        0.03,
+        0.05
+      ],
+      "speed": [
+        0.2,
+        0.35
+      ]
+    },
+    "4": {
+      "power": [
+        5,
+        8
+      ],
+      "vitality": [
+        22,
+        36
+      ],
+      "armor": [
+        3,
+        6
+      ],
+      "hpPct": [
+        3,
+        5
+      ],
+      "powerPct": [
+        3,
+        5
+      ],
+      "armorPct": [
+        3,
+        5
+      ],
+      "crit": [
+        2,
+        3
+      ],
+      "critDamage": [
+        0.04,
+        0.07
+      ],
+      "speed": [
+        0.3,
+        0.45
+      ]
+    },
+    "5": {
+      "power": [
+        8,
+        12
+      ],
+      "vitality": [
+        36,
+        58
+      ],
+      "armor": [
+        5,
+        9
+      ],
+      "hpPct": [
+        4,
+        6
+      ],
+      "powerPct": [
+        4,
+        6
+      ],
+      "armorPct": [
+        4,
+        6
+      ],
+      "crit": [
+        2,
+        4
+      ],
+      "critDamage": [
+        0.05,
+        0.09
+      ],
+      "speed": [
+        0.4,
+        0.6
+      ]
+    },
+    "6": {
+      "power": [
+        11,
+        16
+      ],
+      "vitality": [
+        55,
+        85
+      ],
+      "armor": [
+        7,
+        12
+      ],
+      "hpPct": [
+        5,
+        8
+      ],
+      "powerPct": [
+        5,
+        8
+      ],
+      "armorPct": [
+        5,
+        8
+      ],
+      "crit": [
+        3,
+        5
+      ],
+      "critDamage": [
+        0.07,
+        0.12
+      ],
+      "speed": [
+        0.5,
+        0.75
+      ]
+    }
+  },
+  "rarityCostMultipliers": {
+    "commun": 1,
+    "peuCommun": 1.25,
+    "rare": 1.6,
+    "epique": 2,
+    "legendaire": 2.5
+  },
+  "tierGoldCostMultipliers": {
+    "1": 1,
+    "2": 2.1,
+    "3": 4.4,
+    "4": 8.3,
+    "5": 15.5,
+    "6": 28
+  },
+  "tierSalvageMultipliers": {
+    "1": 1,
+    "2": 1.5,
+    "3": 2.1,
+    "4": 2.8,
+    "5": 3.6,
+    "6": 4.5
+  },
+  "mainStatBySlot": {
+    "Arme": "power",
+    "Casque": "vitality",
+    "Armure": "armor"
+  },
+  "variableMainStats": [
+    "hpPct",
+    "powerPct",
+    "armorPct",
+    "crit",
+    "critDamage",
+    "speed"
+  ],
+  "substatKeys": [
+    "power",
+    "vitality",
+    "armor",
+    "hpPct",
+    "powerPct",
+    "armorPct",
+    "crit",
+    "critDamage",
+    "speed"
+  ]
+}

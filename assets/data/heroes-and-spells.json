@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "description": "Héros jouables, statistiques de base et sorts actifs.",
+  "heroes": [
+    {
+      "id": "archer",
+      "name": "Aelya",
+      "title": "Archère",
+      "portrait": "assets/sprites/Characters/craftpix/Aelya/Idle/Idle_000.png",
+      "position": "front",
+      "base": {
+        "hp": 92,
+        "power": 12,
+        "armor": 4,
+        "crit": 6,
+        "precision": 16
+      },
+      "spell": {
+        "name": "Flèche verdoyante",
+        "type": "strike",
+        "multiplier": 1.65,
+        "cooldownTurns": 3,
+        "vfx": "Fleche_Verdoyante",
+        "vfxSubfolder": "PNG",
+        "vfxFrames": 4,
+        "icon": "Icons/PNG/Icons_Fleche_Verdoyante.png",
+        "projectile": true,
+        "projectileDuration": 1500,
+        "projectileClass": "verdant-arrow",
+        "impactColor": "verdant",
+        "projectileOriginX": 0.7,
+        "projectileOriginY": 0.62,
+        "projectileVisualOffsetX": 48,
+        "projectileTargetX": 0.34,
+        "projectileTargetY": 0.7
+      }
+    },
+    {
+      "id": "barbarian",
+      "name": "Brom",
+      "title": "Guerrier barbare",
+      "portrait": "assets/sprites/Characters/craftpix/Brom/Idle/Idle_000.png",
+      "position": "middle",
+      "base": {
+        "hp": 135,
+        "power": 11,
+        "armor": 10,
+        "crit": 3,
+        "precision": 0
+      },
+      "spell": {
+        "name": "Entaille dorée",
+        "type": "strike",
+        "multiplier": 1.8,
+        "cooldownTurns": 3,
+        "castAnimation": "spell",
+        "vfx": "Entaille_Doree",
+        "vfxSubfolder": "PNG",
+        "vfxFrames": 4,
+        "vfxFrameDuration": 80,
+        "vfxHoldDuration": 220,
+        "vfxOnTarget": true,
+        "icon": "Icons/PNG/Icons_Entaille_Doree.png",
+        "impactFrame": 5
+      }
+    },
+    {
+      "id": "mage",
+      "name": "Lyra",
+      "title": "Mage",
+      "portrait": "assets/sprites/Characters/craftpix/Lyra/Idle/Idle_000.png",
+      "position": "back",
+      "base": {
+        "hp": 85,
+        "power": 15,
+        "armor": 3,
+        "crit": 4,
+        "precision": 8
+      },
+      "spell": {
+        "name": "Boule d’eau",
+        "type": "strike",
+        "multiplier": 1.55,
+        "cooldownTurns": 3,
+        "vfx": "Boule_Deau",
+        "vfxSubfolder": "PNG",
+        "vfxFrames": 12,
+        "icon": "Icons/PNG/Icons_Boule_Deau.png",
+        "impactFrame": 5,
+        "projectile": true,
+        "projectileDuration": 1500,
+        "impactColor": "water",
+        "projectileOriginX": 0.67,
+        "projectileOriginY": 0.62,
+        "projectileTargetX": 0.36,
+        "projectileTargetY": 0.68
+      }
+    },
+    {
+      "id": "priest",
+      "name": "Elyne",
+      "title": "Prêtresse",
+      "unlock": "twitch",
+      "portrait": "assets/sprites/Characters/craftpix/Elyne/Idle/0_Priest_Idle_000.png",
+      "position": null,
+      "base": {
+        "hp": 112,
+        "power": 7,
+        "armor": 7,
+        "crit": 2,
+        "precision": 4
+      },
+      "spell": {
+        "name": "Récupération de vie",
+        "type": "heal",
+        "multiplier": 0.18,
+        "cooldownTurns": 4,
+        "castAnimation": "spell",
+        "vfx": "Recuperation_De_Vie",
+        "vfxSubfolder": "PNG",
+        "vfxFrames": 12,
+        "icon": "Icons/PNG/Icons_Recuperation_De_Vie.png"
+      }
+    },
+    {
+      "id": "knight",
+      "name": "Gareth",
+      "title": "Chevalier blanc",
+      "unlock": "twitch",
+      "portrait": "assets/sprites/Characters/craftpix/Gareth/Idle/Idle_000.png",
+      "position": null,
+      "base": {
+        "hp": 150,
+        "power": 9,
+        "armor": 14,
+        "crit": 1,
+        "precision": 0
+      },
+      "spell": {
+        "name": "Frappe du rempart",
+        "type": "strike",
+        "multiplier": 1.8,
+        "cooldownTurns": 3,
+        "castAnimation": "spell",
+        "vfx": "Frappe_Du_Rempart",
+        "vfxSubfolder": "PNG",
+        "vfxFrames": 10,
+        "vfxAnchor": "sword-tip",
+        "icon": "Icons/PNG/Icons_Frappe_Du_Rempart.png",
+        "impactFrame": 5
+      }
+    },
+    {
+      "id": "paladin",
+      "name": "Aldric",
+      "title": "Paladin",
+      "unlock": "twitch",
+      "portrait": "assets/sprites/Characters/craftpix/Aldric/Idle/0_Paladin_Idle_000.png",
+      "position": null,
+      "base": {
+        "hp": 142,
+        "power": 10,
+        "armor": 13,
+        "crit": 2,
+        "precision": 3
+      },
+      "spell": {
+        "name": "Bénédiction du bouclier",
+        "type": "heal",
+        "multiplier": 0.14,
+        "cooldownTurns": 4,
+        "castAnimation": "spell",
+        "vfx": "Benediction_Du_Bouclier",
+        "vfxSubfolder": "PNG",
+        "vfxFrames": 1,
+        "vfxDuration": 650,
+        "vfxPlacement": "healing",
+        "icon": "Icons/PNG/Icons_Benediction_Du_Bouclier.png"
+      }
+    },
+    {
+      "id": "ninja",
+      "name": "Kaito",
+      "title": "Ninja blanc",
+      "unlock": "twitch",
+      "portrait": "assets/sprites/Characters/craftpix/Kaito/Idle/Idle_000.png",
+      "position": null,
+      "base": {
+        "hp": 96,
+        "power": 16,
+        "armor": 5,
+        "crit": 8,
+        "precision": 12
+      },
+      "spell": {
+        "name": "Nuage toxique",
+        "type": "aoe",
+        "multiplier": 1.25,
+        "cooldownTurns": 3,
+        "castAnimation": "spell",
+        "vfx": "Nuage_Toxique",
+        "vfxSubfolder": "PNG",
+        "vfxFrames": 12,
+        "icon": "Icons/PNG/Icons_Nuage_Toxique.png",
+        "impactFrame": 5,
+        "impactColor": "arcane",
+        "vfxOnTarget": true
+      }
+    },
+    {
+      "id": "necromancer",
+      "name": "Nécromancien",
+      "title": "Invocateur des âmes",
+      "unlock": "twitch",
+      "portrait": "assets/sprites/Characters/craftpix/Necromancien/Idle/Necromancer_01_Idle_000.png",
+      "position": null,
+      "base": {
+        "hp": 98,
+        "power": 11,
+        "armor": 5,
+        "crit": 5,
+        "precision": 10
+      },
+      "spell": {
+        "name": "Appel du crâne",
+        "type": "summon",
+        "cooldownTurns": 5,
+        "castAnimation": "spell",
+        "impactFrame": 6,
+        "icon": "Icons/PNG/Icons_Appel_du_Crane.png",
+        "summonCount": 1,
+        "summonAttacks": 2,
+        "summonDamageMultiplier": 0.45
+      }
+    }
+  ]
+}

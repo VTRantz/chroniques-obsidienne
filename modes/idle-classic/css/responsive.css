@@ -1,0 +1,95 @@
+/* Viewport layout: keep controls readable, size combat artwork from its arena. */
+body { zoom:1; width:100%; }
+.app-shell { width:100%; max-width:1600px; padding:clamp(12px,2vw,28px); margin-inline:auto; }
+body.idle-wide #tab-combat .battle-grid,
+body.idle-wide #tab-tour .battle-grid { width:100%; margin-left:0; transform:none; }
+#tab-combat,#tab-tour,.battle-grid,.combat-card,.loot-card,.hero-card,.standalone-panel { min-width:0; }
+.site-header,.header-actions,.main-tabs { flex-wrap:wrap; }
+.tab-group { min-width:0; }
+#battle-area.immersive-battle {
+  container-type:size; position:relative; width:100%; height:clamp(300px,52dvh,600px);
+  min-height:0; max-height:none; padding:0; overflow:hidden;
+}
+#battle-area .battle-team .fighter {
+  width:14%; min-width:0; bottom:clamp(12px,4cqh,24px); padding-inline:0;
+}
+#battle-area .battle-team-heroes .fighter[data-position="back"] { left:2%; right:auto; }
+#battle-area .battle-team-heroes .fighter[data-position="middle"] { left:17%; right:auto; }
+#battle-area .battle-team-heroes .fighter[data-position="front"] { left:32%; right:auto; }
+#battle-area .battle-team-enemies .fighter[data-position="front"] { right:32%; left:auto; }
+#battle-area .battle-team-enemies .fighter[data-position="middle"] { right:17%; left:auto; }
+#battle-area .battle-team-enemies .fighter[data-position="back"] { right:2%; left:auto; }
+#battle-area .battle-team .fighter .fighter-sprite {
+  width:min(14cqw,34cqh,190px); height:min(14cqw,34cqh,190px); max-width:none;
+  object-fit:contain; transform:none !important; transform-origin:center bottom !important;
+}
+#battle-area .battle-team .fighter.enemy .fighter-sprite { transform:scaleX(-1) !important; }
+#battle-area .battle-team .fighter.enemy.boss .fighter-sprite { width:min(19cqw,46cqh,260px); height:min(19cqw,46cqh,260px); }
+#battle-area .battle-team .fighter.enemy.mini-boss .fighter-sprite { width:min(16cqw,39cqh,215px); height:min(16cqw,39cqh,215px); }
+#battle-area #hero-fighter-necromancer .fighter-sprite { width:min(16cqw,39cqh,215px); height:min(16cqw,39cqh,215px); }
+#battle-area .battle-team .fighter h3 { margin:0 0 4px; padding:3px 2px; width:100%; min-height:28px; max-height:32px; font-size:clamp(9px,1cqw,13px); line-height:1.15; overflow:hidden; }
+#battle-area .battle-team .enemy-hp { width:90%; height:16px; }
+#battle-area .battle-team-enemies .fighter { padding-bottom:47px; }
+#battle-area .battle-team .battle-spell-cooldown { width:42px; height:42px; flex-basis:42px; }
+#battle-area .battle-team .battle-spell-cooldown img,#battle-area .battle-team .battle-spell-cooldown span { width:38px; height:38px; }
+#battle-area .battle-team .fighter .spell-vfx { width:min(23cqw,48cqh,280px); height:min(23cqw,48cqh,280px); }
+#battle-area .battle-team .fighter.player .spell-vfx { width:min(17cqw,36cqh,200px); height:min(17cqw,36cqh,200px); }
+#battle-area .battle-team .fighter.enemy .spell-vfx.golden-slash-vfx { width:min(27cqw,56cqh,320px); height:min(27cqw,56cqh,320px); }
+#battle-area .spell-projectile,#battle-area .spell-projectile.verdant-arrow { width:min(20cqw,40cqh,230px); height:min(20cqw,40cqh,230px); }
+/* L'invocation conserve la même échelle que le Nécromancien. */
+#battle-area .summoned-skull { width:min(16cqw,39cqh,215px); height:min(16cqw,39cqh,215px); }
+#battle-area .floating-damage { font-size:clamp(14px,2.2cqw,30px); }
+#battle-area .combat-options { top:10px; left:10px; }
+#combat-options-menu { max-width:calc(100vw - 80px); }
+.inventory-grid { grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr)); }
+.preset-list { grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr)); }
+iframe { max-width:100%; }
+@media(max-width:1000px) {
+  .hero-roster-list { flex-wrap:wrap; }
+  .inventory-filter-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .inventory-substat-filter { grid-template-columns:1fr; }
+}
+@media(max-width:750px) {
+  .app-shell { padding:12px 10px 40px; }
+  .combat-card,.loot-card { padding:10px; }
+  #battle-area.immersive-battle { height:clamp(290px,45dvh,400px); }
+  #battle-area .battle-team .fighter .fighter-sprite { width:17cqw; height:17cqw; }
+  #battle-area .battle-team .fighter.enemy.boss .fighter-sprite { width:22cqw; height:22cqw; }
+  #battle-area .battle-team .fighter.enemy.mini-boss .fighter-sprite,
+  #battle-area #hero-fighter-necromancer .fighter-sprite,
+  #battle-area .summoned-skull { width:19cqw; height:19cqw; }
+  #battle-area .battle-team .fighter h3 { font-size:9px; }
+  #battle-area .battle-team .enemy-hp::after { font-size:8px; }
+  .inventory-filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .equipment-grid { grid-template-columns:1fr; grid-template-areas:'hero' 'helmet' 'amulet' 'weapon' 'gloves' 'armor' 'boots'; }
+  .formation-slots { min-width:0; }
+  .combat-traits { flex-wrap:wrap; }
+}
+@media(max-height:550px) and (min-width:600px) {
+  #battle-area.immersive-battle { height:290px; }
+}
+#battle-area.immersive-battle { margin-inline:0; border:1px solid #687691; border-radius:16px; }
+#battle-area .battle-layer { background-size:cover; }
+.world-map-scene { width:100%; margin-inline:auto; }
+@media(max-width:750px) {
+ #battle-area .battle-team .fighter h3 { font-family:Manrope,sans-serif; font-weight:800; font-size:9px; overflow-wrap:normal; }
+ #battle-area .battle-team .enemy-hp::after { font-family:Manrope,sans-serif; font-size:8px; font-weight:700; }
+}
+.inventory-tower-resource-list { position:relative; }
+.tower-resources { position:relative; }
+.tower-resources .tower-resource { position:static; }
+.tower-resources .tower-resource::after,
+.tower-resources .tower-resource:hover::after,
+.tower-resources .tower-resource:focus-visible::after { left:0; right:0; width:auto; transform:none; }
+.inventory-tower-resource-list .inventory-tower-resource { position:static; }
+.inventory-tower-resource-list .inventory-tower-resource::after,
+.inventory-tower-resource-list .inventory-tower-resource:hover::after,
+.inventory-tower-resource-list .inventory-tower-resource:focus-visible::after { left:0; right:0; width:auto; transform:none; }
+@media(max-width:1000px) {
+ .inventory-tower-wallet { flex-direction:column; align-items:stretch; }
+ .inventory-tower-resource-list { width:100%; }
+}
+@media(max-width:400px) {
+ .stat-group .stats { grid-template-columns:1fr; }
+ .stats span { min-width:0; overflow-wrap:anywhere; }
+}

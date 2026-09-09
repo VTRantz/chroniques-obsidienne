@@ -1,0 +1,601 @@
+{
+  "version": 1,
+  "chapters": [
+    {
+      "id": "premiers-pas",
+      "tier": 1,
+      "title": "Les premiers pas",
+      "subtitle": "Former une équipe et comprendre la première route.",
+      "objectives": [
+        {
+          "id": "kills-25",
+          "title": "Premiers combats",
+          "description": "Vaincre 25 ennemis.",
+          "metric": "kills",
+          "target": 25,
+          "reward": {
+            "gold": 100
+          }
+        },
+        {
+          "id": "equip-3",
+          "title": "S’équiper",
+          "description": "Porter 3 pièces d’équipement sur l’ensemble des héros.",
+          "metric": "equipped",
+          "target": 3,
+          "reward": {
+            "gold": 120
+          }
+        },
+        {
+          "id": "bestiary-3",
+          "title": "Premières observations",
+          "description": "Découvrir 3 créatures dans le Bestiaire.",
+          "metric": "bestiary",
+          "target": 3,
+          "reward": {
+            "gold": 100
+          }
+        },
+        {
+          "id": "heroes-level-3",
+          "title": "Équipe novice",
+          "description": "Monter 3 héros au niveau 3.",
+          "metric": "heroesLevel",
+          "level": 3,
+          "target": 3,
+          "reward": {
+            "gold": 150
+          }
+        },
+        {
+          "id": "upgrades-3",
+          "title": "Premier investissement",
+          "description": "Effectuer 3 améliorations d’équipement.",
+          "metric": "upgrades",
+          "target": 3,
+          "reward": {
+            "gold": 150
+          }
+        },
+        {
+          "id": "route-t1-1",
+          "title": "Une route sécurisée",
+          "description": "Vaincre le boss T1 d’une famille.",
+          "metric": "routes",
+          "tier": 1,
+          "target": 1,
+          "reward": {
+            "essence": 20,
+            "keys": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "maitrise-t1",
+      "tier": 1,
+      "title": "Maîtrise du T1",
+      "subtitle": "Comparer les premiers sets et ouvrir toutes les familles.",
+      "objectives": [
+        {
+          "id": "kills-100",
+          "title": "Combattant régulier",
+          "description": "Vaincre 100 ennemis.",
+          "metric": "kills",
+          "target": 100,
+          "reward": {
+            "gold": 250
+          }
+        },
+        {
+          "id": "upgrades-12",
+          "title": "Équipement renforcé",
+          "description": "Effectuer 12 améliorations au total.",
+          "metric": "upgrades",
+          "target": 12,
+          "reward": {
+            "gold": 300
+          }
+        },
+        {
+          "id": "set-3",
+          "title": "Identité de build",
+          "description": "Activer un bonus de set 3 pièces sur un héros.",
+          "metric": "heroesWithSet",
+          "pieces": 3,
+          "target": 1,
+          "reward": {
+            "gold": 250
+          }
+        },
+        {
+          "id": "bestiary-8",
+          "title": "Reconnaissance",
+          "description": "Découvrir 8 créatures.",
+          "metric": "bestiary",
+          "target": 8,
+          "reward": {
+            "essence": 15
+          }
+        },
+        {
+          "id": "route-t1-3",
+          "title": "Trois familles",
+          "description": "Terminer le T1 de 3 routes différentes.",
+          "metric": "routes",
+          "tier": 1,
+          "target": 3,
+          "reward": {
+            "essence": 20
+          }
+        },
+        {
+          "id": "route-t1-6",
+          "title": "Tour des terres connues",
+          "description": "Terminer le T1 des 6 routes.",
+          "metric": "routes",
+          "tier": 1,
+          "target": 6,
+          "reward": {
+            "essence": 30,
+            "keys": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "conquete-t2",
+      "tier": 2,
+      "title": "Conquête du T2",
+      "subtitle": "Faire progresser plusieurs héros et entretenir le cycle du loot.",
+      "objectives": [
+        {
+          "id": "kills-250",
+          "title": "Expérience du terrain",
+          "description": "Vaincre 250 ennemis.",
+          "metric": "kills",
+          "target": 250,
+          "reward": {
+            "gold": 500
+          }
+        },
+        {
+          "id": "heroes-level-10",
+          "title": "Premier palier de héros",
+          "description": "Monter 3 héros au niveau 10.",
+          "metric": "heroesLevel",
+          "level": 10,
+          "target": 3,
+          "reward": {
+            "gold": 600
+          }
+        },
+        {
+          "id": "recycle-20",
+          "title": "Faire de la place",
+          "description": "Recycler 20 objets au total.",
+          "metric": "recycled",
+          "target": 20,
+          "reward": {
+            "essence": 35
+          }
+        },
+        {
+          "id": "upgrades-35",
+          "title": "Forge appliquée",
+          "description": "Effectuer 35 améliorations au total.",
+          "metric": "upgrades",
+          "target": 35,
+          "reward": {
+            "gold": 500
+          }
+        },
+        {
+          "id": "route-t2-3",
+          "title": "Percée au T2",
+          "description": "Terminer le T2 de 3 routes.",
+          "metric": "routes",
+          "tier": 2,
+          "target": 3,
+          "reward": {
+            "essence": 50
+          }
+        },
+        {
+          "id": "route-t2-6",
+          "title": "Domination du T2",
+          "description": "Terminer le T2 des 6 routes.",
+          "metric": "routes",
+          "tier": 2,
+          "target": 6,
+          "reward": {
+            "essence": 60,
+            "keys": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "forge-t3",
+      "tier": 3,
+      "title": "La forge du T3",
+      "subtitle": "Construire un véritable noyau d’équipe et entrer dans la Tour.",
+      "objectives": [
+        {
+          "id": "kills-500",
+          "title": "Vétéran des routes",
+          "description": "Vaincre 500 ennemis.",
+          "metric": "kills",
+          "target": 500,
+          "reward": {
+            "gold": 1000
+          }
+        },
+        {
+          "id": "heroes-level-18",
+          "title": "Noyau expérimenté",
+          "description": "Monter 3 héros au niveau 18.",
+          "metric": "heroesLevel",
+          "level": 18,
+          "target": 3,
+          "reward": {
+            "gold": 1000
+          }
+        },
+        {
+          "id": "equip-t3-6",
+          "title": "Base T3",
+          "description": "Équiper 6 pièces T3 ou supérieures.",
+          "metric": "equippedTier",
+          "tier": 3,
+          "target": 6,
+          "reward": {
+            "gold": 900
+          }
+        },
+        {
+          "id": "upgrades-80",
+          "title": "Atelier actif",
+          "description": "Effectuer 80 améliorations au total.",
+          "metric": "upgrades",
+          "target": 80,
+          "reward": {
+            "gold": 1200
+          }
+        },
+        {
+          "id": "tower-10",
+          "title": "Première ascension",
+          "description": "Atteindre l’étage 10 de la Tour.",
+          "metric": "tower",
+          "target": 10,
+          "reward": {
+            "essence": 50,
+            "shards": 2
+          }
+        },
+        {
+          "id": "route-t3-6",
+          "title": "Domination du T3",
+          "description": "Terminer le T3 des 6 routes.",
+          "metric": "routes",
+          "tier": 3,
+          "target": 6,
+          "reward": {
+            "essence": 100,
+            "keys": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "strategie-t4",
+      "tier": 4,
+      "title": "Stratégie du T4",
+      "subtitle": "Les sets complets et les améliorations ciblées deviennent indispensables.",
+      "objectives": [
+        {
+          "id": "kills-900",
+          "title": "Campagne prolongée",
+          "description": "Vaincre 900 ennemis.",
+          "metric": "kills",
+          "target": 900,
+          "reward": {
+            "gold": 2000
+          }
+        },
+        {
+          "id": "heroes-level-25",
+          "title": "Équipe confirmée",
+          "description": "Monter 3 héros au niveau 25.",
+          "metric": "heroesLevel",
+          "level": 25,
+          "target": 3,
+          "reward": {
+            "gold": 1800
+          }
+        },
+        {
+          "id": "set-6",
+          "title": "Set complet",
+          "description": "Activer un bonus de set 6 pièces sur un héros.",
+          "metric": "heroesWithSet",
+          "pieces": 6,
+          "target": 1,
+          "reward": {
+            "essence": 100
+          }
+        },
+        {
+          "id": "equip-t4-plus9-6",
+          "title": "Pièces de confiance",
+          "description": "Équiper 6 pièces T4 ou supérieures améliorées au moins +9.",
+          "metric": "equippedTierUpgrade",
+          "tier": 4,
+          "upgrade": 9,
+          "target": 6,
+          "reward": {
+            "gold": 2000
+          }
+        },
+        {
+          "id": "tower-25",
+          "title": "Quart de la Tour",
+          "description": "Atteindre l’étage 25.",
+          "metric": "tower",
+          "target": 25,
+          "reward": {
+            "essence": 75,
+            "shards": 3,
+            "seals": 1
+          }
+        },
+        {
+          "id": "route-t4-6",
+          "title": "Domination du T4",
+          "description": "Terminer le T4 des 6 routes.",
+          "metric": "routes",
+          "tier": 4,
+          "target": 6,
+          "reward": {
+            "essence": 150,
+            "keys": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "ascension-t5",
+      "tier": 5,
+      "title": "Ascension du T5",
+      "subtitle": "Préparer plusieurs builds capables d’ouvrir le late game.",
+      "objectives": [
+        {
+          "id": "kills-1500",
+          "title": "Armée brisée",
+          "description": "Vaincre 1 500 ennemis.",
+          "metric": "kills",
+          "target": 1500,
+          "reward": {
+            "gold": 3500
+          }
+        },
+        {
+          "id": "heroes-level-35",
+          "title": "Héros aguerris",
+          "description": "Monter 3 héros au niveau 35.",
+          "metric": "heroesLevel",
+          "level": 35,
+          "target": 3,
+          "reward": {
+            "gold": 3000
+          }
+        },
+        {
+          "id": "equip-t5-12",
+          "title": "Deux builds T5",
+          "description": "Équiper 12 pièces T5 ou supérieures.",
+          "metric": "equippedTier",
+          "tier": 5,
+          "target": 12,
+          "reward": {
+            "gold": 3000
+          }
+        },
+        {
+          "id": "upgrades-180",
+          "title": "Maître de forge",
+          "description": "Effectuer 180 améliorations au total.",
+          "metric": "upgrades",
+          "target": 180,
+          "reward": {
+            "gold": 3500
+          }
+        },
+        {
+          "id": "tower-50",
+          "title": "Mi-chemin d’Obsidienne",
+          "description": "Atteindre l’étage 50.",
+          "metric": "tower",
+          "target": 50,
+          "reward": {
+            "shards": 4,
+            "seals": 1
+          }
+        },
+        {
+          "id": "route-t5-6",
+          "title": "Le T6 est ouvert",
+          "description": "Terminer le T5 des 6 routes.",
+          "metric": "routes",
+          "tier": 5,
+          "target": 6,
+          "reward": {
+            "essence": 250,
+            "keys": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "late-game-t6",
+      "tier": 6,
+      "title": "Le late game T6",
+      "subtitle": "Finaliser les niveaux et bâtir trois personnages de haut niveau.",
+      "objectives": [
+        {
+          "id": "kills-2500",
+          "title": "Conquérant",
+          "description": "Vaincre 2 500 ennemis.",
+          "metric": "kills",
+          "target": 2500,
+          "reward": {
+            "gold": 6000
+          }
+        },
+        {
+          "id": "heroes-level-50",
+          "title": "Niveau maximum",
+          "description": "Monter 3 héros au niveau 50.",
+          "metric": "heroesLevel",
+          "level": 50,
+          "target": 3,
+          "reward": {
+            "gold": 6000
+          }
+        },
+        {
+          "id": "spells-level-5",
+          "title": "Sorts maîtrisés",
+          "description": "Monter 3 sorts au niveau 5.",
+          "metric": "spellsLevel",
+          "level": 5,
+          "target": 3,
+          "reward": {
+            "essence": 200
+          }
+        },
+        {
+          "id": "equip-t6-18",
+          "title": "Escouade T6",
+          "description": "Équiper 18 pièces T6 sur les héros.",
+          "metric": "equippedTier",
+          "tier": 6,
+          "target": 18,
+          "reward": {
+            "gold": 5000
+          }
+        },
+        {
+          "id": "tower-75",
+          "title": "Haute Tour",
+          "description": "Atteindre l’étage 75.",
+          "metric": "tower",
+          "target": 75,
+          "reward": {
+            "shards": 6,
+            "seals": 1
+          }
+        },
+        {
+          "id": "route-t6-6",
+          "title": "Toutes les routes conquises",
+          "description": "Terminer le T6 des 6 routes.",
+          "metric": "routes",
+          "tier": 6,
+          "target": 6,
+          "reward": {
+            "essence": 400
+          }
+        }
+      ]
+    },
+    {
+      "id": "obsidienne-parfaite",
+      "tier": 6,
+      "title": "L’Obsidienne parfaite",
+      "subtitle": "Objectifs de très longue durée pour finaliser l’optimisation.",
+      "objectives": [
+        {
+          "id": "kills-5000",
+          "title": "Légende des routes",
+          "description": "Vaincre 5 000 ennemis.",
+          "metric": "kills",
+          "target": 5000,
+          "reward": {
+            "gold": 10000
+          }
+        },
+        {
+          "id": "bestiary-all",
+          "title": "Bestiaire complet",
+          "description": "Découvrir toutes les créatures actuellement disponibles.",
+          "metric": "bestiaryAll",
+          "target": "all",
+          "reward": {
+            "essence": 300
+          }
+        },
+        {
+          "id": "legendary-t6-6",
+          "title": "Parure légendaire",
+          "description": "Équiper 6 objets légendaires T6 sur un même héros.",
+          "metric": "legendaryTierHero",
+          "tier": 6,
+          "target": 6,
+          "reward": {
+            "essence": 400
+          }
+        },
+        {
+          "id": "maxed-t6-6",
+          "title": "Build finalisé",
+          "description": "Équiper 6 objets T6 +15 sur un même héros.",
+          "metric": "maxedTierHero",
+          "tier": 6,
+          "upgrade": 15,
+          "target": 6,
+          "reward": {
+            "gold": 10000
+          }
+        },
+        {
+          "id": "maxed-t6-18",
+          "title": "Trio optimisé",
+          "description": "Équiper 18 objets T6 +15 sur les 3 héros de l’équipe.",
+          "metric": "maxedTierTeam",
+          "tier": 6,
+          "upgrade": 15,
+          "target": 18,
+          "reward": {
+            "essence": 500,
+            "shards": 8
+          }
+        },
+        {
+          "id": "perfections-2",
+          "title": "Deux pièces parfaites",
+          "description": "Perfectionner une sous-stat sur 2 objets différents.",
+          "metric": "perfections",
+          "target": 2,
+          "reward": {
+            "seals": 2
+          }
+        },
+        {
+          "id": "tower-100",
+          "title": "Sommet de la Tour",
+          "description": "Terminer l’étage 100 de la Tour d’Obsidienne.",
+          "metric": "tower",
+          "target": 100,
+          "reward": {
+            "gold": 15000,
+            "essence": 700,
+            "prisms": 1
+          }
+        }
+      ]
+    }
+  ]
+}

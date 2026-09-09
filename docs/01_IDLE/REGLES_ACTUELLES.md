@@ -1,55 +1,87 @@
 # Règles actuelles — Mode Idle
 
-## Statut
+## Source de vérité
 
-Le mode Idle est jouable dans le navigateur et en cours d’équilibrage. Il est indépendant du Jardin et du Donjon Mystère, sauf pour l’or partagé prévu ultérieurement.
+Les constantes et formules exécutées sont dans `modes/idle-classic/js/data.js`,
+`state.js` et `combat.js`. Ce dossier décrit leur fonctionnement au 1er septembre 2026.
 
-## Combat
+## Combat et équipe
 
-- Combat automatique en équipes de 3 héros contre 3 monstres.
-- Chaque héros possède son propre niveau, équipement et emplacement : avant, milieu ou arrière.
-- Le ciblage privilégie l’avant (65 %), puis le milieu (25 %) et l’arrière (10 %). La précision déplace progressivement cette priorité vers l’arrière.
-- L’armure réduit les dégâts selon `armure / (armure + 100)`.
-- La formation choisie pendant un combat est appliquée à la rencontre suivante.
+- Combat automatique 3 héros contre 3 ennemis.
+- La formation active possède les positions avant, milieu et arrière.
+- Les héros et les ennemis jouent à tour de rôle ; la vitesse classe l'ordre au
+  sein d'un camp, puis les deux camps alternent.
+- Ciblage de base : avant 65 %, milieu 25 %, arrière 10 %. La précision favorise
+  les positions éloignées.
+- Réduction par armure : `armure / (armure + 100)`.
+- Une défaite renvoie au début du tier actuellement joué.
 
-## Routes et tiers
+## Progression des héros
 
-Les six routes sont : Village en ruines (zombies), Camp des orcs, Ossuaire ancien (squelettes), Manoir vampirique, Dunes ardentes et Bosquet mycélien.
+Chaque héros a son niveau individuel, de 1 à 50. Chaque niveau augmente le
+socle de statistiques de 1,2 %, le critique de 0,08 point et la précision de
+0,12 point. Les niveaux 10, 20, 30, 40 et 50 donnent un point de sort.
 
-| Tier | Étapes |
-| --- | --- |
-| T1 | 1–10 |
-| T2 | 11–25 |
-| T3 | 26–50 |
-| T4 | 51–100 |
-| T5 | 101–150 |
-| T6 | 151–300 |
+La puissance, la vitalité et l'armure utilisent la même formule :
+`(stat native + bonus plats) × niveau × bonus en %`. Une arme avec de la
+puissance fixe reste donc utile tout au long de la progression, puis les bonus
+en pourcentage la valorisent.
 
-- Un boss apparaît à la dernière étape de chaque tier.
-- Une défaite renvoie au début du tier actif.
-- Les familles commencent dans une même tranche de puissance ; la difficulté augmente par tier puis par étape, pas par famille.
-- Les élites sont rares (5 %) et garantissent un équipement ; les boss donnent aussi un équipement et de l’essence.
+Les sorts commencent au niveau 1, plafonnent au niveau 5 et gagnent 10 %
+d'efficacité par niveau supplémentaire. Les détails sont dans
+[Héros et sorts](HEROS_ET_SORTS.md).
+
+Les soins de groupe rendent actuellement 18 % des PV maximum pour Elyne et
+14 % pour Aldric, avant le multiplicateur du niveau de sort. Ils ne se lancent
+que si un allié passe sous 70 % ou si au moins deux alliés sont blessés.
+
+## Routes
+
+Chaque route possède les six tiers T1 à T6 et 100 étapes : 1–15, 16–30, 31–50,
+51–67, 68–83 et 84–100. Un mini-boss apparaît à certaines étapes, puis un boss
+conclut chaque tier et débloque le suivant. Le mode farm boucle dans le tier
+actif, tout en conservant le déblocage obtenu.
+
+Le départ du T1 reste accessible au trio initial sans équipement. La pente de
+chaque tier est volontairement forte : son début sert au farm et son boss
+vérifie l'investissement. Le T6 termine la montée au niveau 50 et demande du
+stuff T6 +15. La Tour utilise une courbe séparée des routes.
 
 Voir [Routes et familles](ROUTES_ET_FAMILLES.md).
 
-## Équipement
+## Équipement et ressources
 
-- Six emplacements par héros : Arme, Casque, Armure, Gants, Bottes et Amulette.
-- Tiers T1 à T6 ; la rareté est distincte du tier.
-- Raretés : Commun, Peu commun, Rare, Épique et Légendaire.
-- L’objet s’améliore de +0 à +15 : la stat principale gagne 20 % de sa base à chaque niveau (×4 au +15) et les sous-stats proc aux paliers +3, +6, +9, +12 et +15.
-- Le tier du butin est toujours celui de l’étape en cours : une étape T2 donne un objet T2. La difficulté ne modifie pas ce tier.
-- Dans l’inventaire, les filtres servent aussi au recyclage groupé ; le bouton indique les objets concernés et l’essence gagnée avant de recycler.
-- Chaque famille de route fournit son set et ses bonus à 3 ou 6 pièces.
+Chaque héros possède six emplacements d'équipement. Les objets sont T1 à T6,
+de Commun à Légendaire, et peuvent monter jusqu'à +15. L'essence provient du
+recyclage des objets ainsi que des mini-boss et boss. L'inventaire dispose de
+filtres par tier, rareté, emplacement, set, stat principale et sous-stats
+sélectionnables ; les sous-stats peuvent être recherchées toutes ensemble ou
+au moins une par objet. Le survol compare les écarts avec la pièce équipée au
+même niveau d'amélioration.
 
-Voir [Équipement](EQUIPEMENT.md).
+Voir [Équipement](EQUIPEMENT.md) et [Équilibrage](EQUILIBRAGE.md).
 
-## Visuel de combat
+## Tour d'Obsidienne
 
-- Le décor défile entre deux rencontres.
-- Les héros utilisent `Walking` pendant ce déplacement.
-- Quand le décor s’arrête, les nouveaux monstres arrivent depuis la droite avec `Walking`, puis passent en `Idle` avant la reprise du combat.
-- Les animations `Hurt`, `Dying` et les animations d’attaque restent utilisées en combat.
-- Test de sort : les héros combattant à l’épée (Brom et Gareth) lancent automatiquement `Entaille dorée` toutes les 6,2 secondes. Le VFX utilise la séquence `Sort/3` ; les autres classes conservent uniquement leur attaque normale.
+Le mode Normal s'ouvre après la victoire contre un boss de route et consomme
+une clé par tentative. Le mode Hard s'ouvre après avoir terminé les 100 étages
+du Normal et consomme deux clés. Chaque difficulté possède son propre record et
+ses propres premières victoires. Une mort met fin à la tentative et renvoie à
+l'étage 1 pour la clé suivante. Le bilan final affiche l'étage atteint, la
+durée, les combats gagnés et tentés, le taux de victoire, les récompenses, les
+drops de Tour et le meilleur étage enregistré avant le départ.
 
-Voir [Combat 3v3 et transitions](COMBAT_3V3.md).
+Le Normal accompagne les joueurs du T1 au T5, à raison de vingt étages par
+tier. Le Hard constitue la Tour T6 et demande progressivement du +10, du +12,
+puis du +15 optimisé pour viser les derniers étages.
+
+La première victoire garantit la récompense. Les étages déjà validés peuvent
+redonner leurs gains normaux à 50 %, un sceau à 10 % ou un prisme à 2 % sur
+les paliers correspondants. Voir [Tour d'Obsidienne](TOUR_OBSIDIENNE.md).
+
+## Visuel
+
+Les héros marchent pendant le défilement du décor. Les ennemis entrent ensuite
+depuis la droite, passent en `Idle`, puis le combat reprend. Les dégâts et soins
+sont affichés au-dessus de la cible, et les sorts disposent d'un indicateur de
+recharge sous le héros concerné.

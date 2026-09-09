@@ -1,20 +1,24 @@
 # Décisions validées — Mode Idle
 
-- Le mode Idle utilise un combat automatique 3v3.
-- Chaque héros possède son équipement, son niveau, sa future liste de sorts et sa position de formation.
-- Les positions sont avant, milieu et arrière ; l’avant est visuellement à droite dans le menu de formation.
-- Les six familles actives sont zombie, orc, skeleton, vampire, desert et mycelium.
-- Chaque route possède ses propres tiers déverrouillés.
-- Les tiers sont T1 1–10, T2 11–25, T3 26–50, T4 51–100, T5 101–150 et T6 151–300.
-- Un boss conclut chaque tier ; une défaite redémarre au début du tier en cours.
-- Les élites ont 5 % de chance d’apparaître et donnent davantage de butin.
-- Les familles doivent démarrer dans une tranche de PV et d’ATQ comparable ; les tiers portent la montée de difficulté.
-- L’équipement a six emplacements, des tiers T1–T6 et des raretés Commun à Légendaire.
-- La rareté détermine le nombre de sous-statistiques : 0 / 1 / 2 / 3 / 4.
-- La stat principale dépend du tier, pas de la rareté. Une arme T6 possède 68 ATQ de base, quelle que soit sa rareté.
-- L’amélioration maximale est +15 : la stat principale gagne 20 % de sa base par niveau (×4 au +15), avec un proc de sous-stat à +3, +6, +9, +12 et +15.
-- Les procs sont indiqués sur l’objet (`+1 proc`, `+2 procs`, etc.) ; la plage de jet est visible uniquement au survol de la sous-stat.
-- Le recyclage groupé utilise les filtres complets de l’inventaire et ne recycle que les objets affichés par ces filtres.
-- Les sets sont liés aux familles de routes et donnent un bonus à 3 ou 6 pièces.
-- Les objets sont représentés par les icônes d’emplacements, pas par les anciennes images de sets.
-- Pendant la transition, les héros marchent pendant le défilement du décor ; les nouveaux monstres arrivent avec `Walking` une fois le décor arrêté.
+- Le combat actif est un 3v3 automatique à tours alternés.
+- Les héros possèdent chacun équipement, niveau, sort, position et recharge propres.
+- Les héros plafonnent au niveau 50 ; les sorts plafonnent au niveau 5.
+- Les routes comptent 100 étapes réparties sur six tiers, avec mini-boss et boss.
+- Un mini-boss donne essence et objet garanti ; un boss débloque le tier suivant.
+- Le farm reste dans le tier sélectionné après le boss, sans empêcher le déblocage.
+- Le loot est distinct du tier : la rareté détermine les sous-stats, le tier la base.
+- L'équipement monte jusqu'à +15 à raison de +20 % de stat principale par niveau.
+- L'inventaire propose une recherche multi-sous-stats et une comparaison à niveau d'amélioration égal.
+- Les récompenses de la Tour servent au perfectionnement : éclats pour reforger, sceaux pour protéger et prismes pour atteindre un jet maximal.
+- La Tour possède un Normal à 1 clé et un Hard à 2 clés. Le Hard se débloque
+  après le Normal 100 ; leurs records et premières victoires sont séparés.
+- Le Normal couvre T1 à T5 par bandes de 20 étages ; le Hard est réservé à la
+  progression T6.
+- La première victoire de Tour est garantie. Les répétitions peuvent redonner
+  les ressources avec 50 % de chance pour les gains normaux, 10 % pour les
+  sceaux et 2 % pour les prismes sur leurs étages dédiés.
+- La Tour ne donne pas d'équipement et accélère l'optimisation sans remplacer le farm des routes.
+- Les fichiers du dossier `99_ARCHIVES` sont historiques et ne décrivent pas les règles actives.
+- Le T6 constitue le late game des routes : niveau 50 et équipement +15 y sont attendus.
+- La difficulté de la Tour est indépendante du coefficient T6 des routes.
+- Une composition doit pouvoir être forte ou faible selon la famille ; le trio initial n'est pas garanti de terminer le T6.

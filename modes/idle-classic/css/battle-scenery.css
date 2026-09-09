@@ -1,0 +1,63 @@
+/* Panoramas : illustration continue, atmosphère indépendante des combattants. */
+#battle-area[data-biome="zombie"] { --scene-image:url('../../../assets/sprites/Background/village-panorama.png'); }
+#battle-area[data-biome="vampire"] { --scene-image:url('../../../assets/sprites/Background/manoir-panorama.png'); }
+#battle-area[data-biome="mycelium"] { --scene-image:url('../../../assets/sprites/Background/bosquet-panorama.png'); }
+#battle-area[data-biome="orc"] { --scene-image:url('../../../assets/sprites/Background/orcs-panorama.png'); }
+#battle-area[data-biome="skeleton"] { --scene-image:url('../../../assets/sprites/Background/ossuaire-panorama.png'); }
+#battle-area[data-biome="desert"] { --scene-image:url('../../../assets/sprites/Background/dunes-panorama.png'); }
+#battle-area[data-panorama="true"] .battle-layer { background-image:none; background-repeat:no-repeat; }
+#battle-area[data-panorama="true"] .battle-sky {
+  inset:0;
+}
+.scenery-strip { display:none; }
+#battle-area[data-panorama="true"] .scenery-strip { position:absolute;inset:0;display:flex;will-change:transform; }
+#battle-area[data-panorama="true"] .scenery-strip span { position:absolute;width:var(--tile-width);height:100%;background-size:cover;background-position:50% 48%;mask-image:linear-gradient(to right,transparent,#000 var(--tile-blend)); }
+#battle-area[data-panorama="true"] .battle-sky .scenery-strip span { background-image:var(--scene-image); }
+#battle-area[data-panorama="true"] .battle-road .scenery-strip span { background-image:var(--scene-image); }
+/* Toutes les images et particules sont dans le contexte de fond, sous les unités. */
+#battle-area[data-panorama="true"] .battle-parallax { z-index:0;pointer-events:none; }
+#battle-area[data-panorama="true"] .battle-team { z-index:3; }
+#battle-area[data-panorama="true"] .battle-far {
+  background:radial-gradient(ellipse at 60% 20%,#ffc57825,transparent 58%);
+  background-position:center !important;
+}
+#battle-area[data-panorama="true"] .battle-mid {
+  inset:42% -8% 8%;
+  background:radial-gradient(ellipse at 25% 70%,#9bc8dd30,transparent 52%),radial-gradient(ellipse at 75% 40%,#b8d4df26,transparent 48%);
+  background-position:center !important;
+  animation:village-mist 19s ease-in-out infinite alternate;
+}
+#battle-area[data-panorama="true"] .battle-road {
+  top:0; mask-image:linear-gradient(transparent 65%,#000 90%);
+  background:linear-gradient(0deg,#101a2a66,transparent 35%);
+  background-position:center !important;
+}
+#battle-area[data-panorama="true"] .battle-foreground {
+  background:radial-gradient(ellipse at 50% 45%,transparent 45%,#10172866 100%);
+  background-position:center !important;
+}
+#battle-area[data-panorama="true"] .battle-foreground::after {
+  content:''; position:absolute; inset:15% 5% 5%;
+  background:radial-gradient(circle at 12% 65%,#ffd69b 0 1px,transparent 2px),radial-gradient(circle at 28% 80%,#ffa65e 0 1px,transparent 2px),radial-gradient(circle at 74% 45%,#ffd69b 0 1px,transparent 2px),radial-gradient(circle at 88% 75%,#ffb66c 0 1.5px,transparent 3px),radial-gradient(circle at 60% 90%,#ffa65e 0 1px,transparent 2px);
+  animation:village-embers 9s linear infinite;
+}
+#battle-area[data-panorama="true"] .fighter-sprite { filter:drop-shadow(0 7px 3px #0b101c80); }
+@keyframes village-mist { from { transform:translateX(-3%);opacity:.55; } to { transform:translateX(3%);opacity:.9; } }
+@keyframes village-embers { 0% { transform:translate(0,15px);opacity:0; } 20%,70% { opacity:.65; } 100% { transform:translate(18px,-55px);opacity:0; } }
+@media(max-width:750px) {
+  #battle-area[data-panorama="true"] .battle-sky .scenery-strip span { background-position:55% 55%; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #battle-area[data-panorama="true"] .battle-sky { transform:none; }
+  #battle-area[data-panorama="true"] .battle-mid,
+  #battle-area[data-panorama="true"] .battle-foreground::after { animation:none; }
+}
+
+
+/* Le Village conserve son premier plan peint séparément. */
+#battle-area[data-biome="zombie"] .battle-road { top:60%;mask-image:none; }
+#battle-area[data-biome="zombie"] .battle-road .scenery-strip span { background-image:url('../../../assets/sprites/Background/village-premier-plan.png');background-size:100% 100%; }
+#battle-area[data-biome="mycelium"] .battle-foreground::after { filter:hue-rotate(115deg); }
+#battle-area[data-biome="skeleton"] .battle-foreground::after { filter:hue-rotate(135deg); }
+#battle-area[data-biome="vampire"] .battle-foreground::after { filter:hue-rotate(300deg);opacity:.3; }
+#battle-area[data-biome="desert"] .battle-mid { opacity:.25; }

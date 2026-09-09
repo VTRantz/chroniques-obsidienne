@@ -13,9 +13,10 @@
   image-rendering: pixelated;
 }
 
-.item-slot-icon {
-  width: 23px;
-  height: 23px;
+img.rpg-stat-icon.item-slot-icon {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
 }
 
 .item-set-icon {
@@ -93,13 +94,23 @@
   font-weight: 700;
 }
 
+/* Perfectionnement de Tour : détail fermé par défaut pour conserver un
+   inventaire compact ; il ne s'ouvre que sur la pièce que le joueur optimise. */
+.tower-optimization { margin:2px 0 9px; border:1px solid #51416d; border-radius:8px; background:#151426; color:#cfc4e3; }
+.tower-optimization summary { padding:7px 8px; color:#d8c0ff; font:700 9px 'DM Mono',monospace; cursor:pointer; list-style:none; }.tower-optimization summary::-webkit-details-marker { display:none; }.tower-optimization summary::before { margin-right:6px; content:'✦'; color:#d8a8ff; }.tower-optimization[open] summary { border-bottom:1px solid #413555; }
+.tower-optimization p { margin:7px 8px 5px; color:#a99fbd; font-size:9px; line-height:1.35; }.tower-optimization-resources { margin:0 8px 7px; color:#e1d6f4; font:700 9px 'DM Mono',monospace; }
+.tower-reforge { width:calc(100% - 16px); min-height:29px; margin:0 8px 7px; padding:5px 7px; border:1px solid #8b66c5; border-radius:6px; color:#f6efff; background:#4e3474; font:700 9px Manrope,sans-serif; }.tower-reforge:disabled { opacity:.45; cursor:not-allowed; }
+.tower-substats { display:grid; gap:3px; padding:0 8px 8px; }.tower-substat { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:5px; align-items:center; padding-top:4px; border-top:1px solid #332b45; color:#c8bfda; font-size:9px; }.tower-substat.locked>span { color:#f0d69c; }.tower-substat>div { display:flex; gap:4px; }.tower-substat button { min-height:24px; padding:3px 5px; border:1px solid #5a4b70; border-radius:5px; color:#cfc5dd; background:#201b30; font:700 8px Manrope,sans-serif; }.tower-substat button:hover:not(:disabled) { border-color:#b897e8; color:#fff; }.tower-substat button[data-tower-perfect] { border-color:#80619e; color:#e5d3ff; }.tower-substat button:disabled { opacity:.55; cursor:default; }
+
 @media (max-width:750px) {
   .slot.equipped,
   .inventory-item { grid-template-columns: 58px minmax(0, 1fr); column-gap: 7px; }
   .slot.equipped { min-height: 154px; }
   .rpg-item-art { width: 58px; min-height: 58px; }
   .rpg-item-art .item-set-icon { width: 56px; height: 56px; }
+  img.rpg-stat-icon.item-slot-icon { width:54px; height:54px; flex-basis:54px; }
   .inventory-item .rpg-item-body { min-height: 142px; }
+  .tower-substat { grid-template-columns:1fr; }.tower-substat>div { flex-wrap:wrap; }
 }
 
 .slot.equipped .item-stats,

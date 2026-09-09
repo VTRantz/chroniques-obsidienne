@@ -1,9 +1,9 @@
 const tiers = {
-  commun: { label: 'Commun', color: '#b4bdcb', sell: 8 },
-  peuCommun: { label: 'Peu commun', color: '#65d69b', sell: 13 },
-  rare: { label: 'Rare', color: '#6ba9ff', sell: 20 },
-  epique: { label: 'Epique', color: '#b684ff', sell: 55 },
-  legendaire: { label: 'Légendaire', color: '#ffbf55', sell: 150 }
+  commun: { label: 'Commun', color: '#b4bdcb', sell: 10 },
+  peuCommun: { label: 'Peu commun', color: '#65d69b', sell: 16 },
+  rare: { label: 'Rare', color: '#6ba9ff', sell: 25 },
+  epique: { label: 'Epique', color: '#b684ff', sell: 70 },
+  legendaire: { label: 'Légendaire', color: '#ffbf55', sell: 190 }
 };
 
 // Chaque route de famille possède son propre set. À six pièces, le bonus
@@ -11,10 +11,10 @@ const tiers = {
 const setDefs = {
   zombie:   { name:'Set du Fléau',          family:'zombie',   bonus3:'PV maximum +15 %',              bonus6:'PV maximum +35 %',              effects:{3:{hpPct:.15}, 6:{hpPct:.35}} },
   orc:      { name:'Set du Carnage',        family:'orc',      bonus3:'Dégâts +15 %',                 bonus6:'Dégâts +35 %',                 effects:{3:{powerPct:.15}, 6:{powerPct:.35}} },
-  skeleton: { name:'Set du Bastion d’Os',   family:'skeleton', bonus3:'Défense +15 %',                bonus6:'Défense +35 %',                effects:{3:{armorPct:.15}, 6:{armorPct:.35}} },
-  vampire:  { name:'Set de la Soif Rouge',  family:'vampire',  bonus3:'Vol de vie +8 %',              bonus6:'Vol de vie +20 %',             effects:{3:{lifesteal:8}, 6:{lifesteal:20}} },
-  desert:   { name:'Set des Sables Vifs',   family:'desert',   bonus3:'Vitesse de combat +12 %',      bonus6:'Vitesse de combat +30 %',      effects:{3:{haste:.12}, 6:{haste:.30}} },
-  mycelium: { name:'Set du Mycélium Féral', family:'mycelium', bonus3:'Dégâts critiques +15 %',       bonus6:'Dégâts critiques +40 %',       effects:{3:{critDamage:.15}, 6:{critDamage:.40}} }
+  skeleton: { name:'Set du Bastion d’Os',   family:'skeleton', bonus3:'Défense +25 %',                bonus6:'Défense +60 %',                effects:{3:{armorPct:.25}, 6:{armorPct:.60}} },
+  vampire:  { name:'Set de la Soif Rouge',  family:'vampire',  bonus3:'Vol de vie +8 %',              bonus6:'Vol de vie +18 %',             effects:{3:{lifesteal:8}, 6:{lifesteal:18}} },
+  desert:   { name:'Set des Sables Vifs',   family:'desert',   bonus3:'Vitesse +5 %',                 bonus6:'Vitesse +12 %',                effects:{3:{speed:.5}, 6:{speed:1.2}} },
+  mycelium: { name:'Set du Mycélium Féral', family:'mycelium', bonus3:'Critique +8 % · dégâts crit. +15 %', bonus6:'Critique +20 % · dégâts crit. +40 %', effects:{3:{crit:8,critDamage:.15}, 6:{crit:20,critDamage:.40}} }
 };
 // Un set dépend uniquement de la famille de la route, jamais de la rareté.
 const setForTier = {};
@@ -128,7 +128,7 @@ const TALENT_BRANCHES = [
     {id:'loot-8', desc:'+0,1% chance de butin', effects:{loot:.001}, maxRank:3, kind:'major'},
     {id:'loot-9', desc:'+0,1% chance de butin', effects:{loot:.001}, maxRank:3, kind:'major'},
     {id:'loot-6', desc:'Abondance : +1% butin, mais -5% or', effects:{loot:.01,gold:-.05}, maxRank:1, kind:'keystone'},
-    {id:'loot-7', desc:'Serrurier : +10% chance de clé, mais -4% or', effects:{keyDrop:.10,gold:-.04}, maxRank:1, kind:'keystone'}
+    {id:'loot-7', desc:'Serrurier : +10% chance de clé de Tour, mais -4% or', effects:{keyDrop:.10,gold:-.04}, maxRank:1, kind:'keystone'}
   ]},
   {id:'speed', icon:'➤', color:'#83aef4', angle:90, nodes:[
     {id:'speed1', desc:'+0,4% vitesse de combat', effects:{haste:.004}, maxRank:5},
@@ -246,12 +246,12 @@ const TALENT_COST_CACHE = {};
 // La route choisit la famille du butin ; le tier d'étape choisit ensuite sa
 // rareté. Un Légendaire T1 est donc possible, mais exceptionnel.
 const CLASSIC_LOOT = {
-  zombie:  { drop:.20 },
-  orc:     { drop:.25 },
-  vampire: { drop:.25 },
-  skeleton:{ drop:.25 },
-  desert:  { drop:.25 },
-  mycelium:{ drop:.25 }
+  zombie:  { drop:.55 },
+  orc:     { drop:.55 },
+  vampire: { drop:.55 },
+  skeleton:{ drop:.55 },
+  desert:  { drop:.55 },
+  mycelium:{ drop:.55 }
 };
 // Les poids sont conditionnels à l'obtention d'un équipement. Chaque ligne
 // totalise 100 : la rareté progresse avec le tier, sans retirer les rares
@@ -267,33 +267,133 @@ const LOOT_RARITY_BY_ROUTE_TIER = {
 const LUCK_DROP_BONUS = { perPoint:.002, max:.10 };
 const BOSS_KEY_DROP_CHANCE = .25;
 const BOSS_BONUS_LOOT_CHANCE = .10;
-const BOSS_ESSENCE_REWARDS = [5,8,12,18,25,35];
+const BOSS_ESSENCE_REWARDS = [20,30,45,65,95,135];
+const MINI_BOSS_ESSENCE_REWARDS = [4,6,8,11,15,20];
 const ROUTE_TIERS = [
-  { tier:1, start:1, end:10 }, { tier:2, start:11, end:25 },
-  { tier:3, start:26, end:50 }, { tier:4, start:51, end:100 },
-  { tier:5, start:101, end:150 }, { tier:6, start:151, end:300 }
+  // Les deux premiers tiers prennent davantage de temps : le T3 ne démarre
+  // plus au bout de 20 combats. Le boss du T3 reste bien à l'étape 50.
+  { tier:1, start:1,  end:15,  miniBosses:[5,10] },
+  { tier:2, start:16, end:30,  miniBosses:[20,25] },
+  { tier:3, start:31, end:50,  miniBosses:[35,40,45] },
+  { tier:4, start:51, end:67,  miniBosses:[55,60,65] },
+  { tier:5, start:68, end:83,  miniBosses:[72,77,82] },
+  { tier:6, start:84, end:100, miniBosses:[88,93,98] }
 ];
-const ROUTE_LENGTH = 300;
+const ROUTE_LENGTH = 100;
+// Late game : la Tour ne donne pas d'équipement. Elle sert à perfectionner les
+// pièces obtenues dans les routes T6, sans les remplacer.
+const OBSIDIAN_TOWER_MAX_FLOOR = 100;
+const OBSIDIAN_TOWER_FAMILIES = ['zombie','orc','skeleton','vampire','desert','mycelium'];
+// Les opérations de Tour suivent le Tier de l'objet. Les ressources spéciales
+// ouvrent l'action ; l'essence en reste le coût économique récurrent.
+const TOWER_ITEM_OPTIMIZATION_COSTS = {
+  1:{reforgeShards:2,reforgeEssence:25,lockSeals:1,lockEssence:15,perfectPrisms:1,perfectEssence:100},
+  2:{reforgeShards:3,reforgeEssence:50,lockSeals:1,lockEssence:30,perfectPrisms:1,perfectEssence:200},
+  3:{reforgeShards:4,reforgeEssence:90,lockSeals:1,lockEssence:55,perfectPrisms:1,perfectEssence:350},
+  4:{reforgeShards:6,reforgeEssence:160,lockSeals:1,lockEssence:95,perfectPrisms:2,perfectEssence:600},
+  5:{reforgeShards:8,reforgeEssence:280,lockSeals:1,lockEssence:160,perfectPrisms:2,perfectEssence:950},
+  6:{reforgeShards:10,reforgeEssence:450,lockSeals:1,lockEssence:250,perfectPrisms:2,perfectEssence:1500}
+};
+function towerItemOptimizationCosts(item){
+  const tier=Math.max(1,Math.min(6,Math.floor(Number(item?.tier)||1)));
+  return TOWER_ITEM_OPTIMIZATION_COSTS[tier];
+}
+const TOWER_ESSENCE_REWARD_BY_TIER = {1:2,2:3,3:5,4:8,5:12,6:18};
+function towerFloorRewards(floor,difficulty='normal'){
+  const mode=typeof obsidianTowerMode==='function' ? obsidianTowerMode(difficulty) : null;
+  const rules=mode?.rewards || {goldMultiplier:1,essenceMultiplier:1,shardMultiplier:1,sealFloors:[25,50,75,100],prismFloors:[100]};
+  const band=mode?.enemy?.model==='campaign'&&Array.isArray(mode.enemy.tierBands)
+    ? mode.enemy.tierBands.find(entry=>floor>=entry.floors?.[0]&&floor<=entry.floors?.[1])
+    : null;
+  const tier=Math.max(1,Math.min(6,Number(band?.routeTier||mode?.enemy?.routeTier||routeTierForStep(floor).tier)||1));
+  const baseEssence=floor%3===0 ? TOWER_ESSENCE_REWARD_BY_TIER[tier] : 0;
+  let baseShards=0;
+  if(floor%5===0) baseShards+=1+Math.floor(tier/3);
+  if(floor%10===0) baseShards+=Math.ceil(tier/2);
+  const reward={
+    gold:Math.round((10+floor*2)*(Number(rules.goldMultiplier)||1)),
+    essence:baseEssence ? Math.max(1,Math.round(baseEssence*(Number(rules.essenceMultiplier)||1))) : 0,
+    shards:baseShards ? Math.max(1,Math.round(baseShards*(Number(rules.shardMultiplier)||1))) : 0,
+    seals:Array.isArray(rules.sealFloors)&&rules.sealFloors.includes(floor)?1:0,
+    prisms:Array.isArray(rules.prismFloors)&&rules.prismFloors.includes(floor)?1:0
+  };
+  return reward;
+}
+function towerRepeatedFloorRewards(floor,difficulty='normal',random=Math.random){
+  const reward=towerFloorRewards(floor,difficulty);
+  const mode=typeof obsidianTowerMode==='function' ? obsidianTowerMode(difficulty) : null;
+  const chances=mode?.rewards?.repeatDropChances || {gold:.5,essence:.5,shards:.5,seals:.1,prisms:.02};
+  const rareFloors=mode?.rewards?.repeatDropFloors || {};
+  return Object.fromEntries(Object.entries(reward).map(([resource,baseAmount])=>{
+    const floors=rareFloors[resource];
+    const amount=Array.isArray(floors) ? (floors.includes(floor)?1:0) : baseAmount;
+    const chance=Math.max(0,Math.min(1,Number(chances[resource])||0));
+    return [resource,amount>0&&random()<chance?amount:0];
+  }));
+}
 function routeTierForStep(step){ return ROUTE_TIERS.find(entry => step >= entry.start && step <= entry.end) || ROUTE_TIERS[0]; }
 function routeTierStart(step){ return routeTierForStep(step).start; }
+function isTierMiniBoss(tier,step){ return (tier.miniBosses || []).includes(step); }
+// Source unique : la carte et le générateur de combat utilisent exactement
+// cette même réponse. Un boss final ne peut donc jamais apparaître avant la
+// dernière étape de son palier.
+function routeEncounterType(step){
+  const tier=routeTierForStep(step);
+  if(step === tier.end) return 'boss';
+  if(isTierMiniBoss(tier,step)) return 'mini-boss';
+  return 'normal';
+}
 const ELITE_SPAWN_CHANCE = 0.05;
-// Toutes les familles démarrent dans la même tranche. La montée en puissance
-// est portée par le tier, puis légèrement par les étapes à l'intérieur de ce tier.
-const ROUTE_STEP_HP_GROWTH = 1.055;
-const ROUTE_STEP_ATTACK_GROWTH = 1.025;
+// Chaque tier progresse de façon lissée, quel que soit son nombre d'étapes.
+// L'ancienne formule appliquait +5,5 % de PV à chacune des 150 étapes du T6 :
+// elle créait une multiplication par près de 3 000, donc un mur impossible.
+const ENEMY_TIER_END_SCALING = {
+  // Le début du palier sert au farm ; sa fin vérifie que les niveaux et le
+  // stuff gagnés dans ce palier ont réellement été investis. Cette pente évite
+  // qu'une équipe qui vient juste de débloquer un tier traverse aussi son boss.
+  1:{hp:3.30,attack:2.00}, 2:{hp:2.80,attack:1.80},
+  3:{hp:2.70,attack:1.75}, 4:{hp:2.60,attack:1.70},
+  5:{hp:2.50,attack:1.65}, 6:{hp:2.40,attack:1.60}
+};
+function routeTierStepScale(tier,currentStep){
+  const end=ENEMY_TIER_END_SCALING[tier.tier] || ENEMY_TIER_END_SCALING[1];
+  const progress=Math.max(0,Math.min(1,(currentStep-tier.start)/Math.max(1,tier.end-tier.start)));
+  return {hp:Math.pow(end.hp,progress),attack:Math.pow(end.attack,progress)};
+}
+// L'XP suit les paliers de contenu, au lieu de dépendre uniquement de la
+// difficulté. Chaque Tier reste donc nettement plus rentable que le précédent.
+const ROUTE_STEP_XP_GROWTH = .004;
+// La difficulté supplémentaire produit davantage de combats de farm. Ces
+// multiplicateurs évitent donc que le niveau 50 soit déjà atteint au boss T5 :
+// la dernière portion de progression d'XP doit se terminer pendant le T6.
+const ENEMY_TIER_XP_MULTIPLIER = {1:.85,2:1.30,3:1.90,4:2.10,5:2.40,6:7.00};
+// L'or progresse moins vite que le prix des améliorations : un nouveau Tier
+// rémunère mieux, mais terminer un objet devient progressivement plus long.
+const ENEMY_TIER_GOLD_MULTIPLIER = {1:1,2:1.55,3:2.40,4:3.60,5:5.20,6:7.50};
 const ENEMY_TIER_SCALING = {
-  1:{hp:1,attack:1}, 2:{hp:2.2,attack:1.7}, 3:{hp:4.8,attack:2.9},
-  4:{hp:10.5,attack:5}, 5:{hp:23,attack:8.5}, 6:{hp:50,attack:14.5}
+  // Le T1 commence plus doucement pour l'équipe gratuite sans équipement.
+  // À partir du T2, chaque saut est calibré sur le nouveau tier de stuff et
+  // non sur un héros nu. Le T6 exige enfin niveaux, +15 et bons rolls.
+  1:{hp:2.4,attack:1.5}, 2:{hp:6.0,attack:2.6}, 3:{hp:16.0,attack:6.5},
+  4:{hp:36.0,attack:15.0}, 5:{hp:95.0,attack:45.0}, 6:{hp:330.0,attack:145.0}
 };
-const GEAR_RANKS = {
-  1: { label: 'T1', statMultiplier: 1 },
-  2: { label: 'T2', statMultiplier: 2.2 },
-  3: { label: 'T3', statMultiplier: 4.5 }
+// La Tour possède sa propre référence. La lier directement au coefficient T6
+// rendait tout ajustement des routes capable de casser ses 100 étages.
+const TOWER_ENEMY_BASE_SCALING = {hp:45.5,attack:30.4};
+const TOWER_FLOOR_GROWTH = {hp:1.045,attack:1.020};
+// Les profils de monstres ne partent pas tous du même socle. Les unités du
+// désert cumulent attaque, parade et ciblage dangereux ; ce correctif conserve
+// leur identité sans doubler le temps de progression de cette seule route.
+const ROUTE_FAMILY_COMBAT_SCALING = {
+  zombie:{hp:1,attack:1}, orc:{hp:1,attack:1}, skeleton:{hp:1,attack:1},
+  vampire:{hp:1,attack:1}, desert:{hp:.80,attack:.82}, mycelium:{hp:1,attack:1}
 };
-const CLASSIC_DIFFICULTIES = {
-  normal: { label: 'Normal', hp: 1, attack: 1, reward: 1, gold: 1, itemRank: 1 },
-  hard:   { label: 'Hard',   hp: 6.2, attack: 6.5, reward: 4, gold: 2.5, itemRank: 2 },
-  hell:   { label: 'Hell',   hp: 18, attack: 15, reward: 12, gold: 6, itemRank: 3 }
+// Un boss doit exiger une équipe préparée, pas seulement quelques attaques
+// supplémentaires. Les coefficients s'appliquent uniquement au combattant
+// spécial placé au centre ; ses deux accompagnateurs restent normaux.
+const ENCOUNTER_COMBAT_MULTIPLIERS = {
+  normal:{hp:1,attack:1}, elite:{hp:1.6,attack:1.08},
+  miniBoss:{hp:1.85,attack:1.22}, boss:{hp:3.00,attack:1.45}
 };
 const CLASSIC_ROUTES = [
   { family: 'zombie',  name: 'Village en ruines',    boss: 'Chevalier trépassé', bossGold: 50, level: 'Accessible sans prérequis' },
@@ -317,10 +417,11 @@ const RARITY_SUBSTAT_COUNT = {
 // Version 6 : les anciens objets à statistiques fixes sont incompatibles avec
 // les nouveaux objets T1–T6 à stat principale et sous-statistiques.
 const STUFF_VERSION = 6;
-const MAX_ITEM_UPGRADE = 15;
-// Chaque niveau augmente la stat principale. Un objet atteint x4 au +15 ;
-// les sous-stats progressent uniquement pendant les cinq procs dédiés.
-const EQUIPMENT_MAIN_STAT_PER_UPGRADE = .20;
+let MAX_ITEM_UPGRADE = 15;
+// Chaque niveau augmente la stat principale de 20 %. Une amélioration T1 est
+// donc visible dès le premier rang (+1,2 ATQ sur une arme à 6) et un objet
+// +15 atteint x4 : le late game récompense réellement les rolls et l'optimisation.
+let EQUIPMENT_MAIN_STAT_PER_UPGRADE = .20;
 // Conservé exclusivement pour les objets historiques, qui ne sont plus générés.
 const UPGRADE_STAT_PER_LEVEL = .035;
 const MAX_CRITICAL_CHANCE = .75;
@@ -345,7 +446,11 @@ const EQUIPMENT_SUBSTAT_ROLLS = {
   6:{power:[11,16],vitality:[55,85],armor:[7,12],hpPct:[5,8],powerPct:[5,8],armorPct:[5,8],crit:[3,5],critDamage:[.07,.12],speed:[.50,.75]}
 };
 const EQUIPMENT_RARITY_COST_MULTIPLIER = {commun:1,peuCommun:1.25,rare:1.6,epique:2,legendaire:2.5};
-const EQUIPMENT_TIER_COST_MULTIPLIER = {1:1,2:1.8,3:3.2,4:5.5,5:9,6:15};
+const EQUIPMENT_TIER_GOLD_COST_MULTIPLIER = {1:1,2:2.1,3:4.4,4:8.3,5:15.5,6:28};
+// Le recyclage donne une quantité d'essence croissante et monotone. Sa pente
+// reste nettement sous celle du coût en or afin d'éviter toute conversion
+// rentable de l'or en essence via un objet amélioré.
+const EQUIPMENT_TIER_SALVAGE_MULTIPLIER = {1:1,2:1.5,3:2.1,4:2.8,5:3.6,6:4.5};
 const EQUIPMENT_MAIN_STAT_BY_SLOT = {Arme:'power',Casque:'vitality',Armure:'armor'};
 const EQUIPMENT_VARIABLE_MAIN_STATS = ['hpPct','powerPct','armorPct','crit','critDamage','speed'];
 const EQUIPMENT_SUBSTAT_KEYS = ['power','vitality','armor','hpPct','powerPct','armorPct','crit','critDamage','speed'];

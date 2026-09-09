@@ -8,14 +8,34 @@ function log(t){
 
 // Chaque famille de route pointe vers ses propres variantes Craftpix.
 const CLASSIC_ENEMY_VISUALS = {
-  zombie:   { folder:'Zombie',    variants:['Zombie_Villager_1','Zombie_Villager_2','Zombie_Villager_3'], file:'Zombie_Villager' },
-  orc:      { folder:'Orc',       variants:['Goblin_1','Goblin_2','Goblin_3'], file:'Goblin' },
-  skeleton: { folder:'Skeleton',  variants:['Skeleton_Warrior_1','Skeleton_Warrior_2','Skeleton_Warrior_3'], file:'Skeleton_Warrior' },
-  vampire:  { folder:'Vampire',   variants:['Vampire_1','Vampire_2','Vampire_3'], file:'Vampire' },
-  desert:   { folder:'Desert',    variants:['Desert_Nomad_1','Desert_Nomad_2','Desert_Nomad_3'], file:'Desert_Nomad' },
-  mycelium: { folder:'Mycelium',  variants:['Elemental_Spirits_1','Elemental_Spirits_2','Elemental_Spirits_3'], file:'Elemental_Spirits' }
+  zombie:   { folder:'Zombie',    variants:['Villageois_Infecte','Zombie_Errant','Mort_Affame'], file:'Zombie_Villager' },
+  orc:      { folder:'Orc',       variants:['Gobelin_Pillard','Gobelin_Berserker','Gobelin_Chef'], file:'Goblin' },
+  skeleton: { folder:'Skeleton',  variants:['Squelette_Eclaireur','Squelette_Guerrier','Squelette_Veteran'], file:'Skeleton_Warrior' },
+  vampire:  { folder:'Vampire',   variants:['Vampire_Nocturne','Vampire_Sanguinaire','Noble_Vampire'], file:'Vampire' },
+  desert:   { folder:'Desert',    variants:['Nomade_des_Dunes','Nomade_Brulant','Nomade_du_Soleil_Noir'], file:'Desert_Nomad' },
+  mycelium: { folder:'Mycelium',  variants:['Esprit_Mycelien','Esprit_Sporifere','Esprit_Primordial'], file:'Elemental_Spirits' }
 };
-const CLASSIC_HERO_VISUAL_ROOT = 'assets/sprites/Characters/craftpix/Archer Guy';
+// Configuration explicite des packs réellement présents : chaque monstre peut
+// désormais utiliser son propre dossier et sa propre animation d'attaque.
+const CLASSIC_BATTLE_MONSTER_VISUALS = {
+  zombie1:{folder:'Zombie',variant:'Villageois_Infecte',file:'Zombie_Villager'}, zombie2:{folder:'Zombie',variant:'Zombie_Errant',file:'Zombie_Villager'}, zombie3:{folder:'Zombie',variant:'Mort_Affame',file:'Zombie_Villager'},
+  zombie:{folder:'Zombie',variant:'Zombie_Classique',file:'Zombie'}, deathKnight:{folder:'Zombie',variant:'Chevalier_dOs',file:'Death_Knight'},
+  orc1:{folder:'Orc',variant:'Gobelin_Pillard',file:'Goblin'}, orc2:{folder:'Orc',variant:'Gobelin_Berserker',file:'Goblin'}, orc3:{folder:'Orc',variant:'Gobelin_Chef',file:'Goblin'},
+  goblin:{folder:'Orc',variant:'Gobelin_Eclaireur',file:'Goblin'}, ogre:{folder:'Orc',variant:'Ogre_Belliqueux',file:'Ogre'}, orc:{folder:'Orc',variant:'Orc_Brutal',file:'Orc'},
+  orcArcher1:{folder:'Orc',variant:'Archer_Orc',file:'Orc_Archer',attack:'Shooting',attackFrames:9}, orcArcher2:{folder:'Orc',variant:'Tireur_Orc',file:'Orc_Archer',attack:'Shooting',attackFrames:9}, orcArcher3:{folder:'Orc',variant:'Arbaletrier_Orc',file:'Orc_Archer',attack:'Shooting',attackFrames:9},
+  skeleton1:{folder:'Skeleton',variant:'Squelette_Eclaireur',file:'Skeleton_Warrior'}, skeleton2:{folder:'Skeleton',variant:'Squelette_Guerrier',file:'Skeleton_Warrior'}, skeleton3:{folder:'Skeleton',variant:'Squelette_Veteran',file:'Skeleton_Warrior'},
+  skeleton:{folder:'Skeleton',variant:'Squelette_Ancien',file:'Skeleton'}, crusader1:{folder:'Skeleton',variant:'Croise_dOs',file:'Skeleton_Crusader'}, crusader2:{folder:'Skeleton',variant:'Croise_Osseux',file:'Skeleton_Crusader'}, crusader3:{folder:'Skeleton',variant:'Croise_Maudit',file:'Skeleton_Crusader'},
+  vampire1:{folder:'Vampire',variant:'Vampire_Nocturne',file:'Vampire'}, vampire2:{folder:'Vampire',variant:'Vampire_Sanguinaire',file:'Vampire'}, vampire3:{folder:'Vampire',variant:'Noble_Vampire',file:'Vampire'},
+  hunter1:{folder:'Vampire',variant:'Chasseur_De_Vampires',file:'Vampire_Hunter'}, hunter2:{folder:'Vampire',variant:'Traqueur_De_Vampires',file:'Vampire_Hunter'}, hunter3:{folder:'Vampire',variant:'Executeur_Vampire',file:'Vampire_Hunter'},
+  desert1:{folder:'Desert',variant:'Nomade_Des_Dunes',file:'Desert_Nomad'}, desert2:{folder:'Desert',variant:'Nomade_Brulant',file:'Desert_Nomad'}, desert3:{folder:'Desert',variant:'Nomade_Du_Soleil_Noir',file:'Desert_Nomad'},
+  shaman1:{folder:'Desert',variant:'Chamane_Des_Dunes',file:'Human_Shaman'}, shaman2:{folder:'Desert',variant:'Chamane_Ardent',file:'Human_Shaman'}, shaman3:{folder:'Desert',variant:'Chamane_Solaire',file:'Human_Shaman'},
+  pyromancer1:{folder:'Desert',variant:'Pyromancien_Nomade',file:'Pyromancer'}, pyromancer2:{folder:'Desert',variant:'Pyromancien_Brulant',file:'Pyromancer'}, pyromancer3:{folder:'Desert',variant:'Pyromancien_Du_Soleil_Noir',file:'Pyromancer'},
+  seer1:{folder:'Desert',variant:'Voyant_Des_Sables',file:'Seer'}, seer2:{folder:'Desert',variant:'Sage_Des_Sables',file:'Seer'}, seer3:{folder:'Desert',variant:'Prophete_Des_Dunes',file:'Seer'},
+  mycelium1:{folder:'Mycelium',variant:'Esprit_Mycelien',file:'Elemental_Spirits'}, mycelium2:{folder:'Mycelium',variant:'Esprit_Sporifere',file:'Elemental_Spirits'}, mycelium3:{folder:'Mycelium',variant:'Esprit_Primordial',file:'Elemental_Spirits'},
+  guardian1:{folder:'Mycelium',variant:'Gardien_Des_Bois',file:'Forest Guardian'}, guardian2:{folder:'Mycelium',variant:'Gardien_Fongique',file:'Forest Guardian'}, guardian3:{folder:'Mycelium',variant:'Gardien_Ancestral',file:'Forest Guardian'}
+};
+const CLASSIC_MONSTERS=[];
+const CLASSIC_HERO_VISUAL_ROOT = 'assets/sprites/Characters/craftpix/Aelya';
 const CLASSIC_VISUAL_FRAME_COUNTS = { idle:18, travel:24, combat:12, hurt:12, death:15 };
 let classicBattleWorldOffset = 0;
 let classicBattleTravelToken = 0;
@@ -57,6 +77,35 @@ function setClassicSpriteFrame(who, action, frame){
 function syncClassicBattleBackdrop(){
   const area = $('battle-area');
   if(!area) return;
+  // Chaque famille garde les mêmes calques (et donc le même parallaxe), mais
+  // les routes vampire et mycélienne utilisent leur décor dédié.
+  const family = state.battle?.enemies?.find(unit => unit.family)?.family || '';
+  area.dataset.biome = family;
+  area.dataset.panorama=String(['zombie','vampire','mycelium','orc','skeleton','desert'].includes(family));
+  if(area.dataset.panorama === 'true'){
+    // Panoramas larges chevauchés : le bord gauche se fond dans le précédent.
+    for(const [selector,speed] of [['.battle-sky',.18],['.battle-road',.62]]){
+      const layer=area.querySelector(selector);
+      let strip=layer.querySelector('.scenery-strip');
+      if(!strip){
+        strip=document.createElement('div'); strip.className='scenery-strip';
+        for(let i=0;i<4;i++) strip.appendChild(document.createElement('span'));
+        layer.appendChild(strip);
+        if(!area.sceneryResizeObserver){
+          area.sceneryResizeObserver=new ResizeObserver(()=>syncClassicBattleBackdrop());
+          area.sceneryResizeObserver.observe(area);
+        }
+      }
+      const tileWidth=Math.max(area.clientWidth*1.35,area.clientHeight*3);
+      const blend=tileWidth*.12;
+      const step=tileWidth-blend;
+      strip.style.setProperty('--tile-width',`${tileWidth}px`);
+      strip.style.setProperty('--tile-blend',`${blend}px`);
+      [...strip.children].forEach((tile,i)=>{tile.style.left=`${(i-1)*step}px`;});
+      const offset=window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : (classicBattleWorldOffset*speed) % Math.max(1,step);
+      strip.style.transform=`translateX(${-offset}px)`;
+    }
+  }
   area.querySelectorAll('[data-parallax]').forEach(layer => {
     layer.style.backgroundPositionX = `${-(classicBattleWorldOffset * Number(layer.dataset.parallax || 0))}px`;
   });
@@ -66,7 +115,7 @@ function advanceClassicBattleBackground(done){
   const token = ++classicBattleTravelToken;
   const startOffset = classicBattleWorldOffset;
   const distance = 860;
-  const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 1250;
+  const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : combatTestDelay(1250);
   const startedAt = performance.now();
   if(area) area.classList.add('is-travelling');
   // Les héros de l'équipe actuelle marchent pendant le défilement du décor.
@@ -111,10 +160,12 @@ function introduceClassicEnemy(done = () => {}){
   }, 700);
 }
 
-function spawn() {
+// Ancien combat 1v1 conservé provisoirement pour ses utilitaires visuels.
+// Son générateur ne doit jamais être appelé par le combat d'équipe 3v3.
+function spawnLegacySingleCombat() {
   state.attackChain = 0;
   const route = CLASSIC_ROUTES[state.route.index];
-  const difficulty = CLASSIC_DIFFICULTIES[state.route.difficulty];
+  const difficulty = {hp:1, attack:1, reward:1, gold:1};
   const currentStep = state.route.step + 1;
   const tier = routeTierForStep(currentStep);
   const miniBoss = currentStep === tier.end;
@@ -170,7 +221,7 @@ function spawn() {
     parry: a.parry,
     title: miniBoss ? 'Mini-boss' : elite ? 'Elite' : 'Normal',
     reward: (miniBoss ? 3 : elite ? 1.7 : 1) * difficulty.reward,
-    goldReward: Math.round((miniBoss ? route.bossGold : a.gold) * difficulty.gold),
+    goldReward: Math.round((miniBoss ? route.bossGold : a.gold) * difficulty.gold * (ENEMY_TIER_GOLD_MULTIPLIER[tier.tier] || 1)),
     family: a.family,
     assetId: a.assetId,
     sprite: ''
@@ -222,12 +273,12 @@ function animateAttack(who){
 
 // L'arme atteint la cible autour de la troisième frame de l'animation (110 ms/frame).
 const ATTACK_IMPACT_DELAY = 330;
-function onAttackImpact(callback){ setTimeout(callback, ATTACK_IMPACT_DELAY); }
+function onAttackImpact(callback){ setTimeout(callback, combatTestDelay(ATTACK_IMPACT_DELAY)); }
 // L'animation Slashing affiche sa première frame après 68 ms. La lame est
 // pleinement horizontale à la frame 5 : le VFX doit démarrer à cet instant.
 function onHeroSpellImpact(spell, callback){
   const impactFrame = Math.max(0,Number(spell?.impactFrame) || 5);
-  setTimeout(callback,(impactFrame + 1) * 68);
+  setTimeout(callback,combatTestDelay((impactFrame + 1) * 68));
 }
 
 function animateHit(who, isCrit=false){
@@ -339,7 +390,7 @@ function setWolfFrame(image, action, frame){
   if(image.nextElementSibling) image.nextElementSibling.style.display = 'none';
 }
 
-function playFighterAnimation(who, action){
+function playPrototypeFighterAnimation(who, action){
   const image = $(who === 'player' ? 'player-sprite' : 'enemy-sprite');
   if(!image) return;
   const folder = who === 'player' ? 'hero' : enemySpriteFolder();
@@ -447,7 +498,7 @@ function playFighterAnimation(who, action){
   }, 120);
 }
 
-function refreshIdleSprites(){
+function refreshPrototypeIdleSprites(){
   const frame = Math.floor(Date.now() / 150) % 12 + 1;
   const hero = $('player-sprite');
   if(hero && !hero.dataset.animationToken){
@@ -502,7 +553,7 @@ function setMobFrame(image, folder, action, frame, direction='left'){
   image.style.display = 'block';
   if(image.nextElementSibling) image.nextElementSibling.style.display = 'none';
 }
-function playFighterAnimation(who, action){
+function playMobFighterAnimation(who, action){
   const image = $(who === 'player' ? 'player-sprite' : 'enemy-sprite');
   if(!image) return;
   const token = Number(image.dataset.animationToken || 0) + 1;
@@ -544,7 +595,7 @@ function playFighterAnimation(who, action){
     }
   }, 110);
 }
-function refreshIdleSprites(){
+function refreshMobIdleSprites(){
   const hero = $('player-sprite');
   if(hero && !hero.dataset.animationToken){
     placeHeroSprite(hero);
@@ -608,7 +659,7 @@ function shakeBattle(){
 }
 
 // ===== COMBAT =====
-function tick(){
+function tickLegacySingleCombat(){
   if(state.paused || !state.enemy || state.enemy.empty) return;
   const e = state.enemy;
   const isCrit = Math.random() < criticalChance();
@@ -689,7 +740,7 @@ function tick(){
         log(`Tu es vaincu : retour à l’étape ${state.route.step + 1}.`);
         const playerSprite = $('player-sprite');
         if(playerSprite) playerSprite.dataset.animationToken = '';
-        spawn();
+        spawnLegacySingleCombat();
         state.paused = false;
         log('Ton héros reprend son souffle.');
         render();
@@ -714,8 +765,7 @@ function resolveEnemyDeath(e){
     const guaranteedLoot = e.title === 'Elite' || e.title === 'Mini-boss';
     const lootTemplate = rollClassicLootItem(e.family, total('luck'), guaranteedLoot);
     if(lootTemplate){
-      const itemRank = CLASSIC_DIFFICULTIES[state.route.difficulty].itemRank;
-      const item = copy(lootTemplate, itemRank);
+      const item = copy(lootTemplate);
       state.lastLoot = item;
       state.lootHistory.unshift(item);
       state.lootHistory = state.lootHistory.slice(0, 5);
@@ -737,7 +787,7 @@ function resolveEnemyDeath(e){
       if(Math.random() < BOSS_BONUS_LOOT_CHANCE){
         const bonusLoot = rollClassicLootItem(e.family, total('luck'), true);
         if(bonusLoot){
-          const bonusItem = copy(bonusLoot, CLASSIC_DIFFICULTIES[state.route.difficulty].itemRank);
+          const bonusItem = copy(bonusLoot);
           state.lastLoot = bonusItem;
           state.lootHistory.unshift(bonusItem);
           state.lootHistory = state.lootHistory.slice(0, 5);
@@ -747,9 +797,10 @@ function resolveEnemyDeath(e){
       }
       if(Math.random() < Math.min(.95, BOSS_KEY_DROP_CHANCE + Math.max(0, talentValue('keyDrop')))){
         state.keys++;
-        log('Le mini-boss laisse tomber une clé de coffre !');
+        log('Le mini-boss laisse tomber une clé de Tour !');
       }
       const clearedTier = routeTierForStep(state.route.step + 1);
+      if(typeof recordProgressionRouteBoss === 'function') recordProgressionRouteBoss(state.route.index,clearedTier.tier);
       const nextTier = ROUTE_TIERS[clearedTier.tier];
       if(nextTier){
         state.route.unlockedTiers[state.route.index] = Math.max(state.route.unlockedTiers[state.route.index], nextTier.tier);
@@ -766,7 +817,7 @@ function resolveEnemyDeath(e){
     // Après la victoire, le héros avance vers la rencontre suivante : les cinq
     // couches du décor défilent à des vitesses différentes pour créer la profondeur.
     advanceClassicBattleBackground(() => {
-      spawn();
+      spawnLegacySingleCombat();
       render();
       introduceClassicEnemy(() => {
         state.paused = false;
@@ -779,20 +830,21 @@ function resolveEnemyDeath(e){
 // Les futures compétences peuvent renseigner `state.battle.taunt` avec l'id
 // d'un héros et une date d'expiration. Le ciblage respectera alors la provocation.
 const CLASSIC_HERO_VISUALS = {
-  archer:{folder:'Archer Guy', attack:'Shooting'},
-  barbarian:{folder:'Barbarian Warrior', attack:'Slashing', spellAttack:'Spell', spellFrames:12},
-  mage:{folder:'Medieval Mage', attack:'Throwing Spell'},
-  priest:{folder:'Priest', attack:'Slashing', spellAttack:'Healing', filePrefix:'0_Priest_'},
-  knight:{folder:'White Armored Knight', attack:'Slashing', spellAttack:'Spell', spellFrames:12},
-  paladin:{folder:'Paladin', attack:'Slashing', spellAttack:'Blessed', spellFrames:30, filePrefix:'0_Paladin_'},
-  ninja:{folder:'White Ninja', attack:'Slashing'}
+  archer:{folder:'Aelya', attack:'Shooting'},
+  barbarian:{folder:'Brom', attack:'Slashing', spellAttack:'Spell', spellFrames:12},
+  mage:{folder:'Lyra', attack:'Throwing Spell'},
+  priest:{folder:'Elyne', attack:'Slashing', spellAttack:'Healing', filePrefix:'0_Priest_'},
+  knight:{folder:'Gareth', attack:'Slashing', spellAttack:'Spell', spellFrames:12},
+  paladin:{folder:'Aldric', attack:'Slashing', spellAttack:'Blessed', spellFrames:30, filePrefix:'0_Paladin_'},
+  ninja:{folder:'Kaito', attack:'Slashing', spellAttack:'Poisonous Smoke', spellFrames:12},
+  necromancer:{folder:'Necromancien', attack:'Attacking', attackFile:'Casting Spells', spellAttack:'Taunt', spellFrames:18, travelFrames:18, filePrefix:'Necromancer_01_'}
 };
 const FORMATION_ORDER = ['front','middle','back'];
 // 15 frames de mort à 72 ms, plus un court temps de lecture avant la prochaine rencontre.
 const TEAM_DEATH_TRANSITION_DELAY = ATTACK_IMPACT_DELAY + 1180;
 
 function activeBattleHeroes(){
-  return state.teamIds.map(id => state.party.find(hero => hero.id === id)).filter(Boolean)
+  return state.teamIds.map(id => state.party.find(hero => hero.id === id)).filter(hero => hero && isHeroUnlocked(hero))
     .sort((a,b) => FORMATION_ORDER.indexOf(a.position) - FORMATION_ORDER.indexOf(b.position));
 }
 function heroEquipmentTotal(hero, key, base=0){
@@ -810,24 +862,31 @@ function heroSetBonus(hero, key){
 }
 function heroCombatStats(hero){
   const base = hero.base || {};
+  const progression=heroLevelProgress(hero);
+  // Formule de base commune aux trois stats :
+  // (stat native + bonus plats) × niveau × bonus en %.
+  // Les bonus plats sont donc désirables, comme l'ATQ d'une arme dans un RPG
+  // de collection, au lieu de devenir négligeables après quelques niveaux.
   const vitality = heroEquipmentTotal(hero,'vitality');
+  const flatPower = heroEquipmentTotal(hero,'power');
+  const flatArmor = heroEquipmentTotal(hero,'armor');
   const hpPct = heroEquipmentTotal(hero,'hpPct') / 100;
   const powerPct = heroEquipmentTotal(hero,'powerPct') / 100;
   const armorPct = heroEquipmentTotal(hero,'armorPct') / 100;
-  const armor = ((Number(base.armor) || 0) + heroEquipmentTotal(hero,'armor')) * (1 + armorPct + talentValue('armor') + heroSetBonus(hero,'armorPct'));
-  const speed = Math.max(0, heroEquipmentTotal(hero,'speed',1) - 1);
+  const armor = ((Number(base.armor) || 0) + flatArmor) * progression.baseMultiplier * (1 + armorPct + talentValue('armor') + heroSetBonus(hero,'armorPct'));
+  const speed = Math.max(0, heroEquipmentTotal(hero,'speed',1) + heroSetBonus(hero,'speed') - 1);
   const haste = Math.min(.5, speed * .1 + talentValue('haste') + heroSetBonus(hero,'haste'));
-  const max = Math.max(1, Math.round(((Number(base.hp) || 100) + vitality) * (1 + hpPct + talentValue('hp') + heroSetBonus(hero,'hpPct'))));
+  const max = Math.max(1, Math.round(((Number(base.hp) || 100) + vitality) * progression.baseMultiplier * (1 + hpPct + talentValue('hp') + heroSetBonus(hero,'hpPct'))));
   const reduction = armor / (armor + 100);
   return {
-    maxHp:max, armor, reduction, haste, speed:heroEquipmentTotal(hero,'speed',Number(base.speed) || 1),
-    damage:Math.max(8, heroEquipmentTotal(hero,'power',Number(base.power) || 10)) * Math.max(.1, 1 + powerPct + talentValue('damage') + heroSetBonus(hero,'powerPct')),
-    crit:Math.min(MAX_CRITICAL_CHANCE, Math.max(0, (heroEquipmentTotal(hero,'crit') + (Number(base.crit) || 0)) / 100 + talentValue('crit'))),
+    maxHp:max, armor, reduction, haste, speed:heroEquipmentTotal(hero,'speed',Number(base.speed) || 1) + heroSetBonus(hero,'speed'),
+    damage:Math.max(8, ((Number(base.power) || 10) + flatPower) * progression.baseMultiplier) * Math.max(.1, 1 + powerPct + talentValue('damage') + heroSetBonus(hero,'powerPct')),
+    crit:Math.min(MAX_CRITICAL_CHANCE, Math.max(0, (heroEquipmentTotal(hero,'crit') + (Number(base.crit) || 0) + progression.critBonus + heroSetBonus(hero,'crit')) / 100 + talentValue('crit'))),
     critDamage:1.7 + Math.max(0, heroEquipmentTotal(hero,'critDamage') + talentValue('critDamage') + heroSetBonus(hero,'critDamage')),
     dodge:Math.min(.25, .02 + speed * .1 + talentValue('dodge')),
     parry:.03 + Math.min(1, reduction / .71) * .17,
     lifesteal:heroEquipmentTotal(hero,'lifesteal') + talentValue('lifesteal') + heroSetBonus(hero,'lifesteal'),
-    precision:Math.max(0, (Number(base.precision) || 0) + heroEquipmentTotal(hero,'precision'))
+    precision:Math.max(0, (Number(base.precision) || 0) + progression.precisionBonus + heroEquipmentTotal(hero,'precision'))
   };
 }
 function battleFighterId(side, id){ return `${side}-fighter-${id}`; }
@@ -835,6 +894,8 @@ function battleSpriteId(side, id){ return `${side}-sprite-${id}`; }
 function battleFighter(side, id){ return $(battleFighterId(side,id)); }
 function battleSprite(side, id){ return $(battleSpriteId(side,id)); }
 function battleSpellVfx(side, id){ return $("spell-vfx-" + side + "-" + id); }
+function battleSummonLayer(){ return $('battle-summons'); }
+function battleSummonSprite(id){ return $('summon-sprite-' + id); }
 // Les PNG Craftpix sont carrés, mais ils sont affichés dans une boîte plus
 // haute avec `object-fit: contain` et `object-position: center bottom`.
 // On convertit donc le point demandé dans le carré réellement dessiné, pas
@@ -860,13 +921,109 @@ function battleArenaPoint(area, point){
     y:(point.y - rect.top) * area.clientHeight / rect.height
   };
 }
+function summonSpritePath(summon, action, frame){
+  const folder = action === 'combat' ? 'Attacking' : action === 'death' ? 'Dying' : (summon.idleFolder || 'Idle');
+  return `assets/sprites/Characters/craftpix/Sort/Invocation_Necromancienne/${summon.folder}/${folder}/${folder}_${classicPadFrame(frame)}.png`;
+}
+function renderBattleSummons(){
+  const layer=battleSummonLayer(); const battle=state.battle;
+  if(!layer) return;
+  const summons=(battle?.summons || []).filter(summon=>summon.active);
+  const existing=new Set(summons.map(summon=>summon.id));
+  [...layer.children].forEach(node=>{ if(!existing.has(node.dataset.summonId)) node.remove(); });
+  summons.forEach((summon,index)=>{
+    const caster=battle.heroes.find(hero=>hero.id===summon.casterId);
+    // L'ancre est au sol, sur l'avant du Nécromancien. L'image elle-même est
+    // ensuite alignée par son bas : le crâne ne flotte plus au milieu du décor.
+    const point=caster && battleSpritePoint('hero',caster,.72,1);
+    const area=$('battle-area');
+    if(!caster || !point || !area) return;
+    let image=battleSummonSprite(summon.id);
+    if(!image){
+      image=document.createElement('img'); image.id=`summon-sprite-${summon.id}`;
+      image.className='summoned-skull'; image.dataset.summonId=summon.id; image.alt='';
+      image.src=summonSpritePath(summon,'idle',0); layer.appendChild(image);
+    }
+    const local=battleArenaPoint(area,point);
+    // Le héros regarde vers la droite : le crâne doit donc flotter devant
+    // lui, entre son sprite et les ennemis, jamais derrière son dos.
+    const offsets=[[60,42]][index] || [60,42];
+    image.style.left=`${local.x + offsets[0]}px`; image.style.top=`${local.y + offsets[1]}px`;
+  });
+}
+function playSummonAnimation(summon, action='combat'){
+  const image=battleSummonSprite(summon.id); if(!image) return;
+  const token=Number(image.dataset.animationToken||0)+1; image.dataset.animationToken=token;
+  const count=action === 'death' ? 15 : 12; let frame=0;
+  const timer=setInterval(()=>{
+    if(Number(image.dataset.animationToken)!==token){ clearInterval(timer); return; }
+    image.src=summonSpritePath(summon,action,frame++);
+    if(frame>=count){
+      clearInterval(timer);
+      if(Number(image.dataset.animationToken)!==token) return;
+      image.dataset.animationToken='';
+      // La dernière frame de mort reste visible jusqu'à la disparition du
+      // crâne ; elle ne doit jamais revenir brusquement à Idle.
+      image.src=summonSpritePath(summon,action === 'death' ? 'death' : 'idle',action === 'death' ? count-1 : 0);
+    }
+  },combatTestDelay(58));
+}
+function summonNecromancerSkulls(heroUnit, spell){
+  const battle=state.battle; if(!battle) return [];
+  battle.summons=Array.from({length:Math.max(1,Number(spell.summonCount)||3)},(_,index)=>({
+    // Chaque invocation tire l'un des trois crânes. Ils ont tous désormais
+    // leur Idle, ce qui laisse une animation cohérente après leur attaque.
+    id:`${heroUnit.id}-skull-${index+1}`, casterId:heroUnit.id, folder:`Skull ${String(Math.floor(Math.random()*3)+1).padStart(2,'0')}`,
+    idleFolder:'Idle', active:true, attacksRemaining:Math.max(1,Number(spell.summonAttacks)||2), damageMultiplier:Number(spell.summonDamageMultiplier)||.15
+  }));
+  renderBattleSummons();
+  return battle.summons;
+}
+function useSummonedSkullAttack(heroUnit, enemies, onComplete=()=>{}){
+  const battle=state.battle; const summons=(battle?.summons||[]).filter(summon=>summon.active&&summon.attacksRemaining>0&&summon.casterId===heroUnit.id);
+  if(!summons.length){ onComplete(); return; }
+  const stats=heroCombatStats(heroUnit.hero); let remaining=summons.length;
+  summons.forEach((summon,index)=>{
+    setTimeout(()=>{
+      if(state.battle!==battle){ if(--remaining===0) onComplete(); return; }
+      playSummonAnimation(summon,'combat');
+      onAttackImpact(()=>{
+        const target=pickHeroTarget(enemies,stats.precision);
+        if(target && target.hp>0 && !target.dying){
+          const hit=stats.damage*summon.damageMultiplier*heroSpellMultiplier(heroUnit.hero);
+          const dealt=Math.min(hit,target.hp); const lethal=hit>=target.hp;
+          target.hp=Math.max(0,target.hp-hit);
+          if(typeof recordCombatHit==='function')recordCombatHit(battle,heroUnit,target,dealt);
+          if(lethal) playBattleDeath('enemy',target); else animateBattleUnit('enemy',target,'hurt');
+          showBattleDamage('enemy',target,dealt);
+        }
+        summon.attacksRemaining=Math.max(0,summon.attacksRemaining-1);
+        if(summon.attacksRemaining===0){
+          // La seconde attaque doit être lue jusqu'au bout. Le crâne meurt
+          // ensuite, puis sa dernière frame reste un instant à l'écran.
+          setTimeout(()=>{
+            if(state.battle!==battle || !summon.active) return;
+            playSummonAnimation(summon,'death');
+            setTimeout(()=>{
+              if(state.battle===battle){ summon.active=false; renderBattleSummons(); }
+            },combatTestDelay(15 * 58 + 750));
+          },combatTestDelay(12 * 58 + 180));
+        }
+        if(--remaining===0){
+          if(!battle.enemies.some(enemy=>enemy.hp>0)) queueTeamVictory(battle);
+          setTimeout(onComplete,combatTestDelay(120));
+        }
+      });
+    },combatTestDelay(index*92));
+  });
+}
 function spellVfxPath(spell, frame){
   // Certaines animations commencent à 000 (Paladin), d'autres à 1 : ne pas
   // traiter 0 comme une valeur absente, sinon la première frame serait perdue.
   const index = frame + (spell.vfxFrameStart ?? 1);
-  const file = spell.vfxFramePrefix
+  const file = spell.vfxFile || (spell.vfxFramePrefix
     ? `${spell.vfxFramePrefix}${String(index).padStart(spell.vfxFramePadding || 0,'0')}.png`
-    : `${index}.png`;
+    : `${index}.png`);
   if(spell.vfxBasePath) return `${spell.vfxBasePath}/${file}`;
   const subfolder = spell.vfxSubfolder ? `/${spell.vfxSubfolder}` : '';
   return `assets/sprites/Characters/craftpix/Sort/${spell.vfx}${subfolder}/${file}`;
@@ -894,24 +1051,32 @@ function renderBattleSpellCooldowns(){
 function playSpellVfx(side, unit, spell){
   const image = battleSpellVfx(side,unit.id);
   if(!image || !spell?.vfx) return;
-  image.classList.toggle('life-recovery-vfx',spell.vfx === 'Life Recovery');
+  image.classList.toggle('life-recovery-vfx',spell.vfx === 'Recuperation_De_Vie' || spell.vfxPlacement === 'healing');
   image.classList.toggle('sword-tip-vfx',spell.vfxAnchor === 'sword-tip');
+  image.classList.toggle('golden-slash-vfx',spell.vfx === 'Entaille_Doree');
   const token = Number(image.dataset.animationToken || 0) + 1;
   image.dataset.animationToken = token;
   const frames = Number(spell.vfxFrames) || ({1:10,2:5,3:10,4:8,5:8,6:10,7:10,8:10,9:8,10:8}[spell.vfx] || 8);
   let frame = 0;
   image.hidden = false;
   image.src = spellVfxPath(spell,frame);
+  if(frames === 1){
+    setTimeout(() => { if(Number(image.dataset.animationToken) === token) image.hidden = true; }, combatTestDelay(Number(spell.vfxDuration) || 500));
+    return;
+  }
   const timer = setInterval(() => {
     if(Number(image.dataset.animationToken) !== token){ clearInterval(timer); return; }
     frame++;
     if(frame >= frames){
       clearInterval(timer);
-      if(Number(image.dataset.animationToken) === token) image.hidden = true;
+      const holdDuration = Number(spell.vfxHoldDuration) || 0;
+      if(holdDuration){
+        setTimeout(() => { if(Number(image.dataset.animationToken) === token) image.hidden = true; },combatTestDelay(holdDuration));
+      }else if(Number(image.dataset.animationToken) === token) image.hidden = true;
       return;
     }
     image.src = spellVfxPath(spell,frame);
-  },58);
+  },combatTestDelay(Number(spell.vfxFrameDuration) || 58));
 }
 function showSpellImpact(target, spell){
   const area = $('battle-area');
@@ -926,20 +1091,20 @@ function showSpellImpact(target, spell){
   impact.style.top = `${localPoint.y}px`;
   area.appendChild(impact);
   fighter.classList.add('spell-hit');
-  setTimeout(() => { impact.remove(); fighter.classList.remove('spell-hit'); },520);
+  setTimeout(() => { impact.remove(); fighter.classList.remove('spell-hit'); },combatTestDelay(520));
 }
 function playSpellProjectile(caster, target, spell, onArrival){
   const area = $('battle-area');
   const origin = battleSpritePoint('hero',caster,spell.projectileOriginX ?? .7,spell.projectileOriginY ?? .7);
   const destination = battleSpritePoint('enemy',target,spell.projectileTargetX ?? .38,spell.projectileTargetY ?? .68);
   if(!area || !origin || !destination){ onArrival?.(); return; }
-  const duration = Number(spell.projectileDuration) || 360;
+  const duration = combatTestDelay(Number(spell.projectileDuration) || 360);
   // Laisse le sort visible un instant au bout de l'arme avant son départ.
   // Sans cette anticipation, la première image est déjà assez loin du héros
   // sur les grands écrans, même avec des coordonnées correctes.
-  const windup = 360;
+  const windup = combatTestDelay(360);
   const image = document.createElement('img');
-  image.className = 'spell-projectile';
+  image.className = `spell-projectile ${spell.projectileClass || ''}`;
   image.src = spellVfxPath(spell,0);
   image.alt = '';
   image.setAttribute('aria-hidden','true');
@@ -965,14 +1130,14 @@ function playSpellProjectile(caster, target, spell, onArrival){
   launch.style.left = `${launchXPx}px`;
   launch.style.top = `${startYPx}px`;
   area.appendChild(launch);
-  setTimeout(() => launch.remove(),360);
+  setTimeout(() => launch.remove(),combatTestDelay(360));
   const frames = Number(spell.vfxFrames) || 5;
   let frame = 0;
   const timer = setInterval(() => {
     frame++;
     if(frame >= frames){ clearInterval(timer); return; }
     image.src = spellVfxPath(spell,frame);
-  },duration / frames);
+  },Math.max(1,Math.round(duration / frames)));
   const startedAt = performance.now() + windup;
   function travel(now){
     const progress = Math.max(0,Math.min(1,(now - startedAt) / duration));
@@ -990,13 +1155,13 @@ function battleUnitPath(side, unit, action, frame){
   if(side === 'hero'){
     const visual = CLASSIC_HERO_VISUALS[unit.id] || CLASSIC_HERO_VISUALS.archer;
     const folder = action === 'combat' ? visual.attack : action === 'spell' ? (visual.spellAttack || visual.attack) : ({idle:'Idle',travel:'Walking',hurt:'Hurt',death:'Dying'}[action] || 'Idle');
-    const prefix = visual.filePrefix ? `${visual.filePrefix}${folder}_` : `${folder}_`;
+    const filename = action === 'combat' ? (visual.attackFile || folder) : folder;
+    const prefix = visual.filePrefix ? `${visual.filePrefix}${filename}_` : `${filename}_`;
     return `assets/sprites/Characters/craftpix/${visual.folder}/${folder}/${prefix}${safe}.png`;
   }
-  const visual = CLASSIC_ENEMY_VISUALS[unit.family] || CLASSIC_ENEMY_VISUALS.zombie;
-  const variant = visual.variants[Math.max(0, Math.min(2, (Number(String(unit.assetId).slice(-1)) || 1) - 1))];
-  const folder = action === 'combat' ? 'Slashing' : ({idle:'Idle',travel:'Walking',hurt:'Hurt',death:'Dying'}[action] || 'Idle');
-  return `assets/sprites/Monsters/craftpix/${visual.folder}/${variant}/${folder}/0_${visual.file}_${folder}_${safe}.png`;
+  const visual = CLASSIC_BATTLE_MONSTER_VISUALS[unit.assetId] || CLASSIC_BATTLE_MONSTER_VISUALS.zombie1;
+  const folder = action === 'combat' ? (visual.attack || 'Slashing') : ({idle:'Idle',travel:'Walking',hurt:'Hurt',death:'Dying'}[action] || 'Idle');
+  return `assets/sprites/Monsters/craftpix/${visual.folder}/${visual.variant}/${folder}/0_${visual.file}_${folder}_${safe}.png`;
 }
 function setBattleSpriteFrame(side, unit, action, frame){
   const image = battleSprite(side,unit.id);
@@ -1006,7 +1171,11 @@ function setBattleSpriteFrame(side, unit, action, frame){
 }
 function battleFrameCount(side, unit, action){
   if(action === 'spell' && side === 'hero') return (CLASSIC_HERO_VISUALS[unit.id]?.spellFrames) || 12;
-  if(action === 'combat') return side === 'hero' && unit.id === 'archer' ? 9 : 12;
+  if(action === 'travel' && side === 'hero') return (CLASSIC_HERO_VISUALS[unit.id]?.travelFrames) || CLASSIC_VISUAL_FRAME_COUNTS.travel;
+  if(action === 'combat'){
+    if(side === 'hero') return unit.id === 'archer' ? 9 : 12;
+    return CLASSIC_BATTLE_MONSTER_VISUALS[unit.assetId]?.attackFrames || 12;
+  }
   return CLASSIC_VISUAL_FRAME_COUNTS[action] || 18;
 }
 function playBattleAnimation(side, unit, action, frameDelay){
@@ -1015,7 +1184,7 @@ function playBattleAnimation(side, unit, action, frameDelay){
   const token = Number(image.dataset.animationToken || 0) + 1;
   image.dataset.animationToken = token;
   const count = battleFrameCount(side,unit,action);
-  const delay = frameDelay || (action === 'death' ? 72 : action === 'travel' ? 58 : 68);
+  const delay = combatTestDelay(frameDelay || (action === 'death' ? 72 : action === 'travel' ? 58 : 68));
   let frame = 0;
   const timer = setInterval(() => {
     if(Number(image.dataset.animationToken) !== token){ clearInterval(timer); return; }
@@ -1037,24 +1206,45 @@ function animateBattleUnit(side, unit, action, crit=false){
   const stateClass = action === 'combat' || action === 'spell' ? 'attacking' : crit ? 'crit' : action === 'dodge' ? 'dodge' : 'hit';
   fighter.classList.add(stateClass);
   if(action !== 'dodge') playBattleAnimation(side,unit,action);
-  setTimeout(() => fighter.classList.remove('attacking','hit','crit','dodge'), 430);
+  setTimeout(() => fighter.classList.remove('attacking','hit','crit','dodge'), combatTestDelay(430));
 }
 function playBattleDeath(side, unit){
   // Un dernier coup peut être résolu après la mort d'équipe. Sans ce garde,
   // l'animation repartait depuis la première frame et semblait relever l'unité.
   if(unit.dying) return;
   unit.dying = true;
-  animateBattleUnit(side,unit,'death');
+  const fighter=battleFighter(side,unit.id);
+  const bar=fighter?.querySelector('.enemy-hp');
+  const fill=bar?.querySelector('i');
+  const detail=fighter?.querySelector('.fighter-hp-detail');
+  // La dernière valeur de PV doit être visible avant la chute : sinon le
+  // sprite pouvait mourir alors que la barre affichait encore ses anciens PV.
+  if(bar) bar.dataset.hp=`0 / ${unit.maxHp}`;
+  if(fill) fill.style.width='0%';
+  if(detail) detail.textContent=`0 / ${unit.maxHp} PV`;
+  setTimeout(()=>{
+    if(unit.dying) animateBattleUnit(side,unit,'death');
+  },combatTestDelay(70));
 }
 function showBattleDamage(side, unit, amount, type='normal'){
   const layer = $('damage-layer'); if(!layer) return;
   const fighter = battleFighter(side,unit.id); if(!fighter) return;
   const area = $('battle-area'); const rect = fighter.getBoundingClientRect(); const arena = area.getBoundingClientRect();
   const el = document.createElement('div'); el.className = `floating-damage${type==='crit'?' crit':''}${type==='miss'?' miss':''}${type==='heal'?' heal':''}`;
+  const targetKey = `${side}-${unit.id}`;
+  const activeCount = [...layer.querySelectorAll('.floating-damage')]
+    .filter(node => node.dataset.fighterId === targetKey).length;
+  const lane = [0,-1,1][activeCount % 3];
+  const row = Math.floor(activeCount / 3);
+  const horizontalOffset = lane * Math.min(42, rect.width * .2);
+  const verticalOffset = row * Math.min(20, rect.height * .08);
+  el.dataset.fighterId = targetKey;
   el.textContent = type === 'miss' ? 'ESQUIVE' : type === 'heal' ? `+${Math.round(amount)}` : `-${Math.round(amount)}`;
-  el.style.left = `${(rect.left - arena.left + rect.width / 2) / arena.width * 100}%`;
-  el.style.top = `${Math.max(12, (rect.top - arena.top) / arena.height * 100)}%`;
-  layer.appendChild(el); setTimeout(() => el.remove(),1600);
+  el.style.left = `${(rect.left - arena.left + rect.width / 2 + horizontalOffset) / arena.width * 100}%`;
+  // Le haut du conteneur correspond au sommet du sprite : partir un peu plus
+  // bas place le nombre au niveau du torse, au lieu du décor derrière lui.
+  el.style.top = `${Math.max(12, Math.min(85, (rect.top - arena.top + rect.height * .22 + verticalOffset) / arena.height * 100))}%`;
+  layer.appendChild(el); setTimeout(() => el.remove(),combatTestDelay(1600));
 }
 function useHeroSpell(heroUnit, enemies, onComplete=()=>{}){
   const spell = heroUnit.hero.spell;
@@ -1074,13 +1264,24 @@ function useHeroSpell(heroUnit, enemies, onComplete=()=>{}){
     const allies = state.battle.heroes.filter(unit => unit.hp > 0);
     onAttackImpact(() => {
       allies.forEach(ally => {
-        const amount = Math.max(1, Math.round(ally.maxHp * spell.multiplier));
+        const amount = Math.max(1, Math.round(ally.maxHp * spell.multiplier * heroSpellMultiplier(heroUnit.hero)));
         const healed = Math.min(amount, ally.maxHp - ally.hp);
         ally.hp += healed;
+        if(typeof recordCombatHit==='function')recordCombatHit(state.battle,heroUnit,ally,healed,true);
         playSpellVfx('hero',ally,spell);
         if(healed) showBattleDamage('hero',ally,healed,'heal');
       });
       setTimeout(onComplete,combatTestDelay(240));
+    });
+    return true;
+  }
+  if(spell.type === 'summon'){
+    const battle=state.battle;
+    onHeroSpellImpact(spell,()=>{
+      if(state.battle !== battle) return;
+      summonNecromancerSkulls(heroUnit,spell);
+      log(`${heroUnit.name} invoque ${Math.max(1,Number(spell.summonCount)||3)} crânes.`);
+      useSummonedSkullAttack(heroUnit,enemies,onComplete);
     });
     return true;
   }
@@ -1095,7 +1296,7 @@ function useHeroSpell(heroUnit, enemies, onComplete=()=>{}){
     const stats = heroCombatStats(heroUnit.hero);
     const impacts = liveTargets.map(target => {
       if(spell.projectile) target.pendingSpellImpact = true;
-      return {target,amount:stats.damage * spell.multiplier};
+      return {target,amount:stats.damage * spell.multiplier * heroSpellMultiplier(heroUnit.hero)};
     });
     const resolveImpact = ({target,amount}) => {
       target.pendingSpellImpact = false;
@@ -1105,6 +1306,7 @@ function useHeroSpell(heroUnit, enemies, onComplete=()=>{}){
         const dealt=Math.min(amount,target.hp);
         const lethal=amount >= target.hp;
         target.hp=Math.max(0,target.hp-amount);
+        if(typeof recordCombatHit==='function')recordCombatHit(state.battle,heroUnit,target,dealt);
         if(lethal) playBattleDeath('enemy',target);
         else animateBattleUnit('enemy',target,'hurt');
         showBattleDamage('enemy',target,dealt,'crit');
@@ -1124,8 +1326,10 @@ function useHeroSpell(heroUnit, enemies, onComplete=()=>{}){
       onComplete();
       return;
     }
-    // Les attaques de mêlée restent ancrées sur l'arme du héros lanceur.
-    playSpellVfx('hero',heroUnit,spell);
+    // Le VFX d'une zone toxique appartient aux ennemis touchés ; le VFX des
+    // sorts de mêlée reste, lui, ancré sur son lanceur.
+    if(spell.vfxOnTarget) impacts.forEach(({target}) => playSpellVfx('enemy',target,spell));
+    else playSpellVfx('hero',heroUnit,spell);
     impacts.forEach(resolveImpact);
     setTimeout(onComplete,combatTestDelay(240));
   });
@@ -1158,12 +1362,15 @@ function renderBattleTeams(){
   const heroes = state.battle?.heroes || []; const enemies = state.battle?.enemies || [];
   const teamMarkup = (side,units) => units.map(unit => {
     const hpPct = Math.max(0,unit.hp / unit.maxHp * 100);
-    const boss = side === 'enemy' && unit.title === 'Mini-boss';
+    const boss = side === 'enemy' && unit.isBoss;
+    const miniBoss = side === 'enemy' && unit.isMiniBoss;
+    const encounterBadge = boss ? '<span class="encounter-badge boss-badge">★ BOSS DE PALIER</span>' : miniBoss ? '<span class="encounter-badge mini-boss-badge">◆ MINI-BOSS</span>' : '';
     const spell = side === 'hero' ? unit.hero.spell : null;
     const spellIcon = spell ? `<img src="${spellIconPath(spell)}" alt="${spell.name}">` : '<span aria-hidden="true">✦</span>';
-    return `<div class="fighter ${side === 'hero' ? 'player' : 'enemy'} ${boss?'boss':''} ${unit.deathFinished?'defeated':''}" id="${battleFighterId(side,unit.id)}" data-position="${unit.position}">
+    return `<div class="fighter ${side === 'hero' ? 'player' : 'enemy'} ${boss?'boss':''} ${miniBoss?'mini-boss':''} ${unit.deathFinished?'defeated':''}" id="${battleFighterId(side,unit.id)}" data-position="${unit.position}">
       <img alt="${unit.name}" class="fighter-sprite" id="${battleSpriteId(side,unit.id)}">
       <img alt="" aria-hidden="true" class="spell-vfx" id="spell-vfx-${side}-${unit.id}" hidden>
+      ${encounterBadge}
       <h3>${unit.name}</h3><p class="fighter-hp-detail">${Math.ceil(unit.hp)} / ${unit.maxHp} PV</p>
       <div class="enemy-hp" data-hp="${Math.ceil(unit.hp)} / ${unit.maxHp}"><i style="width:${hpPct}%"></i></div>
       ${side === 'hero' ? `<div class="battle-spell-cooldown${spell ? '' : ' unavailable'}" data-hero-id="${unit.id}" title="${spell?.name || 'Sort non appris'}" aria-label="${spell?.name || 'Sort non appris'}">${spellIcon}<b class="battle-spell-cooldown-time">—</b></div>` : ''}
@@ -1179,7 +1386,7 @@ function renderBattleTeams(){
   // Le décor porte le déplacement : la nouvelle équipe apparaît à sa place
   // finale en Idle. Walking est joué par l'équipe précédente pendant le trajet.
     if(battle.enemyArrival){
-      const duration=battle.enemyArrivalDuration || 1000;
+      const duration=combatTestDelay(battle.enemyArrivalDuration || 1000);
       requestAnimationFrame(() => {
         if(state.battle !== battle) return;
         enemies.forEach(unit => {
@@ -1197,6 +1404,7 @@ function renderBattleTeams(){
       }, duration);
     }
     renderBattleSpellCooldowns();
+    renderBattleSummons();
     return;
   }
   [...heroes.map(unit=>['hero',unit]),...enemies.map(unit=>['enemy',unit])].forEach(([side,unit]) => {
@@ -1207,37 +1415,136 @@ function renderBattleTeams(){
     if(bar){ bar.dataset.hp=`${Math.ceil(unit.hp)} / ${unit.maxHp}`; fill.style.width=`${Math.max(0,unit.hp/unit.maxHp*100)}%`; }
   });
   renderBattleSpellCooldowns();
+  renderBattleSummons();
 }
 function classicMonsterPool(){
+  if(CLASSIC_MONSTERS.length) return CLASSIC_MONSTERS.map(monster=>({...monster}));
   return [
     { name:'Villageois infecté', family:'zombie', weight:20, gold:24, hp:88, atk:6, dodge:.04, parry:.01, assetId:'zombie1' }, { name:'Zombie errant', family:'zombie', weight:20, gold:28, hp:100, atk:7, dodge:.04, parry:.02, assetId:'zombie2' }, { name:'Mort affamé', family:'zombie', weight:20, gold:32, hp:112, atk:8, dodge:.03, parry:.03, assetId:'zombie3' },
+    { name:'Chevalier d’os', family:'zombie', weight:5, gold:38, hp:138, atk:10, dodge:.02, parry:.08, assetId:'deathKnight', miniBoss:true },
     { name:'Gobelin pillard', family:'orc', weight:10, gold:24, hp:92, atk:6, dodge:.02, parry:.06, assetId:'orc1' }, { name:'Gobelin berserker', family:'orc', weight:10, gold:28, hp:104, atk:7, dodge:.02, parry:.04, assetId:'orc2' }, { name:'Gobelin chef', family:'orc', weight:10, gold:32, hp:116, atk:8, dodge:.02, parry:.08, assetId:'orc3' },
+    { name:'Gobelin éclaireur', family:'orc', weight:8, gold:25, hp:96, atk:7, dodge:.04, parry:.04, assetId:'goblin' }, { name:'Ogre belliqueux', family:'orc', weight:5, gold:38, hp:145, atk:10, dodge:.01, parry:.10, assetId:'ogre', miniBoss:true }, { name:'Orc brutal', family:'orc', weight:7, gold:31, hp:125, atk:9, dodge:.01, parry:.08, assetId:'orc' },
+    { name:'Archer orc', family:'orc', weight:8, gold:27, hp:82, atk:9, dodge:.05, parry:.02, assetId:'orcArcher1' }, { name:'Tireur orc', family:'orc', weight:8, gold:29, hp:90, atk:10, dodge:.05, parry:.02, assetId:'orcArcher2' }, { name:'Arbalétrier orc', family:'orc', weight:8, gold:32, hp:98, atk:11, dodge:.04, parry:.03, assetId:'orcArcher3' },
     { name:'Squelette éclaireur', family:'skeleton', weight:10, gold:24, hp:84, atk:7, dodge:.07, parry:.03, assetId:'skeleton1' }, { name:'Squelette guerrier', family:'skeleton', weight:10, gold:28, hp:96, atk:8, dodge:.06, parry:.04, assetId:'skeleton2' }, { name:'Squelette vétéran', family:'skeleton', weight:10, gold:32, hp:108, atk:9, dodge:.05, parry:.07, assetId:'skeleton3' },
+    { name:'Squelette ancien', family:'skeleton', weight:8, gold:26, hp:96, atk:8, dodge:.06, parry:.04, assetId:'skeleton' }, { name:'Croisé d’os', family:'skeleton', weight:7, gold:34, hp:126, atk:10, dodge:.03, parry:.11, assetId:'crusader1', miniBoss:true }, { name:'Croisé osseux', family:'skeleton', weight:7, gold:36, hp:134, atk:10, dodge:.03, parry:.12, assetId:'crusader2', miniBoss:true }, { name:'Croisé maudit', family:'skeleton', weight:7, gold:38, hp:142, atk:11, dodge:.02, parry:.12, assetId:'crusader3', miniBoss:true },
     { name:'Vampire nocturne', family:'vampire', weight:10, gold:24, hp:90, atk:7, dodge:.05, parry:.03, assetId:'vampire1' }, { name:'Vampire sanguinaire', family:'vampire', weight:10, gold:28, hp:102, atk:8, dodge:.04, parry:.04, assetId:'vampire2' }, { name:'Noble vampire', family:'vampire', weight:10, gold:32, hp:114, atk:9, dodge:.03, parry:.05, assetId:'vampire3' },
+    { name:'Chasseur de vampires', family:'vampire', weight:8, gold:28, hp:102, atk:9, dodge:.05, parry:.07, assetId:'hunter1', miniBoss:true }, { name:'Traqueur de vampires', family:'vampire', weight:8, gold:31, hp:112, atk:10, dodge:.04, parry:.08, assetId:'hunter2', miniBoss:true }, { name:'Exécuteur vampire', family:'vampire', weight:8, gold:35, hp:124, atk:11, dodge:.03, parry:.10, assetId:'hunter3', miniBoss:true },
     { name:'Nomade des dunes', family:'desert', weight:10, gold:24, hp:94, atk:6, dodge:.01, parry:.09, assetId:'desert1' }, { name:'Nomade brûlant', family:'desert', weight:10, gold:28, hp:106, atk:7, dodge:.01, parry:.11, assetId:'desert2' }, { name:'Nomade du soleil noir', family:'desert', weight:10, gold:32, hp:118, atk:8, dodge:.01, parry:.12, assetId:'desert3' },
-    { name:'Esprit mycélien', family:'mycelium', weight:10, gold:24, hp:86, atk:7, dodge:.06, parry:.05, assetId:'mycelium1' }, { name:'Esprit sporifère', family:'mycelium', weight:10, gold:28, hp:98, atk:8, dodge:.06, parry:.06, assetId:'mycelium2' }, { name:'Esprit primordial', family:'mycelium', weight:10, gold:32, hp:110, atk:9, dodge:.05, parry:.07, assetId:'mycelium3' }
+    { name:'Chamane des dunes', family:'desert', weight:8, gold:26, hp:90, atk:9, dodge:.03, parry:.05, assetId:'shaman1' }, { name:'Chamane ardent', family:'desert', weight:8, gold:29, hp:98, atk:10, dodge:.03, parry:.05, assetId:'shaman2' }, { name:'Chamane solaire', family:'desert', weight:8, gold:32, hp:106, atk:11, dodge:.03, parry:.06, assetId:'shaman3' },
+    { name:'Pyromancien nomade', family:'desert', weight:7, gold:30, hp:92, atk:11, dodge:.02, parry:.05, assetId:'pyromancer1' }, { name:'Pyromancien brûlant', family:'desert', weight:7, gold:34, hp:102, atk:12, dodge:.02, parry:.06, assetId:'pyromancer2' }, { name:'Pyromancien du soleil noir', family:'desert', weight:7, gold:38, hp:112, atk:13, dodge:.02, parry:.06, assetId:'pyromancer3' },
+    { name:'Voyant des sables', family:'desert', weight:7, gold:30, hp:88, atk:10, dodge:.04, parry:.06, assetId:'seer1', miniBoss:true }, { name:'Sage des sables', family:'desert', weight:7, gold:34, hp:98, atk:11, dodge:.04, parry:.07, assetId:'seer2', miniBoss:true }, { name:'Prophète des dunes', family:'desert', weight:7, gold:38, hp:108, atk:12, dodge:.04, parry:.07, assetId:'seer3', miniBoss:true },
+    { name:'Esprit mycélien', family:'mycelium', weight:10, gold:24, hp:86, atk:7, dodge:.06, parry:.05, assetId:'mycelium1' }, { name:'Esprit sporifère', family:'mycelium', weight:10, gold:28, hp:98, atk:8, dodge:.06, parry:.06, assetId:'mycelium2' }, { name:'Esprit primordial', family:'mycelium', weight:10, gold:32, hp:110, atk:9, dodge:.05, parry:.07, assetId:'mycelium3' },
+    { name:'Gardien des bois', family:'mycelium', weight:8, gold:30, hp:118, atk:9, dodge:.03, parry:.10, assetId:'guardian1', miniBoss:true }, { name:'Gardien fongique', family:'mycelium', weight:8, gold:34, hp:130, atk:10, dodge:.03, parry:.11, assetId:'guardian2', miniBoss:true }, { name:'Gardien ancestral', family:'mycelium', weight:8, gold:38, hp:142, atk:11, dodge:.02, parry:.12, assetId:'guardian3', miniBoss:true }
   ];
 }
 function spawn(options={}){
-  const route = CLASSIC_ROUTES[state.route.index]; const difficulty = CLASSIC_DIFFICULTIES[state.route.difficulty];
-  const currentStep = state.route.step + 1; const tier = routeTierForStep(currentStep); const miniBoss = currentStep === tier.end;
-  const pool = classicMonsterPool().filter(monster => monster.family === route.family);
+  if(state.tower?.active) return spawnObsidianTower(options);
+  const route = CLASSIC_ROUTES[state.route.index];
+  const currentStep = state.route.step + 1;
+  const tier = routeTierForStep(currentStep);
+  const encounter=routeEncounterType(currentStep);
+  const finalBoss = encounter === 'boss';
+  const miniBoss = encounter === 'mini-boss';
+  const familyPool = classicMonsterPool().filter(monster => monster.family === route.family);
+  const normalPool = familyPool.filter(monster => !monster.miniBoss);
+  const specialPool = familyPool.filter(monster => monster.miniBoss);
   const stepInTier=currentStep-tier.start;
   const tierScale=ENEMY_TIER_SCALING[tier.tier] || ENEMY_TIER_SCALING[1];
-  const hpScale=tierScale.hp * Math.pow(ROUTE_STEP_HP_GROWTH,stepInTier) * difficulty.hp;
-  const atkScale=tierScale.attack * Math.pow(ROUTE_STEP_ATTACK_GROWTH,stepInTier) * difficulty.attack;
+  const stepScale=routeTierStepScale(tier,currentStep);
+  const familyScale=ROUTE_FAMILY_COMBAT_SCALING[route.family] || ROUTE_FAMILY_COMBAT_SCALING.zombie;
+  const hpScale=tierScale.hp * stepScale.hp * familyScale.hp;
+  const atkScale=tierScale.attack * stepScale.attack * familyScale.attack;
+  const xpScale=(ENEMY_TIER_XP_MULTIPLIER[tier.tier] || 1) * (1 + stepInTier * ROUTE_STEP_XP_GROWTH);
+  const goldScale=ENEMY_TIER_GOLD_MULTIPLIER[tier.tier] || 1;
   const chosen = FORMATION_ORDER.map((position,index) => {
+    // Un seul combattant spécial est présent : celui du milieu. Auparavant,
+    // les deux accompagnateurs étaient eux aussi tirés dans la liste des
+    // mini-boss, ce qui faisait apparaître leurs sprites aux mauvais étages.
+    const specialCenter = (finalBoss || miniBoss) && index === 1;
+    const pool = specialCenter && specialPool.length ? specialPool : normalPool;
     let roll = Math.random() * pool.reduce((sum,m)=>sum+m.weight,0); const base = pool.find(m => (roll -= m.weight) < 0) || pool[0];
-    const elite = !miniBoss && index === 1 && Math.random() < ELITE_SPAWN_CHANCE;
-    const boss = miniBoss && index === 1; const multiplier = boss ? 1.8 : elite ? 1.5 : 1;
+    const elite = !finalBoss && !miniBoss && index === 1 && Math.random() < ELITE_SPAWN_CHANCE;
+    const boss = finalBoss && index === 1;
+    const miniBossUnit = miniBoss && index === 1;
+    const encounterStats = boss ? ENCOUNTER_COMBAT_MULTIPLIERS.boss : miniBossUnit ? ENCOUNTER_COMBAT_MULTIPLIERS.miniBoss : elite ? ENCOUNTER_COMBAT_MULTIPLIERS.elite : ENCOUNTER_COMBAT_MULTIPLIERS.normal;
     // Les trois variantes ont aussi une vivacité légèrement différente : elle
     // sert uniquement à l'ordre d'initiative, jamais aux dégâts.
     const speed = Number(base.speed) || (.92 + index * .04);
-    const unit = {...base, id:`enemy-${Date.now()}-${index}`, position, speed, title:boss?'Mini-boss':elite?'Elite':'Normal', reward:(boss?3:elite?1.7:1)*difficulty.reward, goldReward:Math.round((boss?route.bossGold:base.gold)*difficulty.gold/3), maxHp:Math.round(base.hp * multiplier * hpScale * .58), attack:Math.round(base.atk * multiplier * atkScale), isBoss:boss};
-    if(boss) unit.name = route.boss; unit.hp = unit.maxHp; return unit;
+    const unit = {...base, baseName:base.name, id:`enemy-${Date.now()}-${index}`, position, speed, routeTier:tier.tier, routeStep:currentStep,
+      title:boss?'Boss':miniBossUnit?'Mini-boss':elite?'Elite':'Normal',
+      reward:(boss?3:miniBossUnit?2:elite?1.7:1)*xpScale,
+      goldReward:Math.round((boss?route.bossGold:base.gold*(miniBossUnit?1.75:1))*goldScale/3),
+      maxHp:Math.round(base.hp * encounterStats.hp * hpScale * .58), attack:Math.round(base.atk * encounterStats.attack * atkScale), isBoss:boss, isMiniBoss:miniBossUnit};
+    if(boss) unit.name = route.boss;
+    else if(miniBossUnit) unit.name = `Champion ${base.name}`;
+    unit.hp = unit.maxHp;
+    return unit;
   });
+  chosen.forEach(unit => recordBestiaryEncounter(unit,'route'));
   const heroes = activeBattleHeroes().map(hero => { const stats=heroCombatStats(hero); return {id:hero.id,name:hero.name,position:hero.position,hero,maxHp:stats.maxHp,hp:stats.maxHp}; });
-  state.battle = {heroes,enemies:chosen,taunt:null,turnOrder:[],turnIndex:0,turnBusy:false,round:0,routeIndex:state.route.index,routeStep:state.route.step,introducing:!!options.enemyArrival,enemyArrival:!!options.enemyArrival,enemyArrivalDuration:options.enemyArrivalDuration}; state.enemy = chosen[1]; state.enemyHp = chosen[1].hp; state.playerHp = heroes[0]?.hp || 0; state.attackChain=0;
+  state.battle = {heroes,enemies:chosen,summons:[],taunt:null,turnOrder:[],turnIndex:0,turnBusy:false,round:0,routeIndex:state.route.index,routeStep:state.route.step,introducing:!!options.enemyArrival,enemyArrival:!!options.enemyArrival,enemyArrivalDuration:options.enemyArrivalDuration}; state.enemy = chosen[1]; state.enemyHp = chosen[1].hp; state.playerHp = heroes[0]?.hp || 0; state.attackChain=0;
+  syncClassicBattleBackdrop();
+  if(typeof startCombatReport==='function')startCombatReport(state.battle);
+  // La carte doit être redessinée dès que la nouvelle manche existe. Sans ce
+  // rendu, elle pouvait encore afficher l'étape précédente tandis que le
+  // mini-boss ou le boss de l'étape suivante était déjà apparu à l'écran.
+  if(typeof renderClassicRoute === 'function') renderClassicRoute();
+  renderBattleTeams();
+}
+function spawnObsidianTower(options={}){
+  const floor=state.tower.floor;
+  const difficulty=state.tower.difficulty||'normal';
+  const towerMode=typeof obsidianTowerMode==='function'?obsidianTowerMode(difficulty):{enemy:{model:'endgame',hpMultiplier:1,attackMultiplier:1,hpGrowth:TOWER_FLOOR_GROWTH.hp,attackGrowth:TOWER_FLOOR_GROWTH.attack}};
+  const family=OBSIDIAN_TOWER_FAMILIES[(floor-1)%OBSIDIAN_TOWER_FAMILIES.length];
+  const special=floor%10===0;
+  const familyPool=classicMonsterPool().filter(monster=>monster.family===family);
+  const normalPool=familyPool.filter(monster=>!monster.miniBoss);
+  const specialPool=familyPool.filter(monster=>monster.miniBoss);
+  let hpScale,attackScale,unitHpFactor=.32,towerTier=6;
+  if(towerMode.enemy?.model==='campaign'){
+    // Le Normal suit cinq bandes lisibles : T1, T2, T3, T4 puis T5. Chaque
+    // bande de 20 étages reproduit la montée interne du tier de route associé.
+    const bands=Array.isArray(towerMode.enemy.tierBands)?towerMode.enemy.tierBands:[];
+    const band=bands.find(entry=>floor>=entry.floors?.[0]&&floor<=entry.floors?.[1])||bands[0];
+    towerTier=Math.max(1,Math.min(5,Number(band?.routeTier)||1));
+    const routeTier=ROUTE_TIERS.find(entry=>entry.tier===towerTier)||ROUTE_TIERS[0];
+    const bandStart=Number(band?.floors?.[0])||1,bandEnd=Number(band?.floors?.[1])||20;
+    const bandProgress=Math.max(0,Math.min(1,(floor-bandStart)/Math.max(1,bandEnd-bandStart)));
+    const virtualStep=routeTier.start+bandProgress*(routeTier.end-routeTier.start);
+    const stepScale=routeTierStepScale(routeTier,virtualStep);
+    const tierScale=ENEMY_TIER_SCALING[towerTier]||ENEMY_TIER_SCALING[1];
+    const familyScale=ROUTE_FAMILY_COMBAT_SCALING[family]||ROUTE_FAMILY_COMBAT_SCALING.zombie;
+    hpScale=tierScale.hp*stepScale.hp*familyScale.hp*(Number(towerMode.enemy.hpMultiplier)||1);
+    attackScale=tierScale.attack*stepScale.attack*familyScale.attack*(Number(towerMode.enemy.attackMultiplier)||1);
+    unitHpFactor=.58;
+  }else{
+    // Le Hard reprend la courbe de late game T6 historique de la Tour.
+    towerTier=Math.max(1,Math.min(6,Number(towerMode.enemy?.routeTier)||6));
+    const hpGrowth=Number(towerMode.enemy?.hpGrowth)||TOWER_FLOOR_GROWTH.hp;
+    const attackGrowth=Number(towerMode.enemy?.attackGrowth)||TOWER_FLOOR_GROWTH.attack;
+    hpScale=TOWER_ENEMY_BASE_SCALING.hp*(Number(towerMode.enemy?.hpMultiplier)||1)*Math.pow(hpGrowth,floor-1);
+    attackScale=TOWER_ENEMY_BASE_SCALING.attack*(Number(towerMode.enemy?.attackMultiplier)||1)*Math.pow(attackGrowth,floor-1);
+  }
+  const chosen=FORMATION_ORDER.map((position,index)=>{
+    const towerGuardian=special&&index===1;
+    const pool=towerGuardian&&specialPool.length?specialPool:normalPool;
+    let roll=Math.random()*pool.reduce((sum,monster)=>sum+monster.weight,0);
+    const base=pool.find(monster=>(roll-=monster.weight)<0)||pool[0];
+    const encounter=towerGuardian?ENCOUNTER_COMBAT_MULTIPLIERS.boss:ENCOUNTER_COMBAT_MULTIPLIERS.normal;
+    const unit={...base,baseName:base.name,id:`tower-${Date.now()}-${index}`,position,speed:Number(base.speed)||(.92+index*.04),towerFloor:floor,towerTier,towerDifficulty:difficulty,
+      title:towerGuardian?'Gardien de la Tour':'Normal',reward:0,goldReward:0,
+      maxHp:Math.round(base.hp*hpScale*encounter.hp*unitHpFactor),attack:Math.round(base.atk*attackScale*encounter.attack),isTowerGuardian:towerGuardian};
+    if(towerGuardian) unit.name=`Gardien d’Obsidienne — ${base.name}`;
+    unit.hp=unit.maxHp;
+    return unit;
+  });
+  chosen.forEach(unit => recordBestiaryEncounter(unit,'tour'));
+  const heroes=activeBattleHeroes().map(hero=>{const stats=heroCombatStats(hero);return {id:hero.id,name:hero.name,position:hero.position,hero,maxHp:stats.maxHp,hp:stats.maxHp};});
+  state.battle={heroes,enemies:chosen,summons:[],taunt:null,turnOrder:[],turnIndex:0,turnBusy:false,round:0,content:'tower',towerFloor:floor,towerDifficulty:difficulty,introducing:!!options.enemyArrival,enemyArrival:!!options.enemyArrival,enemyArrivalDuration:options.enemyArrivalDuration};
+  state.enemy=chosen[1]; state.enemyHp=chosen[1].hp; state.playerHp=heroes[0]?.hp||0; state.attackChain=0;
+  if(typeof startCombatReport==='function')startCombatReport(state.battle);
+  syncClassicBattleBackdrop();
+  if(typeof renderClassicRoute === 'function') renderClassicRoute();
   renderBattleTeams();
 }
 function restartBattleForFormation(){
@@ -1253,53 +1560,142 @@ function restartBattleForFormation(){
 function defeatTeam(battle=state.battle){
   if(!battle || state.battle !== battle || battle.defeatQueued) return;
   battle.defeatQueued=true;
+  if(typeof finishCombatReport==='function')finishCombatReport(battle,false);
   state.paused=true;
   setTimeout(() => {
     if(state.battle !== battle) return;
+    if(battle.content==='tower'){
+      const mode=typeof obsidianTowerMode==='function'?obsidianTowerMode(battle.towerDifficulty):{label:'Normal'};
+      log(`Tentative ${mode.label} terminée à l’étage ${battle.towerFloor}. La prochaine entrée recommencera à l’étage 1.`);
+      if(typeof finishTowerRun === 'function') finishTowerRun('defeat',battle.towerFloor);
+      return;
+    }
     state.route.step = routeTierStart(state.route.step + 1) - 1; state.route.awaitingChoice=false;
-    log(`L’équipe est vaincue : retour à l’étape ${state.route.step+1}.`); spawn(); state.paused=false; render();
-  }, TEAM_DEATH_TRANSITION_DELAY);
+    if(typeof recordAdventureDefeat==='function')recordAdventureDefeat(battle);
+    log(`L’équipe est vaincue : retour à l’étape ${state.route.step+1}.`); spawn(); state.paused=false; render({preserveInteraction:true});
+  }, combatTestDelay(TEAM_DEATH_TRANSITION_DELAY));
 }
 function queueTeamVictory(battle=state.battle){
   if(!battle || state.battle !== battle || battle.victoryQueued) return;
   battle.victoryQueued=true;
+  if(typeof finishCombatReport==='function')finishCombatReport(battle,true);
   state.paused=true;
   battle.enemies.forEach(enemy => playBattleDeath('enemy',enemy));
   setTimeout(() => {
     if(state.battle === battle) resolveTeamVictory(battle);
-  },TEAM_DEATH_TRANSITION_DELAY);
-  render();
+  },combatTestDelay(TEAM_DEATH_TRANSITION_DELAY));
+  render({preserveInteraction:true});
+}
+function awardHeroExperience(heroUnits, amount){
+  const earned=Math.max(0,Math.floor(Number(amount)||0));
+  if(!earned) return;
+  heroUnits.forEach(unit => {
+    const hero=unit.hero;
+    if(!hero || hero.level >= HERO_MAX_LEVEL) return;
+    const previousLevel=hero.level;
+    hero.xp=(Number(hero.xp)||0)+earned;
+    while(hero.level < HERO_MAX_LEVEL && hero.xp >= heroXpRequired(hero.level)){
+      hero.xp-=heroXpRequired(hero.level);
+      hero.level++;
+    }
+    if(hero.level >= HERO_MAX_LEVEL) hero.xp=0;
+    const spellPointsEarned=Math.floor(hero.level / 10)-Math.floor(previousLevel / 10);
+    if(spellPointsEarned > 0) hero.spellPoints=(Number(hero.spellPoints)||0)+spellPointsEarned;
+    if(hero.level > previousLevel){
+      log(`${hero.name} atteint le niveau ${hero.level}${spellPointsEarned ? ` et gagne ${spellPointsEarned} point de sort !` : ' !'}`);
+    }
+  });
 }
 function resolveTeamVictory(battle){
   if(!battle || state.battle !== battle || battle.victoryResolved) return;
   battle.victoryResolved=true;
+  if(battle.content==='tower') return resolveTowerVictory(battle);
   // Une victoire ne peut modifier que l'étape qui a créé cette manche.
   if(state.route.index !== battle.routeIndex || state.route.step !== battle.routeStep) return;
   const enemies = battle.enemies;
+  enemies.forEach(recordBestiaryDefeat);
   const gold = Math.floor(enemies.reduce((sum,e)=>sum+e.goldReward,0) * (1 + total('gold') + talentValue('gold')));
-  const xp = Math.round((16 + state.level*3) * enemies.reduce((sum,e)=>sum+e.reward,0) / 3 * (1 + total('xp') + talentValue('xp')));
-  state.gold += gold; state.xp += xp; state.kills += enemies.length; log(`Victoire d’équipe ! +${gold} or.`); showCombatReward(gold,xp);
-  const boss = enemies.find(enemy=>enemy.isBoss); const elite = enemies.find(enemy=>enemy.title==='Elite'); const source = boss || elite || enemies[0];
-  const lootTemplate=rollClassicLootItem(source.family,total('luck'),!!boss || !!elite);
-  if(lootTemplate){ const item=copy(lootTemplate,CLASSIC_DIFFICULTIES[state.route.difficulty].itemRank); state.lastLoot=item; state.lootHistory.unshift(item); state.lootHistory=state.lootHistory.slice(0,5); addInventoryItem(item); }
+  // Le niveau de compte reste un léger bonus, mais il ne doit jamais faire
+  // exploser l'XP obtenue dans les derniers tiers.
+  const accountXpBase=18*(1+Math.min(20,Math.max(0,state.level-1))*.025);
+  const xp = Math.round(accountXpBase * enemies.reduce((sum,e)=>sum+e.reward,0) / 3 * (1 + total('xp') + talentValue('xp')));
+  state.gold += gold; state.xp += xp; state.kills += enemies.length; awardHeroExperience(battle.heroes,xp); log(`Victoire d’équipe ! +${gold} or.`); showCombatReward(gold,xp);
+  const boss = enemies.find(enemy=>enemy.isBoss);
+  const miniBoss = enemies.find(enemy=>enemy.isMiniBoss);
+  const elite = enemies.find(enemy=>enemy.title==='Elite');
+  const source = boss || miniBoss || elite || enemies[0];
+  const lootTemplate=rollClassicLootItem(source.family,total('luck'),!!boss || !!miniBoss || !!elite);
+  if(lootTemplate){ const item=copy(lootTemplate); state.lastLoot=item; state.lootHistory.unshift(item); state.lootHistory=state.lootHistory.slice(0,5); if(typeof receiveAdventureLoot==='function') receiveAdventureLoot(item);else addInventoryItem(item); }
   if(state.xp >= state.level*100){ state.xp-=state.level*100; state.level++; log(`Niveau ${state.level} atteint !`); }
+  if(miniBoss){
+    const miniEssence=MINI_BOSS_ESSENCE_REWARDS[routeTierForStep(battle.routeStep+1).tier-1] || MINI_BOSS_ESSENCE_REWARDS[0];
+    state.essence+=miniEssence;
+    log(`Mini-boss vaincu ! +${miniEssence} essence et un objet garanti.`);
+  }
+  if(miniBoss || boss){
+    const keyChance=Math.min(.95,BOSS_KEY_DROP_CHANCE+Math.max(0,talentValue('keyDrop')));
+    if(Math.random()<keyChance){
+      state.keys++;
+      log('Une clé de Tour est obtenue.');
+    }
+  }
   if(boss){
-    const bossEssence=BOSS_ESSENCE_REWARDS[state.route.index] || BOSS_ESSENCE_REWARDS[0]; state.essence+=bossEssence;
     const cleared=routeTierForStep(battle.routeStep+1);
+    if(typeof recordProgressionRouteBoss === 'function') recordProgressionRouteBoss(battle.routeIndex,cleared.tier);
+    // La récompense dépend du tier terminé, jamais de la route choisie.
+    const bossEssence=BOSS_ESSENCE_REWARDS[cleared.tier-1] || BOSS_ESSENCE_REWARDS[0]; state.essence+=bossEssence;
+    const next=ROUTE_TIERS[cleared.tier];
+    // Terminer le boss valide toujours le palier suivant. Le farm décide
+    // seulement de la destination après cette victoire, jamais du déblocage.
+    if(next) state.route.unlockedTiers[state.route.index]=Math.max(state.route.unlockedTiers[state.route.index],next.tier);
     if(state.route.farm){
-      // Le farm reste strictement dans le palier en cours : T1 boucle 1–10,
-      // T2 boucle 11–25, etc. Aucun tier suivant n'est débloqué ou lancé.
+      // Le farm reste strictement dans le palier en cours, mais le palier
+      // suivant est bien disponible après le boss final.
       state.route.step=cleared.start-1;
-      log(`Farm : retour à l’étape ${cleared.start} du T${cleared.tier}.`);
+      log(next
+        ? `Tier ${next.tier} débloqué ! Farm : retour à l’étape ${cleared.start} du T${cleared.tier}.`
+        : `Tier 6 terminé : le farm recommence à l’étape ${cleared.start}.`);
     }else{
-      const next=ROUTE_TIERS[cleared.tier];
-      if(next){ state.route.unlockedTiers[state.route.index]=Math.max(state.route.unlockedTiers[state.route.index],next.tier); state.route.step=next.start-1; log(`Tier ${next.tier} débloqué !`); }
+      if(next){ state.route.step=next.start-1; log(`Tier ${next.tier} débloqué !`); }
       else { state.route.step=cleared.start-1; log(`Tier 6 terminé : le farm recommence.`); }
     }
   } else state.route.step = battle.routeStep + 1;
   advanceClassicBattleBackground(() => {
     if(state.battle !== battle) return;
-    spawn({enemyArrival:true}); state.paused=false; render();
+    spawn({enemyArrival:true}); state.paused=false; render({preserveInteraction:true});
+  });
+}
+function resolveTowerVictory(battle){
+  const floor=battle.towerFloor;
+  if(!state.tower.active || state.tower.floor!==floor) return;
+  const difficulty=battle.towerDifficulty||state.tower.difficulty||'normal';
+  const progress=typeof towerProgressState==='function'?towerProgressState(difficulty):state.tower.progress[difficulty];
+  battle.enemies.forEach(recordBestiaryDefeat);
+  const firstClear=!progress.claimedFloors.includes(floor);
+  const reward=firstClear?towerFloorRewards(floor,difficulty):towerRepeatedFloorRewards(floor,difficulty);
+  if(firstClear){
+    progress.claimedFloors.push(floor);
+    progress.highestFloor=Math.max(progress.highestFloor,floor);
+  }
+  state.gold+=reward.gold;
+  state.essence+=reward.essence;
+  state.tower.obsidianShards+=reward.shards;
+  state.tower.stabilizationSeals+=reward.seals;
+  state.tower.perfectionPrisms+=reward.prisms;
+  if(typeof recordTowerRunReward === 'function') recordTowerRunReward(reward,floor);
+  const drops=[reward.gold?`+${reward.gold} or`:null,reward.essence?`+${reward.essence} essence`:null,reward.shards?`+${reward.shards} éclats`:null,reward.seals?`+${reward.seals} sceau`:null,reward.prisms?`+${reward.prisms} prisme`:null].filter(Boolean).join(' · ');
+  const mode=typeof obsidianTowerMode==='function'?obsidianTowerMode(difficulty):{label:'Normal'};
+  if(firstClear) log(`Tour ${mode.label} : première victoire à l’étage ${floor} ! ${drops}.`);
+  else log(drops?`Tour ${mode.label} : butin de répétition à l’étage ${floor} · ${drops}.`:`Tour ${mode.label} : aucun butin obtenu à l’étage ${floor}.`);
+  if(reward.gold) showCombatReward(reward.gold,0);
+  if(floor>=OBSIDIAN_TOWER_MAX_FLOOR){
+    log('Tour d’Obsidienne terminée ! Les récompenses de cette ascension ont été obtenues.');
+    if(typeof finishTowerRun === 'function') finishTowerRun('victory',floor);
+    return;
+  }else state.tower.floor=floor+1;
+  advanceClassicBattleBackground(()=>{
+    if(state.battle!==battle) return;
+    spawn({enemyArrival:true}); state.paused=false; render({preserveInteraction:true});
   });
 }
 function battleInitiative(side, unit){
@@ -1334,7 +1730,11 @@ function completeBattleTurn(battle, delay=45){
   setTimeout(()=>{
     if(state.battle !== battle || state.paused) return;
     battle.turnBusy=false;
-    render();
+    // Un coup ne modifie que les PV et la recharge des sorts. Relancer le
+    // rendu complet ici recréait aussi l'inventaire et le roster sous le
+    // pointeur : hover qui clignote et clics parfois perdus. On actualise
+    // uniquement les nœuds de l'arène, déjà présents dans le DOM.
+    renderBattleTeams();
   },combatTestDelay(delay));
 }
 function tick(){
@@ -1370,12 +1770,17 @@ function tick(){
         const dealt=Math.min(hit,target.hp);
         const lethal=hit>0 && hit>=target.hp;
         target.hp=Math.max(0,target.hp-hit);
+        if(typeof recordCombatHit==='function')recordCombatHit(battle,heroUnit,target,dealt);
         if(lethal) playBattleDeath('enemy',target);
         else animateBattleUnit('enemy',target,'hurt',crit && outcome === 'hit');
         showBattleDamage('enemy',target,dealt,crit && outcome === 'hit' ? 'crit' : 'normal');
-        if(dealt>0 && stats.lifesteal) heroUnit.hp=Math.min(heroUnit.maxHp,heroUnit.hp+dealt*stats.lifesteal/100);
+        if(dealt>0 && stats.lifesteal){
+          const healed=Math.min(heroUnit.maxHp-heroUnit.hp,dealt*stats.lifesteal/100);
+          heroUnit.hp+=healed;
+          if(typeof recordCombatHit==='function')recordCombatHit(battle,heroUnit,heroUnit,healed,true);
+        }
       }
-      completeBattleTurn(battle);
+      useSummonedSkullAttack(heroUnit,battle.enemies,()=>completeBattleTurn(battle));
     });
     return;
   }
@@ -1393,6 +1798,7 @@ function tick(){
       const dealt=Math.min(dmg,target.hp);
       const lethal=dmg>0 && dmg>=target.hp;
       target.hp=Math.max(0,target.hp-dmg);
+      if(typeof recordCombatHit==='function')recordCombatHit(battle,enemy,target,dealt);
       if(lethal) playBattleDeath('hero',target);
       else animateBattleUnit('hero',target,'hurt');
       showBattleDamage('hero',target,dealt);
@@ -1405,3 +1811,4 @@ function tick(){
     completeBattleTurn(battle);
   });
 }
+

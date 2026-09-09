@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chroniques d'Obsidienne</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111b31'/%3E%3Cpath d='M32 10 51 32 32 54 13 32Z' fill='%23b78cff'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="modes/idle-classic/css/style.css?v=70" />
-  <link rel="stylesheet" href="modes/idle-classic/css/rpg-items.css?v=9" />
-  <link rel="stylesheet" href="modes/idle-classic/css/design-system.css?v=6" />
+  <link rel="stylesheet" href="modes/idle-classic/css/style.css?v=133" />
+  <link rel="stylesheet" href="modes/idle-classic/css/rpg-items.css?v=12" />
+  <link rel="stylesheet" href="modes/idle-classic/css/design-system.css?v=11" />
+  <link rel="stylesheet" href="modes/idle-classic/css/responsive.css?v=2" />
+  <link rel="stylesheet" href="modes/idle-classic/css/battle-scenery.css?v=4" />
 </head>
 <body>
   <main class="app-shell">
@@ -43,12 +45,14 @@
         <span class="tab-group-label">MODES DE JEU</span>
         <button class="tab-active" data-tab="combat">⚔ Combat idle</button>
         <button data-tab="donjon">🗝 Donjon</button>
+        <button data-tab="tour">▲ Tour</button>
         <button data-tab="jardin">Jardin</button>
       </div>
       <div class="tab-group">
         <span class="tab-group-label">GESTION</span>
         <button data-tab="personnage">Personnage</button>
-        <button data-tab="talents">Talents</button>
+        <button data-tab="progression">Livre</button>
+        <button data-tab="bestiaire">Bestiaire</button>
         <button data-tab="classement">Classement</button>
       </div>
     </nav>
@@ -65,16 +69,19 @@
         <p>Changer de mode</p>
         <button type="button" data-tab="combat">Combat idle</button>
         <button type="button" data-tab="donjon">Donjon Mystère</button>
+        <button type="button" data-tab="tour">Tour d’Obsidienne</button>
         <button type="button" data-tab="jardin">Jardin</button>
         <button type="button" data-tab="personnage">Personnage</button>
-        <button type="button" data-tab="talents">Talents</button>
+        <button type="button" data-tab="progression">Livre de progression</button>
+        <button type="button" data-tab="bestiaire">Bestiaire</button>
         <button type="button" data-tab="classement">Classement</button>
       </div>
     </div>
 
     <!-- ===================== ONGLET COMBAT ===================== -->
     <section id="tab-combat">
-      <section class="battle-grid">
+      <aside id="adventure-guide" class="adventure-guide" aria-label="Prochain objectif"></aside>
+      <section id="classic-battle-grid" class="battle-grid">
         <article class="combat-card">
           <div class="section-heading">
             <div>
@@ -96,12 +103,15 @@
               <span id="route-mode">Mode : route suivante</span>
               <div id="route-picker" class="route-picker" aria-label="Choisir une route"></div>
               <div id="tier-picker" class="route-picker tier-picker" aria-label="Choisir un tier"></div>
-              <div id="difficulty-picker" class="difficulty-picker" aria-label="Choisir une difficulté"></div>
               <button id="toggle-farm-route-btn">Farmer cette route : NON</button>
             </div>
           </div>
 
           <div class="battle-area immersive-battle" id="battle-area" aria-label="Arène de combat idle">
+            <div class="combat-options">
+              <button id="combat-options-toggle" type="button" aria-expanded="false" aria-controls="combat-options-menu">☰ Combat ▾</button>
+              <div id="combat-options-menu" hidden><button id="open-combat-report" type="button">Bilan du combat</button></div>
+            </div>
             <div class="battle-parallax" aria-hidden="true">
               <div class="battle-layer battle-sky" data-parallax="0.08"></div>
               <div class="battle-layer battle-far" data-parallax="0.18"></div>
@@ -112,6 +122,7 @@
             <div class="battle-vignette" aria-hidden="true"></div>
             <div class="battle-team battle-team-heroes" id="hero-team" aria-label="Équipe des héros"></div>
             <div class="battle-team battle-team-enemies" id="enemy-team" aria-label="Équipe ennemie"></div>
+            <div class="battle-summons" id="battle-summons" aria-hidden="true"></div>
 
             <div id="damage-layer" class="damage-layer"></div>
           </div>
@@ -136,6 +147,23 @@
           <p class="hint">Les objets améliorent votre personnage : il n'y a pas de classe.</p>
         </aside>
       </section>
+    </section>
+
+    <!-- ===================== ONGLET TOUR D’OBSIDIENNE ===================== -->
+    <section id="tab-tour" class="hidden">
+      <article id="obsidian-tower" class="obsidian-tower-panel standalone-panel"></article>
+      <section id="tower-run-summary" class="tower-run-summary" aria-live="polite" hidden></section>
+      <div id="tower-combat-host"></div>
+    </section>
+
+    <!-- ===================== BESTIAIRE ===================== -->
+    <section id="tab-bestiaire" class="hidden">
+      <article id="bestiary-panel" class="bestiary-panel standalone-panel"></article>
+    </section>
+
+    <!-- ===================== LIVRE DE PROGRESSION ===================== -->
+    <section id="tab-progression" class="hidden">
+      <article id="progression-book" class="progression-book standalone-panel"></article>
     </section>
 
     <!-- ===================== ONGLET DONJON ===================== -->
@@ -217,6 +245,7 @@
           <span id="party-count" class="party-count">3 / 3</span>
         </div>
         <div id="hero-roster" class="hero-roster"></div>
+        <section id="adventure-management" class="adventure-management" aria-label="Gestion des configurations"></section>
       </section>
       <section class="hero-card">
         <div class="hero-title">
@@ -234,6 +263,7 @@
           </div>
           <div class="bar"><i id="xp-bar"></i></div>
         </div>
+        <section id="hero-spell-progression" class="hero-spell-progression" aria-label="Progression du sort"></section>
         <div class="stat-groups">
           <section class="stat-group">
             <h3>Combat</h3>
@@ -286,6 +316,13 @@
             <span id="inventory-count">0 objet</span>
           </div>
         </div>
+        <section class="inventory-tower-wallet" aria-label="Ressources de la Tour possédées">
+          <div class="inventory-tower-wallet-title">
+            <p>RESSOURCES DE LA TOUR</p>
+            <span>Disponibles pour optimiser tes équipements.</span>
+          </div>
+          <div id="inventory-tower-resources" class="inventory-tower-resource-list"></div>
+        </section>
         <div class="recycle-bar">
           <span>Recyclage :</span>
           <span class="recycle-filter-hint">utilise les filtres de l’inventaire ci-dessous</span>
@@ -301,34 +338,18 @@
             <label>Rareté<select id="inventory-rarity-filter"><option value="all">Toutes les raretés</option><option value="commun">Commun</option><option value="peuCommun">Peu commun</option><option value="rare">Rare</option><option value="epique">Épique</option><option value="legendaire">Légendaire</option></select></label>
             <label>Emplacement<select id="inventory-slot-filter"><option value="all">Tous les emplacements</option><option value="Arme">Arme</option><option value="Casque">Casque</option><option value="Armure">Armure</option><option value="Gants">Gants</option><option value="Bottes">Bottes</option><option value="Amulette">Amulette</option></select></label>
             <label>Set<select id="inventory-set-filter"><option value="all">Tous les sets</option></select></label>
-            <label>Statistique<select id="inventory-stat-filter"><option value="all">Toutes les statistiques</option><option value="power">ATQ fixe</option><option value="vitality">PV fixes</option><option value="armor">DEF fixe</option><option value="powerPct">ATQ %</option><option value="hpPct">PV %</option><option value="armorPct">DEF %</option><option value="crit">Critique</option><option value="critDamage">Dégâts critiques</option><option value="speed">Vitesse</option></select></label>
-            <label>Trier par<select id="inventory-sort"><option value="recent">Plus récent</option><option value="tier-desc">Tier décroissant</option><option value="rarity-desc">Rareté décroissante</option><option value="upgrade-desc">Amélioration décroissante</option><option value="main-stat-desc">Stat principale décroissante</option></select></label>
+            <label>Stat principale<select id="inventory-stat-filter"><option value="all">Toutes les statistiques</option><option value="power">ATQ fixe</option><option value="vitality">PV fixes</option><option value="armor">DEF fixe</option><option value="powerPct">ATQ %</option><option value="hpPct">PV %</option><option value="armorPct">DEF %</option><option value="crit">Critique</option><option value="critDamage">Dégâts critiques</option><option value="speed">Vitesse</option></select></label>
+            <label>Trier par<select id="inventory-sort"><option value="recent">Plus récent</option><option value="tier-desc">Tier décroissant</option><option value="rarity-desc">Rareté décroissante</option><option value="upgrade-desc">Amélioration décroissante</option></select></label>
+          </div>
+          <div class="inventory-substat-filter">
+            <div><span>Sous-stats recherchées</span><select id="inventory-substat-mode" aria-label="Mode de recherche des sous-stats"><option value="all">Toutes sélectionnées</option><option value="any">Au moins une</option></select></div>
+            <div id="inventory-substat-chips" class="inventory-substat-chips" aria-label="Choisir les sous-stats recherchées"></div>
           </div>
           <p id="inventory-filter-count" class="inventory-filter-count"></p>
         </section>
         <div id="inventory" class="inventory-grid"></div>
       </section>
 
-    </section>
-
-    <!-- ===================== ONGLET TALENTS ===================== -->
-    <section id="tab-talents" class="hidden">
-      <article class="talent-card standalone-panel">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">PROGRESSION</p>
-            <h2>Arbre de talents</h2>
-          </div>
-          <div class="talent-actions">
-            <span><b id="talent-points">0 nœud</b> débloqué(s)</span>
-            <button id="talent-sell-last" type="button">Revendre le dernier nœud (75%)</button>
-            <button id="talent-refund-all" type="button">Réinitialiser l’arbre (70%)</button>
-          </div>
-          </div>
-          <p class="sub">Maximise un nœud pour ouvrir le suivant. Termine les sept passifs d’une branche pour accéder à ses deux choix finaux avec contrepartie. Le jardin aura son arbre séparé.</p>
-          <div id="talent-summary" class="talent-summary"><em>Aucun bonus acheté</em></div>
-          <div id="talent-viewport" class="talent-viewport"><div id="talents" class="talent-tree"></div></div>
-      </article>
     </section>
 
     <!-- ===================== ONGLET CLASSEMENT ===================== -->
@@ -354,13 +375,18 @@
     </article>
   </template>
 
-    <script src="modes/idle-classic/js/data.js?v=23"></script>
-    <script src="modes/idle-classic/js/state.js?v=40"></script>
-<script src="modes/idle-classic/js/talents.js?v=1"></script>
+    <script src="modes/idle-classic/js/data.js?v=43"></script>
+    <script src="modes/idle-classic/js/state.js?v=75"></script>
+    <script src="modes/idle-classic/js/progression-book.js?v=1"></script>
 <script src="modes/idle-classic/js/garden-bridge.js?v=1"></script>
-  <script src="modes/idle-classic/js/combat.js?v=65"></script>
-  <script src="modes/idle-classic/js/ui.js?v=22"></script>
-    <script src="modes/idle-classic/js/rpg-items.js?v=27"></script>
-  <script src="modes/idle-classic/js/main.js?v=8"></script>
+  <script src="modes/idle-classic/js/combat.js?v=120"></script>
+    <script src="modes/idle-classic/js/ui.js?v=49"></script>
+    <script src="modes/idle-classic/js/rpg-items.js?v=51"></script>
+  <script src="modes/idle-classic/js/tower.js?v=17"></script>
+  <script src="modes/idle-classic/js/game-content.js?v=1"></script>
+  <script src="modes/idle-classic/js/build-presets.js?v=1"></script>
+  <script src="modes/idle-classic/js/adventure-tools.js?v=4"></script>
+  <script src="modes/idle-classic/js/combat-report.js?v=1"></script>
+  <script src="modes/idle-classic/js/main.js?v=17"></script>
 </body>
 </html>

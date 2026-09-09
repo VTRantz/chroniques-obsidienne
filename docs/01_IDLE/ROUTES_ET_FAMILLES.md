@@ -1,8 +1,8 @@
-# Routes et familles — Mode Idle
+# Routes, tiers et familles — Mode Idle
 
-## Routes actives
+## Routes
 
-| Famille interne | Route | Boss |
+| Famille | Route | Boss final |
 | --- | --- | --- |
 | zombie | Village en ruines | Chevalier trépassé |
 | orc | Camp des orcs | Ogre de guerre |
@@ -11,43 +11,49 @@
 | desert | Dunes ardentes | Oracle des sables |
 | mycelium | Bosquet mycélien | Gardien sylvestre |
 
-## Tiers et déblocages
+Chaque route conserve ses propres tiers déverrouillés.
 
-| Tier | Étapes | Boss |
-| --- | --- | --- |
-| T1 | 1–10 | 10 |
-| T2 | 11–25 | 25 |
-| T3 | 26–50 | 50 |
-| T4 | 51–100 | 100 |
-| T5 | 101–150 | 150 |
-| T6 | 151–300 | 300 |
+## Progression raccourcie
 
-La progression d’une route n’ouvre pas le même tier dans une autre route. À la défaite, l’équipe repart de la première étape du tier actuellement choisi.
+| Tier | Étapes normales | Mini-boss | Boss |
+| --- | --- | --- | --- |
+| T1 | 1–15 | 5, 10 | 15 |
+| T2 | 16–30 | 21, 26 | 30 |
+| T3 | 31–50 | 37, 44 | 50 |
+| T4 | 51–67 | 57, 63 | 67 |
+| T5 | 68–83 | 74, 79 | 83 |
+| T6 | 84–100 | 90, 96 | 100 |
 
-## Farm de tier
+Les mini-boss sont affichés `◆`, ont un champion au centre de l'équipe adverse,
+un multiplicateur de PV ×1,65 et d'ATQ ×1,14 ; ils garantissent un objet. Les
+boss sont affichés `★`, ont un multiplicateur de PV ×2,25 et d'ATQ ×1,22 ; ils
+débloquent le tier
+suivant.
 
-Lorsque `Farmer cette route` est activé, la route boucle sur le tier actif au lieu d’entrer dans le suivant. Par exemple, un farm activé en T1 répète les étapes 1 à 10 ; il ne passe pas à l’étape 11 et ne débloque pas le T2.
+Les mini-boss donnent aussi de l'essence par tier : 4, 6, 8, 11, 15 et 20.
+Les boss donnent l'essence liée à la route : 20, 30, 45, 65, 95 et 135 dans
+l'ordre des six routes.
 
-## Courbe des ennemis
+## Farm
 
-Toutes les familles démarrent au T1 dans une tranche comparable : environ 84 à 118 PV et 6 à 9 ATQ selon la variante. Les petites différences de parade et d’esquive donnent leur identité aux familles, sans en faire un écart de puissance.
+Le bouton de farm répète le tier actuel après son boss. Le tier suivant est
+quand même déverrouillé ; le farm décide seulement de la destination suivante.
 
-La puissance commune est portée par les tiers :
+## Courbe ennemie
+
+La difficulté dépend du tier et de la progression à l'intérieur de ce tier,
+jamais de la famille seule. Les multiplicateurs de départ sont :
 
 | Tier | PV | ATQ |
 | --- | ---: | ---: |
-| T1 | ×1 | ×1 |
-| T2 | ×2,2 | ×1,7 |
-| T3 | ×4,8 | ×2,9 |
-| T4 | ×10,5 | ×5 |
-| T5 | ×23 | ×8,5 |
-| T6 | ×50 | ×14,5 |
+| T1 | ×1,90 | ×1,55 |
+| T2 | ×3,70 | ×2,35 |
+| T3 | ×6,60 | ×3,00 |
+| T4 | ×10,20 | ×3,80 |
+| T5 | ×17,50 | ×5,20 |
+| T6 | ×30,00 | ×7,70 |
 
-Chaque étape augmente légèrement ces valeurs à l’intérieur de son tier. Les boss ont en plus ×1,8 PV et ATQ ; les élites (5 % de chance) ont ×1,5.
-
-## Butin
-
-- Les élites et les boss garantissent un équipement.
-- Les objets utilisent le tier de l’étape où ils tombent.
-- Les probabilités de rareté deviennent plus favorables au fil des tiers.
-- Les sets sont liés à la famille de la route.
+Chaque tier possède une progression interne lissée selon son nombre d'étapes :
+la dernière étape normale est donc nettement plus difficile que la première.
+Les élites ont 5 % de chance d'apparaître hors mini-boss et boss ; elles ont
+×1,6 PV, ×1,08 ATQ et garantissent aussi un objet.

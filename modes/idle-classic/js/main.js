@@ -1,13 +1,17 @@
 function tickBuffs(){
   const now = Date.now();
+  let changed=false;
   if(state.buffs.healUntil > now){
-    state.playerHp = Math.min(maxHp(), state.playerHp + maxHp()*.02);
+    const nextHp=Math.min(maxHp(), state.playerHp + maxHp()*.02);
+    changed=nextHp!==state.playerHp;
+    state.playerHp=nextHp;
   }
   if(state.buffs.powerApplied && state.buffs.powerUntil <= now){
     state.buffs.powerApplied = false;
+    changed=true;
     log('Le tonique se dissipe.');
   }
-  save();
+  if(changed) save();
 }
 
 // ===== ONGLETS =====
@@ -19,12 +23,6 @@ window.addEventListener('message',event=>{
       return;
     }
     if(event.data?.type==='chroniques:request-mystery-expedition'){
-      if(state.keys<1){
-        sendMysteryPlayerSnapshot(event.source,'chroniques:mystery-expedition-result',{allowed:false,message:'Aucune clé disponible. Bats un mini-boss classique pour obtenir une clé.'});
-        return;
-      }
-      state.keys--;
-      save(); render();
       sendMysteryPlayerSnapshot(event.source,'chroniques:mystery-expedition-result',{allowed:true});
       return;
     }
@@ -74,17 +72,20 @@ window.addEventListener('message',event=>{
 gardenFrame()?.addEventListener('load',syncGardenMobResources);
 
 function switchGameTab(tab){
+  // Une ascension garde son arène sous l'onglet Tour : le bouton Combat idle
+  // ne doit pas déplacer le joueur hors de ce mode en cours.
+  if(tab==='combat' && state.tower?.active) tab='tour';
   const section=document.getElementById(`tab-${tab}`);
   if(!section)return;
   document.querySelectorAll('.main-tabs button').forEach(button=>button.classList.toggle('tab-active',button.dataset.tab===tab));
   document.querySelectorAll('[id^="tab-"]').forEach(panel=>panel.classList.toggle('hidden',panel!==section));
   document.body.classList.toggle('garden-fullscreen',tab==='jardin');
-  document.body.classList.toggle('idle-wide',tab==='combat');
+  document.body.classList.toggle('idle-wide',tab==='combat' || (tab==='tour' && state.tower?.active));
   document.body.classList.remove('idle-fullscreen');
   const modeMenu=$('mode-switcher-menu'),modeToggle=$('mode-switcher-toggle');
   if(modeMenu)modeMenu.hidden=true;
   if(modeToggle)modeToggle.setAttribute('aria-expanded','false');
-  if(tab === 'talents')requestAnimationFrame(centerTalentTree);
+  if(window.idleUiReady) render();
 }
 
 document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>switchGameTab(button.dataset.tab)));
@@ -145,16 +146,14 @@ $('reset-account-btn').onclick = ()=>{
     }, 4000);
     return;
   }
+  discardPendingSave();
   localStorage.removeItem('chroniques-obsidienne-save');
   window.location.reload();
 };
 
 // ===== DEMARRAGE =====
-load();
-spawn();
-render();
-setInterval(garden, 1000);
 function runCombatLoop(){
+  if(typeof tickCombatReportClock==='function')tickCombatReportClock();
   tick();
   // Le combat d'équipe est déjà séquencé par `turnBusy`. On vérifie donc
   // rapidement la fin de l'animation au lieu d'ajouter le délai complet
@@ -162,8 +161,27 @@ function runCombatLoop(){
   const delay = state.battle ? 90 : combatDelay();
   setTimeout(runCombatLoop, combatTestDelay(delay));
 }
-setTimeout(runCombatLoop, combatTestDelay(90));
-setInterval(tickBuffs, 1000);
-// La barre de sort se rafraîchit indépendamment du rendu lourd du combat : le
-// voile de recharge reste donc fluide entre deux attaques automatiques.
-setInterval(renderBattleSpellCooldowns, 80);
+async function startIdleGame(){
+  if(typeof loadGameContent === 'function') await loadGameContent();
+  if(typeof loadProgressionBookContent === 'function') await loadProgressionBookContent();
+  if(typeof loadObsidianTowerContent === 'function') await loadObsidianTowerContent();
+  load();
+  spawn();
+  render();
+  window.idleUiReady=true;
+  setInterval(refreshLiveMissions,250);
+  setInterval(()=>{
+    const gardenTab=$('tab-jardin');
+    if(gardenTab && !gardenTab.classList.contains('hidden')) garden();
+  },1000);
+  setTimeout(runCombatLoop,combatTestDelay(90));
+  setInterval(tickBuffs,1000);
+  // La barre de sort se rafraîchit indépendamment du rendu lourd du combat :
+  // le voile de recharge reste donc fluide entre deux attaques automatiques.
+  setInterval(()=>{
+    const combatVisible=!$('tab-combat')?.classList.contains('hidden');
+    const towerVisible=state.tower?.active && !$('tab-tour')?.classList.contains('hidden');
+    if(combatVisible || towerVisible) renderBattleSpellCooldowns();
+  },200);
+}
+startIdleGame();

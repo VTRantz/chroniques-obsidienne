@@ -1,0 +1,56 @@
+{
+  "version": 2,
+  "modes": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Progression parallèle du T1 au T5, avec un palier tous les 20 étages.",
+      "keyCost": 1,
+      "unlock": { "routeBosses": 1 },
+      "enemy": {
+        "model": "campaign",
+        "hpMultiplier": 1,
+        "attackMultiplier": 1,
+        "tierBands": [
+          { "floors": [1, 20], "routeTier": 1 },
+          { "floors": [21, 40], "routeTier": 2 },
+          { "floors": [41, 60], "routeTier": 3 },
+          { "floors": [61, 80], "routeTier": 4 },
+          { "floors": [81, 100], "routeTier": 5 }
+        ]
+      },
+      "rewards": {
+        "goldMultiplier": 1,
+        "essenceMultiplier": 1,
+        "shardMultiplier": 1,
+        "sealFloors": [25, 50, 75, 100],
+        "prismFloors": [100],
+        "repeatDropChances": { "gold": 0.5, "essence": 0.5, "shards": 0.5, "seals": 0.1, "prisms": 0.02 },
+        "repeatDropFloors": {
+          "seals": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+          "prisms": [20, 40, 60, 80, 100]
+        }
+      }
+    },
+    {
+      "id": "hard",
+      "label": "Hard",
+      "description": "Tour T6 dédiée aux niveaux, au +15 et à l’optimisation des sous-stats.",
+      "keyCost": 2,
+      "unlock": { "normalFloor": 100 },
+      "enemy": { "model": "endgame", "routeTier": 6, "hpMultiplier": 1, "attackMultiplier": 1, "hpGrowth": 1.045, "attackGrowth": 1.02 },
+      "rewards": {
+        "goldMultiplier": 2,
+        "essenceMultiplier": 2,
+        "shardMultiplier": 2,
+        "sealFloors": [20, 40, 60, 80, 100],
+        "prismFloors": [50, 100],
+        "repeatDropChances": { "gold": 0.5, "essence": 0.5, "shards": 0.5, "seals": 0.1, "prisms": 0.02 },
+        "repeatDropFloors": {
+          "seals": [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100],
+          "prisms": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+        }
+      }
+    }
+  ]
+}

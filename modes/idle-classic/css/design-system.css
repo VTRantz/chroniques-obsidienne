@@ -92,7 +92,7 @@ h2 { line-height: 1.15; letter-spacing: -.02em; }
 /* Navigation */
 .main-tabs {
   display: grid;
-  grid-template-columns: minmax(260px, .8fr) minmax(480px, 1.35fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
   gap: var(--space-3);
 }
@@ -340,7 +340,7 @@ button:focus-visible, [tabindex]:focus-visible, iframe:focus-visible { outline: 
   .route-node.boss { flex-basis: 29px; width: 29px; height: 29px; }
   .route-actions { min-width: 0; justify-content: flex-start; gap: 8px; }
   #route-mode { width: 100%; }
-  .route-picker, .difficulty-picker { flex-wrap: wrap; }
+  .route-picker { flex-wrap: wrap; }
   .route-actions button { min-height: 44px; padding: 7px 9px; }
   .route-choice { flex: 0 0 44px; width: 44px; height: 44px; }
   #toggle-farm-route-btn { width: 100%; min-width: 0; white-space: normal; }
@@ -686,3 +686,83 @@ button:focus-visible, [tabindex]:focus-visible, iframe:focus-visible { outline: 
   .equipment-section { margin-top: var(--space-3); }
   .inventory-item .inventory-actions { right: 10px; bottom: 10px; }
 }
+
+/* Actions d'objet : amélioration et Tour côte à côte, cadenas compact. */
+.slot.equipped .equipment-actions,
+.inventory-item .inventory-actions {
+  position:static; grid-column:1 / -1; grid-row:2; width:100%;
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px;
+  gap:8px; margin:12px 0 0; align-self:end; justify-self:stretch;
+}
+.slot.equipped .equipment-actions button,
+.inventory-item .inventory-actions button {
+  box-sizing:border-box; display:flex; align-items:center; justify-content:center;
+  width:100%; height:44px; min-height:44px; margin:0; padding:6px;
+  border-radius:8px; font-size:10px; line-height:1.25; white-space:normal;
+}
+.equipment-actions .upgrade,.inventory-actions .upgrade { grid-column:1; grid-row:1; }
+.equipment-actions .tower-toggle,.inventory-actions .tower-toggle { grid-column:2; grid-row:1; background:#342b51; border:1px solid #6e6097; color:#eee5ff; }
+.equipment-actions .protect-item,.inventory-actions .protect-item { grid-column:3; grid-row:1; padding:0; }
+.equipment-actions .item-transfer,.inventory-actions .item-transfer { grid-column:1; grid-row:2; }
+.inventory-actions .sell { grid-column:2; grid-row:2; }
+.inventory-item .rpg-item-body { padding-bottom:0; }
+.slot.equipped > .tower-optimization,.inventory-item > .tower-optimization { grid-column:1 / -1; grid-row:3; width:100%; box-sizing:border-box; margin:8px 0 0; }
+.slot.equipped > .tower-optimization:not([open]),.inventory-item > .tower-optimization:not([open]) { display:none; }
+.slot.equipped > .tower-optimization > summary,.inventory-item > .tower-optimization > summary { display:none; }
+.protect-item svg { flex:none; }
+.protect-item:disabled { opacity:.8; cursor:help; }
+.tower-toggle[aria-expanded="true"] { box-shadow:inset 0 0 0 1px #c8a9ff; }
+.slot.equipped .equipment-actions .upgrade { grid-column:1; grid-row:1; justify-self:stretch; }
+
+/* Menu de combat et fenêtre de bilan. */
+.battle-area > .combat-options { position:absolute; top:12px; left:12px; z-index:25; margin:0; width:max-content; pointer-events:auto; }
+.combat-options button { min-height:40px; padding:8px 14px; border:1px solid #657091; border-radius:8px; background:#202c43; color:#edf1ff; cursor:pointer; }
+#combat-options-menu { position:absolute; top:calc(100% + 6px); left:0; width:200px; padding:6px; border:1px solid #657091; border-radius:10px; background:#172034; box-shadow:0 8px 24px #0008; }
+#combat-options-menu[hidden] { display:none; }
+#combat-options-menu button { width:100%; text-align:left; border:0; }
+#combat-report-dialog { box-sizing:border-box; width:min(780px,calc(100vw - 28px)); max-height:calc(100dvh - 36px); margin:auto; padding:24px; overflow:auto; border:1px solid #71608d; border-radius:16px; background:#151e30; color:#edf1fc; box-shadow:0 24px 90px #0009; }
+#combat-report-dialog::backdrop { background:#070c18bd; }
+#combat-report-dialog header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+#combat-report-dialog h2 { margin:0; font-size:22px; }
+#combat-report-dialog button { min-height:42px; padding:8px 14px; border:1px solid #63537d; border-radius:8px; background:#2c2742; color:#ece5ff; cursor:pointer; }
+#combat-report-dialog nav { display:flex; flex-wrap:wrap; gap:8px; }
+#combat-report-dialog button[aria-pressed="true"] { background:#59427d; border-color:#b394df; }
+#combat-report-dialog p { font-size:14px; line-height:1.55; }
+#combat-report-dialog .report-note { color:#a9b7cf; font-size:12px; }
+#combat-report-dialog .report-outcome { color:#e3c890; font-weight:700; }
+#combat-report-dialog h3 { font-size:15px; margin-bottom:6px; }
+.report-table-scroll { overflow-x:auto; }
+#combat-report-dialog table { width:100%; border-collapse:collapse; font-size:13px; }
+#combat-report-dialog td,#combat-report-dialog th { padding:12px 8px; border-bottom:1px solid #35415a; text-align:right; }
+#combat-report-dialog th:first-child { text-align:left; }
+#combat-report-dialog td small { color:#acbad2; white-space:nowrap; }
+@media(max-width:550px) { #combat-report-dialog { padding:16px; } #combat-report-dialog td,#combat-report-dialog th { padding:10px 5px; font-size:11px; } }
+#combat-report-dialog button:disabled { opacity:.5; cursor:default; }
+
+/* Configurations nommées et comparaison avant application. */
+.build-name { display:grid; gap:7px; color:#adbad2; font-size:11px; }
+.build-name input { box-sizing:border-box; width:100%; min-width:0; min-height:42px; padding:8px 10px; border:1px solid #586984; border-radius:8px; background:#101929; color:#f0edff; font-size:15px; font-weight:700; }
+.build-name input:focus { outline:2px solid #b194dd; outline-offset:2px; }
+.preset-list .current-build { border-color:#8e78bc; }
+.build-status { display:inline-block; font-size:11px; color:#bdddbd; padding:5px 0; }
+.build-status.unavailable,.build-warning { color:#f0bd9c; }
+.build-set-summary { min-height:36px; }
+.build-set-summary p { margin:6px 0; font-size:11px; }
+.build-buttons { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:12px; }
+.build-buttons button { margin:0; }
+#build-preview-dialog { box-sizing:border-box; width:min(820px,calc(100vw - 24px)); max-height:calc(100dvh - 32px); padding:24px; margin:auto; overflow:auto; border:1px solid #7e699f; border-radius:16px; background:#151e30; color:#edf1fc; }
+#build-preview-dialog::backdrop { background:#070c18bd; }
+#build-preview-dialog header,#build-preview-dialog footer { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+#build-preview-dialog h2 { margin:0; font-size:22px; }
+#build-preview-dialog p { font-size:13px; line-height:1.5; }
+#build-preview-dialog header p { color:#bfa9df; font-size:10px; letter-spacing:.08em; }
+#build-preview-dialog button { min-height:42px; padding:8px 14px; border:1px solid #7b659b; border-radius:8px; background:#46345f; color:#f3edff; cursor:pointer; }
+#build-preview-dialog button:disabled { opacity:.5; cursor:default; }
+.build-hero-preview { border-top:1px solid #35415a; padding:12px 0; }
+.build-hero-preview h3 { font-size:16px; margin:6px 0; }
+.build-table-scroll { overflow-x:auto; }
+#build-preview-dialog table { width:100%; border-collapse:collapse; font-size:13px; }
+#build-preview-dialog th,#build-preview-dialog td { padding:7px; text-align:right; border-bottom:1px solid #2d384f; }
+#build-preview-dialog th:first-child { text-align:left; }
+.build-gain { color:#a4dfb0; }.build-loss { color:#ffb0a5; }
+@media(max-width:550px) { #build-preview-dialog { padding:16px; } #build-preview-dialog th,#build-preview-dialog td { padding:6px 3px; font-size:11px; } #build-preview-dialog footer { align-items:stretch; flex-direction:column; } }
