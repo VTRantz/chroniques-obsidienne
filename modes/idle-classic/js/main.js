@@ -85,6 +85,7 @@ function switchGameTab(tab){
   document.querySelectorAll('.main-tabs button').forEach(button=>button.classList.toggle('tab-active',button.dataset.tab===tab));
   document.querySelectorAll('[id^="tab-"]').forEach(panel=>panel.classList.toggle('hidden',panel!==section));
   document.body.classList.toggle('garden-fullscreen',tab==='jardin');
+  document.body.classList.toggle('dungeon-expanded',tab==='donjon');
   document.body.classList.toggle('idle-wide',tab==='combat' || (tab==='tour' && state.tower?.active));
   document.body.classList.remove('idle-fullscreen');
   const modeMenu=$('mode-switcher-menu'),modeToggle=$('mode-switcher-toggle');

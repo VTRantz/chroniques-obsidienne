@@ -32,3 +32,37 @@ button:focus-visible{outline:2px solid #ffe3a3;outline-offset:2px}
 @media(max-width:720px){.map-panel{top:92px;right:8px;width:120px;padding:6px}.map-panel small{font-size:8px}.side-panel{right:8px;width:160px}.side-panel small{font-size:9px}.movement-controls{left:8px;width:125px}.combat-log{display:none}.message{left:8px;transform:none;max-width:calc(100% - 146px);font-size:10px}.stairs-card{padding:17px}.hero-card{width:calc(100% - 16px)}}
 @media(max-height:560px){.map-panel{top:86px}.legend{display:none}.side-panel{gap:4px;padding:7px}.side-panel button{min-height:26px;padding:5px}.side-panel small{font-size:9px}}
 @media(max-height:460px){.map-panel{width:110px}.map-panel small{display:none}}
+
+/* Des commandes plus grandes quand la hauteur permet de garder la carte dégagée. */
+@media(min-height:650px) {
+  .hero-card { width:min(350px,52vw); padding:12px 14px; }
+  .hero-card strong { font-size:16px; }
+  .hero-card span { font-size:13px; }
+  .meter { height:17px; }
+  .meter b { font-size:11px; line-height:17px; }
+  .run-card { font-size:13px; padding:12px 14px; }
+  .movement-controls { width:172px; padding:9px; }
+  .movement-pad button { height:44px; font-size:24px; }
+  #aim-toggle { min-height:36px; font-size:11px; }
+  .side-panel { width:230px; padding:11px; gap:7px; }
+  .side-panel button { min-height:40px; font-size:12px; }
+  .side-panel small { font-size:11px; }
+  .side-panel .legend { display:none; }
+  .map-panel { top:112px; width:190px; }
+  .map-panel strong,.map-panel small { font-size:10px; }
+  .combat-log { bottom:220px; font-size:12px; width:min(460px,calc(100% - 270px)); }
+  .message { top:118px; font-size:13px; }
+  .intro h1 { font-size:34px; }
+  .intro p { font-size:14px; }
+  .intro button { min-height:44px; font-size:14px; }
+  .hero-equipment li { font-size:12px; }
+}
+@media(max-width:720px) and (min-height:650px) {
+  .hero-card { width:100%; }
+  .map-panel { width:120px; }
+  .map-panel strong,.map-panel small { font-size:8px; }
+  .movement-controls { width:148px; padding:6px; }
+  .side-panel { width:160px; padding:7px; gap:5px; }
+  .side-panel button { min-height:40px; font-size:11px; }
+  .side-panel small { font-size:10px; }
+}
