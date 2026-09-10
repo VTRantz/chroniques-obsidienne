@@ -258,6 +258,7 @@
       this.ctx.imageSmoothingEnabled = false; this.assets = {}; this.sprites = {};
       this.camera = { x: 0, y: 0, zoom: 3 }; this.width = 1; this.height = 1;
       this.zoomFactor = 1; this.previewSpell = false; this.vfx = []; this.encounters = [];
+      this.travel = null; this.choiceKind = 'stairs'; this.soundVolume = 0; this.audio = null;
       this.runStats = { kills: 0, chests: 0 }; this.visitedRooms = new Set();
       this.floor = 1; this.turn = 0; this.seed = Date.now() >>> 0; this.rng = new RNG(this.seed);
       this.player = null; this.enemies = []; this.objects = []; this.items = []; this.doors = []; this.gates = [];
@@ -315,7 +316,20 @@
     }
 
     bind() {
+      document.getElementById('mystery-app').addEventListener('pointerdown', () => this.stopTravel());
+      addEventListener('blur', () => this.stopTravel());
+      document.addEventListener?.('visibilitychange', () => { if (document.hidden) this.stopTravel(); });
       addEventListener('keydown', event => {
+        this.stopTravel();
+        if(!document.getElementById('extra-controls').hidden) {
+          if(event.key==='Escape') {event.preventDefault();this.toggleOptions(false);}
+          if(event.key==='Tab') {
+            const controls=[...document.getElementById('extra-controls').querySelectorAll('button:not(:disabled),input')];
+            const index=controls.indexOf(document.activeElement);
+            event.preventDefault();controls[(index+(event.shiftKey?-1:1)+controls.length)%controls.length]?.focus();
+          }
+          return;
+        }
         if (this.choicePending && event.key === 'Escape') { event.preventDefault(); this.closeStairs(); return; }
         if (this.choicePending && event.key === 'Tab') {
           event.preventDefault();
@@ -355,9 +369,24 @@
           this.prepareHero(hero, this.pendingFreshSeed);
         }
       });
-      this.canvas.addEventListener('pointerdown', () => this.canvas.focus());
+      this.canvas.addEventListener('pointerup', event => {
+        this.canvas.focus();
+        if (event.button !== 0 || !this.canAct()) return;
+        const rect=this.canvas.getBoundingClientRect();
+        const x=Math.floor((((event.clientX-rect.left)*this.width/rect.width-this.width/2)/this.camera.zoom+this.camera.x)/TILE);
+        const y=Math.floor((((event.clientY-rect.top)*this.height/rect.height-this.height*.43)/this.camera.zoom+this.camera.y)/TILE);
+        this.startTravel({x,y});
+      });
+      document.getElementById('travel-stop').onclick = () => this.stopTravel();
+      document.getElementById('stairs-route').onclick = () => {this.toggleOptions(false);this.routeToStairs();};
+      document.getElementById('more-toggle').onclick = () => this.toggleOptions();
+      document.getElementById('settings-close').onclick = () => this.toggleOptions(false);
+      document.getElementById('sound-volume').oninput = event => {
+        this.soundVolume=clamp(Number(event.target.value)||0,0,100)/100;
+        this.playSound('heal');
+      };
       document.getElementById('start-run').onclick = () => this.start();
-      document.getElementById('new-run').onclick = () => this.prepareExpedition();
+      document.getElementById('new-run').onclick = () => {this.toggleOptions(false);this.prepareExpedition();};
       document.getElementById('basic-attack').onclick = () => { this.tryAttack(); this.canvas.focus(); };
       document.getElementById('cast-spell').onclick = () => { this.castSpell(); this.canvas.focus(); };
       document.getElementById('spell-preview').onclick = () => this.toggleSpellPreview();
@@ -367,7 +396,7 @@
       document.getElementById('hero-select').onchange = event => { this.selectedHeroId = event.target.value; this.renderHeroPreview(); };
       document.getElementById('bag-toggle').onclick = () => this.toggleBag(true);
       document.getElementById('bag-close').onclick = () => this.toggleBag(false);
-      document.getElementById('wait-turn').onclick = () => { this.waitTurn(); this.canvas.focus(); };
+      document.getElementById('wait-turn').onclick = () => { this.toggleOptions(false); this.waitTurn(); this.canvas.focus(); };
       document.querySelectorAll('[data-direction]').forEach(button => {
         button.onclick = () => {
           if (this.canAct()) { if (this.aimMode || this.previewSpell) this.player.direction = button.dataset.direction; else this.tryMove(button.dataset.direction); }
@@ -383,7 +412,8 @@
       document.getElementById('stairs-cancel').onclick = () => this.closeStairs();
       document.getElementById('stairs-confirm').onclick = () => {
         if (!this.choicePending) return;
-        this.closeStairs(); this.descend();
+        const exiting=this.choiceKind==='exit';
+        this.closeStairs(); if(exiting) this.showEnd(false,true); else this.descend();
       };
     }
 
@@ -468,6 +498,9 @@
     }
 
     beginStart(freshSeed = false) {
+      this.stopTravel(); this.choiceKind='stairs';
+      document.getElementById('extra-controls').hidden=true;
+      document.getElementById('more-toggle').setAttribute('aria-expanded','false');
       this.runStats = { kills: 0, chests: 0 }; this.visitedRooms.clear(); this.vfx = []; this.previewSpell = false;
       document.getElementById('run-report').hidden = true;
       this.runSerial += 1; this.spellReadyTurn = 0; this.summons = [];
@@ -487,6 +520,7 @@
     }
 
     generateFloor() {
+      this.stopTravel();
       this.busy = false;
       this.map = new DungeonGenerator(this.seed, this.floor).generate(); this.rng = new RNG(this.map.seed);
       this.player = new Actor('player', this.map.start.x, this.map.start.y, this.sprites.player, { hp: this.runHero.stats.maxHp, damage: this.runHero.stats.damage });
@@ -549,7 +583,6 @@
     }
 
     buildDoors() {
-      if (this.floor !== 1) return [];
       const rooms = this.rng.shuffle([...this.map.rooms]);
       for (const room of rooms) {
         const centerX = Math.floor(room.x + room.w / 2);
@@ -565,7 +598,8 @@
         const selected = this.rng.pick(candidates.filter(candidate => candidate.offset === bestOffset));
         return [{ x: selected.x, y: selected.y, side: 'north', openness: 0, exit: true, room }];
       }
-      return [];
+      const cell=this.roomCells(this.map.rooms[0]).find(cell=>!(cell.x===this.player.x && cell.y===this.player.y) && !(cell.x===this.map.stairs.x && cell.y===this.map.stairs.y));
+      return cell ? [{...cell,side:'north',openness:0,exit:true,room:this.map.rooms[0]}] : [];
     }
 
     roomCells(room, margin = 1) {
@@ -598,7 +632,7 @@
       return this.objects.some(object => object.x === x && object.y === y) || this.items.some(item => item.x === x && item.y === y) ||
         this.enemies.some(enemy => !enemy.dead && enemy.x === x && enemy.y === y) || (this.player && this.player.x === x && this.player.y === y) ||
         this.gateAt(x, y) ||
-        this.doors.some(door => door.x === x && door.y === y) ||
+        this.doors.some(door => door.x === x && (door.y === y || door.exit && door.y+1 === y)) ||
         (this.map.stairs.x === x && this.map.stairs.y === y);
     }
 
@@ -697,6 +731,7 @@
     }
 
     enemyHit(enemy) {
+      this.playSound('hit');
       const stats=this.runHero.stats;
       const dodged=this.rng.chance(stats.dodge), parried=!dodged && this.rng.chance(stats.parry);
       const damage=dodged ? 0 : Math.max(1,Math.round(enemy.damage*(1-stats.reduction)*(this.guardTurns>0?.75:1)*(parried?.5:1)));
@@ -713,6 +748,91 @@
     isWalkable(x, y, ignoreEnemy = null) {
       const gate = this.gateAt(x, y);
       return this.tile(x, y) === FLOOR && (!gate || gate.opened) && !this.objectAt(x, y) && !this.enemies.some(enemy => enemy !== ignoreEnemy && !enemy.dead && enemy.x === x && enemy.y === y);
+    }
+
+    toggleOptions(force) {
+      if(this.choicePending || !this.started) return;
+      this.stopTravel();const panel=document.getElementById('extra-controls');
+      panel.hidden=typeof force==='boolean'?!force:!panel.hidden;
+      document.getElementById('more-toggle').setAttribute('aria-expanded',String(!panel.hidden));
+      if(!panel.hidden) document.getElementById('settings-close').focus();else this.canvas.focus();
+    }
+
+    stopTravel() {
+      this.travel=null;
+      document.getElementById('travel-stop').hidden=true;
+    }
+
+    travelPath(target) {
+      if (!this.explored.has(keyOf(target.x,target.y))) return null;
+      const start=keyOf(this.player.x,this.player.y), goal=keyOf(target.x,target.y);
+      const queue=[{x:this.player.x,y:this.player.y}], parents=new Map([[start,null]]);
+      for(let i=0;i<queue.length;i++) {
+        const current=queue[i]; if(keyOf(current.x,current.y)===goal) break;
+        for(const [direction,vector] of Object.entries(DIRECTIONS)) {
+          const next={x:current.x+vector.x,y:current.y+vector.y}, key=keyOf(next.x,next.y);
+          if(parents.has(key) || !this.explored.has(key) || !this.cornerClear(current,next)) continue;
+          const exit=this.doors.some(door=>door.exit && door.x===next.x && door.y===next.y);
+          if(exit ? key!==goal : !this.isWalkable(next.x,next.y)) continue;
+          if(this.encounters.some(cell=>cell.kind==='trap' && !cell.used && cell.x===next.x && cell.y===next.y)) continue;
+          // Ne pas traverser un escalier sans avoir choisi d'y aller.
+          if(next.x===this.map.stairs.x && next.y===this.map.stairs.y && key!==goal) continue;
+          parents.set(key,{previous:keyOf(current.x,current.y),direction}); queue.push(next);
+        }
+      }
+      if(!parents.has(goal)) return null;
+      const path=[]; for(let cursor=goal;cursor!==start;) {const step=parents.get(cursor);path.unshift(step.direction);cursor=step.previous;}
+      return path;
+    }
+
+    startTravel(target, fast=false) {
+      this.stopTravel();
+      if(!this.canAct()) return;
+      if(this.enemies.some(enemy=>!enemy.dead && this.visible.has(keyOf(enemy.x,enemy.y)))) return this.message('Ennemi en vue : utilise les directions pour garder le contrôle.');
+      const path=this.travelPath(target);
+      if(!path) return this.message('Choisis une case découverte accessible sans piège.');
+      if(!path.length) return;
+      this.previewSpell=false; this.aimMode=false;
+      document.getElementById('aim-toggle').setAttribute('aria-pressed','false');
+      document.getElementById('extra-controls').hidden=true;
+      document.getElementById('more-toggle').setAttribute('aria-expanded','false');
+      this.travel={path,target,fast,hp:this.player.hp};
+      document.getElementById('travel-stop').hidden=false; this.advanceTravel();
+    }
+
+    advanceTravel() {
+      if(!this.travel) return;
+      if(!this.canAct() || this.player.hp<this.travel.hp || this.enemies.some(enemy=>!enemy.dead && this.visible.has(keyOf(enemy.x,enemy.y)))) {
+        this.stopTravel(); return;
+      }
+      const direction=this.travel.path.shift(); if(!direction) return this.stopTravel();
+      const vector=DIRECTIONS[direction], next={x:this.player.x+vector.x,y:this.player.y+vector.y};
+      const exit=this.doors.some(door=>door.exit && door.x===next.x && door.y===next.y);
+      if(!this.cornerClear(this.player,next) || (!exit && !this.isWalkable(next.x,next.y)) || this.encounters.some(cell=>!cell.used && cell.kind==='trap' && cell.x===next.x && cell.y===next.y)) return this.stopTravel();
+      this.travel.hp=this.player.hp; this.tryMove(direction);
+    }
+
+    routeToStairs() {
+      if(!this.canAct()) return;
+      if(this.enemies.some(enemy=>!enemy.dead)) return this.message('Élimine tous les ennemis de l’étage avant le trajet rapide.');
+      if(!this.explored.has(keyOf(this.map.stairs.x,this.map.stairs.y))) return this.message('Découvre d’abord l’escalier.');
+      if(this.player.x===this.map.stairs.x && this.player.y===this.map.stairs.y) return this.tryStairs();
+      this.startTravel(this.map.stairs,true);
+    }
+
+    playSound(kind) {
+      if(!this.soundVolume) return;
+      try {
+        const Audio=window.AudioContext || window.webkitAudioContext; if(!Audio) return;
+        this.audio ||= new Audio();
+        if(this.audio.state==='suspended') this.audio.resume().catch(()=>{});
+        const oscillator=this.audio.createOscillator(), gain=this.audio.createGain(), now=this.audio.currentTime;
+        oscillator.type='sine'; oscillator.frequency.setValueAtTime(kind==='heal'?660:kind==='hit'?180:330,now);
+        oscillator.frequency.exponentialRampToValueAtTime(kind==='heal'?880:90,now+.12);
+        gain.gain.setValueAtTime(.06*this.soundVolume,now); gain.gain.exponentialRampToValueAtTime(.001,now+.14);
+        oscillator.connect(gain);gain.connect(this.audio.destination);oscillator.start(now);oscillator.stop(now+.15);
+        oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();};
+      } catch { /* Le jeu reste jouable si le navigateur refuse le son. */ }
     }
 
     tryMove(direction) {
@@ -745,6 +865,8 @@
       const vector = DIRECTIONS[this.player.direction]; const x = this.player.x + vector.x; const y = this.player.y + vector.y;
       const enemy = this.lineTarget(this.attackRange()); if (enemy) return this.attackEnemy(enemy);
       if (!this.cornerClear(this.player, {x,y})) { this.message('L’angle est bloqué.'); return; }
+      const exitDoor=this.doors.find(door=>door.exit && door.x===x && door.y===y);
+      if(exitDoor) return this.escapeDungeon(exitDoor);
       const object = this.objectAt(x, y);
       if (object?.kind === 'vase') return this.breakVase(object);
       if (object?.kind === 'chest') return this.openChest(object);
@@ -763,6 +885,7 @@
 
     damageEnemy(enemy, amount, label = '') {
       if (!enemy || enemy.dead) return 0;
+      this.playSound('attack');
       const damage = Math.min(enemy.hp, Math.max(1, Math.round(amount))); enemy.hp -= damage;
       enemy.hitUntil = performance.now() + 180;
       this.vfx.push({from:{x:this.player.x,y:this.player.y},to:{x:enemy.x,y:enemy.y},start:performance.now(),color:label ? '#b6a1ff' : '#ffe0a0'});
@@ -782,6 +905,7 @@
     healPlayer(amount) {
       const healed = Math.min(this.player.maxHp - this.player.hp, Math.max(0, Math.round(amount)));
       this.player.hp += healed;
+      if(healed) this.playSound('heal');
       if (healed) this.effects.push({x:this.player.x,y:this.player.y,text:`+${healed}`,color:'#71efba',until:performance.now()+1000});
       return healed;
     }
@@ -944,7 +1068,7 @@
       if (!this.canAct()) return;
       if (this.player.x !== this.map.stairs.x || this.player.y !== this.map.stairs.y) return this.message('Place-toi sur l’escalier pour changer d’étage.');
       if (this.enemies.some(enemy => enemy.type === 'boss' && !enemy.dead)) return this.message('Vaincs le gardien pour libérer la sortie.');
-      this.choicePending = true;
+      this.stopTravel(); this.choiceKind='stairs'; this.choicePending = true;
       const dialog = document.getElementById('stairs-dialog'); dialog.hidden = false;
       document.getElementById('stairs-title').textContent = this.floor === MAX_FLOOR ? 'Quitter le donjon ?' : 'Descendre à l’étage suivant ?';
       document.getElementById('stairs-detail').textContent = this.floor === MAX_FLOOR ? 'Ton butin sera rapporté dans le mode idle.' : 'Tu peux encore explorer cet étage. La descente est définitive.';
@@ -958,25 +1082,32 @@
 
     toggleMap() {
       const panel = document.getElementById('map-panel'); panel.hidden = !panel.hidden;
-      document.getElementById('map-toggle').setAttribute('aria-expanded', String(!panel.hidden)); this.canvas.focus();
+      document.getElementById('map-toggle').setAttribute('aria-expanded', String(!panel.hidden));
+      if(document.getElementById('extra-controls').hidden) this.canvas.focus();
     }
 
     waitTurn() { if (!this.canAct()) return; this.completePlayerTurn(); }
-    canAct() { return this.started && !this.busy && !this.choicePending && document.getElementById('inventory-panel').hidden && this.player && !this.player.dead; }
+    canAct() { return this.started && !this.busy && !this.choicePending && document.getElementById('extra-controls').hidden && document.getElementById('inventory-panel').hidden && this.player && !this.player.dead; }
 
     completePlayerTurn(monstersAct = true, afterTurn = null) {
       this.busy = true; this.turn += 1;
-      this.summonTurn();
-      if (monstersAct) this.enemyTurn();
-      if (this.player.hp > 0) this.survivalTurn();
-      this.updateFov(); this.updateHud();
-      if (this.powerTurns > 0) this.powerTurns -= 1; if (this.guardTurns > 0) this.guardTurns -= 1;
       const serial = this.runSerial;
+      const combat=this.player.state==='attack' || this.enemies.some(enemy=>!enemy.dead && this.visible.has(keyOf(enemy.x,enemy.y)));
+      const pace=this.travel?.fast?55:combat?140:80;
       setTimeout(() => {
         if (serial !== this.runSerial || !this.started) return;
-        if (this.player.hp <= 0) return this.defeat();
-        this.busy = false; if (afterTurn) afterTurn();
-      }, 145);
+        this.summonTurn();
+        if (monstersAct) this.enemyTurn();
+        if (this.player.hp > 0) this.survivalTurn();
+        this.updateFov(); this.updateHud();
+        if (this.powerTurns > 0) this.powerTurns -= 1; if (this.guardTurns > 0) this.guardTurns -= 1;
+        setTimeout(() => {
+          if(serial!==this.runSerial || !this.started) return;
+          if(this.player.hp<=0) {this.stopTravel();return this.defeat();}
+          this.busy=false; if(afterTurn) afterTurn();
+          this.advanceTravel();
+        },pace);
+      }, pace);
     }
 
     enemyTurn() {
@@ -1040,12 +1171,17 @@
     }
     victory() { this.busy = true; this.showEnd(true); }
     escapeDungeon(door) {
-      if (this.busy) return;
-      this.busy = true; door.openness = 1; this.message('Retour à la maison…');
-      setTimeout(() => this.showEnd(false, true), 420);
+      if (!this.canAct()) return;
+      this.stopTravel(); this.choiceKind='exit'; this.choicePending=true; door.openness=1;
+      document.getElementById('stairs-dialog').hidden=false;
+      document.getElementById('stairs-title').textContent='Rentrer avec ton butin ?';
+      document.getElementById('stairs-detail').textContent=`Tu quittes l’expédition à l’étage ${this.floor} avec ${this.runGold} or, ${this.runEssence} essences et les ressources collectées. Ce départ termine l’expédition.`;
+      document.getElementById('stairs-confirm').textContent='Rentrer avec le butin';
+      document.getElementById('stairs-cancel').focus();
     }
     showEnd(won, escaped = false) {
       if (!this.started) return;
+      this.stopTravel();
       if (won || escaped) parent.postMessage({ type: 'chroniques:mystery-reward', gold: this.runGold, essence: this.runEssence, resources: { ...this.runMobResources } }, '*');
       this.started = false;
       const intro = document.getElementById('intro'); intro.classList.remove('hidden');
@@ -1114,6 +1250,7 @@
       if (!this.started || this.busy || this.choicePending || this.player?.dead) return;
       const panel = document.getElementById('inventory-panel'); const open = typeof force === 'boolean' ? force : panel.hidden;
       panel.hidden = !open; if (open) this.renderInventory(); else this.canvas.focus();
+      this.stopTravel();
     }
     renderInventory() {
       const list = document.getElementById('inventory-list'); list.replaceChildren();
@@ -1184,6 +1321,7 @@
       document.getElementById('hunger-fill').style.width = `${this.hunger}%`;
       document.getElementById('hunger-meter').classList.toggle('hungry', this.hunger <= 20);
       document.getElementById('stairs-action').hidden = this.player.x !== this.map.stairs.x || this.player.y !== this.map.stairs.y;
+      document.getElementById('stairs-route').disabled=!this.started || this.busy || this.choicePending || this.player.dead || this.enemies.some(enemy=>!enemy.dead) || !this.explored.has(keyOf(this.map.stairs.x,this.map.stairs.y));
       document.getElementById('turn-label').textContent = `Tour ${this.turn}`;
       const living = this.enemies.filter(enemy => !enemy.dead).length; document.getElementById('enemy-label').textContent = `${living} ennemi${living > 1 ? 's' : ''}`;
       document.getElementById('reward-label').textContent = `${this.runGold} or · ${this.runEssence} essence`;
@@ -1216,6 +1354,10 @@
         { y: this.player.visualY * TILE + TILE, draw: () => this.player.draw(ctx) }
       ].sort((a, b) => a.y - b.y);
       drawables.forEach(item => item.draw()); this.drawFog(ctx);
+      if(this.travel) {
+        let x=this.player.x,y=this.player.y;ctx.fillStyle='#71efbaaa';
+        for(const direction of this.travel.path){const d=DIRECTIONS[direction];x+=d.x;y+=d.y;ctx.fillRect(x*TILE+6,y*TILE+6,4,4);}
+      }
       if (this.previewSpell) for(const cell of this.spellCells()) {
         if (!this.visible.has(keyOf(cell.x,cell.y))) continue;
         ctx.fillStyle=this.enemyAt(cell.x,cell.y)?'#f7b35e88':'#8fb7ff55'; ctx.fillRect(cell.x*TILE+1,cell.y*TILE+1,TILE-2,TILE-2);

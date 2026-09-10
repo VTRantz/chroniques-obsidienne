@@ -41,6 +41,17 @@ button:focus-visible{outline:2px solid #ffe3a3;outline-offset:2px}
 @media(max-height:649px){.side-panel{max-height:calc(100% - 220px)}.map-panel{width:110px}.map-panel small{display:none}.zoom-control{top:100px;width:105px}}
 @media(max-width:720px){.zoom-control{left:8px;width:110px}}
 
+#extra-controls:not([hidden]){position:absolute;inset:0;z-index:10;display:grid;place-items:center;padding:20px;background:#030914bb}
+.settings-card{display:grid;gap:12px;width:min(380px,100%);max-height:100%;overflow:auto;padding:20px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.settings-card h2{margin:0;font-size:17px}.settings-card button{min-height:40px;font-size:12px}
+.settings-card .legend{display:grid}
+.setting-control{display:grid;gap:4px;font-size:11px;color:var(--ink)}
+.setting-control input{width:100%;min-height:30px;margin:0;accent-color:#71efba}
+#travel-stop{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:5;background:#683b2c;border-color:#ffcf9d;min-height:42px}
+@media(max-width:720px){#travel-stop{bottom:auto;top:115px;left:8px;transform:none;font-size:11px;max-width:145px}}
+#mystery-canvas{touch-action:none}
+@media(max-width:360px){#mystery-app .movement-controls{width:138px}#mystery-app .side-panel{width:148px}}
+
 /* Des commandes plus grandes quand la hauteur permet de garder la carte dégagée. */
 @media(min-height:650px) {
   .hero-card { width:min(350px,52vw); padding:12px 14px; }

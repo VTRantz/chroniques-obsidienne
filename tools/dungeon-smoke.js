@@ -114,7 +114,7 @@ for(const id of ['priest','paladin']) {
 }
 {
   const game=gameFor();enemy(game);game.runHero.stats.reduction=.5;game.runHero.stats.parry=1;
-  const hp=game.player.hp;game.waitTurn();check(hp-game.player.hp===3,'Armor reduction and parry combine');
+  const hp=game.player.hp;game.waitTurn();check(game.player.hp===hp && game.busy,'Enemy response waits for player animation');settle();check(hp-game.player.hp===3,'Armor reduction and parry combine');
 }
 {
   const game=gameFor();const stats=structuredClone(game.runHero.stats);
@@ -174,9 +174,9 @@ for(const blocker of ['wall','vase','gate']){
   check(near.hp<near.maxHp,'Melee hits diagonally');
 }
 {
-  const game=gameFor();enemy(game,6,6);const hp=game.player.hp;game.waitTurn();
+  const game=gameFor();enemy(game,6,6);const hp=game.player.hp;game.waitTurn();settle();
   check(game.player.hp<hp,'Adjacent diagonal enemy attacks');
-  const blocked=gameFor();blocked.map.grid[5][6]=0;enemy(blocked,6,6);const hp2=blocked.player.hp;blocked.waitTurn();
+  const blocked=gameFor();blocked.map.grid[5][6]=0;enemy(blocked,6,6);const hp2=blocked.player.hp;blocked.waitTurn();settle();
   check(blocked.player.hp===hp2,'Enemy cannot attack through a blocked corner');
 }
 {
@@ -186,7 +186,7 @@ for(const blocker of ['wall','vase','gate']){
   check(!(detour.x===7 && detour.y===7),'Pathfinding respects corner barriers');
   game.map.grid[8][7]=1;game.waitTurn();settle();
   check(actor.alertTurns>0 && actor.lastSeen.x===5,'Enemy records the visible hero position');
-  game.player.x=20;game.player.y=17;const before={x:actor.x,y:actor.y};game.waitTurn();
+  game.player.x=20;game.player.y=17;const before={x:actor.x,y:actor.y};game.waitTurn();settle();
   check(actor.x!==before.x || actor.y!==before.y,'Enemy briefly pursues the last known position');
 }
 {
@@ -268,7 +268,63 @@ for(let seed=1;seed<=20;seed++) {
   const game=gameFor();game.seed=seed;game.generateFloor();
   check(game.encounters.every(cell=>game.tile(cell.x,cell.y)===1 && !game.occupied(cell.x,cell.y)),`Seed ${seed}: encounters occupy free floor only`);
 }
-console.log(`Donjon : ${checks} vérifications réussies (héros, sorts, récompenses, exploration, visée et attaques annoncées).`);
+{
+  const game=gameFor();game.map.rooms=[];game.map.stairs={x:20,y:15};
+  game.startTravel({x:8,y:5});settle();
+  check(game.player.x===8 && game.player.y===5 && game.turn===3 && !game.travel,'Click route spends one turn per tile then stops');
+  check(game.hunger===99.55,'Automatic walking spends normal satiety');
+  const turn=game.turn;game.startTravel({x:29,y:19});
+  check(game.turn===turn && !game.travel,'Unknown target is refused');
+  game.startTravel({x:5,y:5});game.stopTravel();settle();
+  check(game.player.x===7 && game.turn===turn+1,'Cancel stops after current committed step');
+}
+{
+  const game=gameFor();game.map.rooms=[];enemy(game,17,5);game.updateFov();
+  game.startTravel({x:10,y:5});settle();
+  check(game.player.x===6 && game.turn===1 && !game.travel,'Newly visible enemy interrupts automatic travel');
+  game.startTravel({x:8,y:5});check(game.turn===1,'Visible enemy prevents new automatic travel');
+}
+{
+  const game=gameFor();game.map.rooms=[];game.hunger=0;
+  game.startTravel({x:9,y:5});settle();
+  check(game.turn===1 && !game.travel,'Taking starvation damage interrupts travel');
+  const blocked=gameFor();blocked.map.grid=Array.from({length:20},()=>Array(30).fill(0));
+  for(let x=5;x<=8;x++)blocked.map.grid[5][x]=1;
+  blocked.encounters=[{x:6,y:5,kind:'trap',used:false}];
+  check(blocked.travelPath({x:8,y:5})===null,'Automatic route never crosses an active trap');
+  blocked.encounters=[];blocked.objects=[{x:6,y:5,kind:'vase'}];
+  check(blocked.travelPath({x:8,y:5})===null,'Automatic route does not break objects');
+}
+{
+  const game=gameFor();game.map.stairs={x:8,y:5};enemy(game,20,15);
+  game.routeToStairs();check(game.turn===0,'Fast stairs route requires fully cleared floor');
+  game.enemies=[];game.routeToStairs();settle();
+  check(game.turn===3 && game.choicePending && game.floor===1,'Fast stairs route walks normally and asks before descending');
+}
+{
+  const game=gameFor();game.floor=5;game.runGold=123;game.runEssence=7;
+  const boss=enemy(game,15,15);boss.type='boss';
+  game.doors=[{x:6,y:5,exit:true,openness:0}];messages.length=0;
+  game.tryMove('right');check(game.choicePending && game.choiceKind==='exit' && game.turn===0 && game.started,'Exit asks confirmation even with living boss');
+  nodes.get('stairs-cancel').onclick();check(game.canAct() && game.started && !messages.some(m=>m.type==='chroniques:mystery-reward'),'Cancel exit preserves expedition and loot');
+  game.tryMove('right');nodes.get('stairs-confirm').onclick();nodes.get('stairs-confirm').onclick();
+  const rewards=messages.filter(m=>m.type==='chroniques:mystery-reward');
+  check(rewards.length===1 && rewards[0].gold===123 && rewards[0].essence===7 && !game.started,'Confirmed exit pays accumulated loot exactly once');
+}
+{
+  const game=gameFor();game.toggleOptions(true);game.tryMove('right');
+  check(game.turn===0 && !game.canAct(),'Options pause player controls');
+  nodes.get('wait-turn').onclick();settle();
+  check(game.turn===1 && game.canAct() && nodes.get('extra-controls').hidden,'Wait action closes options and spends one turn');
+}
+for(let seed=1;seed<=20;seed++) for(let floor=1;floor<=5;floor++) {
+  const game=gameFor();game.seed=seed;game.floor=floor;game.generateFloor();
+  check(game.doors.filter(door=>door.exit).length===1,`Seed ${seed}, floor ${floor}: exactly one exit`);
+  game.enemies=[];game.encounters=[];
+  for(let y=0;y<20;y++)for(let x=0;x<30;x++)game.explored.add(`${x},${y}`);
+  check(game.travelPath(game.doors[0])!==null,`Seed ${seed}, floor ${floor}: exit reachable with generated objects`);
+}
+console.log(`Donjon : ${checks} vérifications réussies (héros, sorts, récompenses, exploration, trajets et sorties).`);
 
 if(process.argv.includes('--rewards-audit')){
   const profiles=Array.from({length:6},(_,index)=>{

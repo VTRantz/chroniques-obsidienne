@@ -71,6 +71,16 @@
 
 ## Vérification
 
+### Confort, trajets et sorties — 10 septembre 2026
+
+- Clic ou toucher sur une case découverte : trajet automatique par les cases connues, respectant angles, obstacles, ennemis et pièges actifs. Un escalier ou une porte de sortie ne peut être traversé comme simple étape intermédiaire.
+- Le trajet refuse de démarrer avec un ennemi visible, s’arrête si un ennemi devient visible ou si les PV diminuent, et reste annulable par le bouton d’arrêt, une commande manuelle, un clic, un changement de fenêtre ou d’onglet du navigateur. L’action déjà engagée se termine normalement.
+- Après élimination de tous les ennemis de l’étage et découverte de l’escalier, « Rejoindre l’escalier » accélère les animations du trajet. Chaque case garde son coût en tours et satiété ; les pièges restent évités. La descente exige toujours une confirmation.
+- Une porte de retour existe à chacun des cinq étages, avec sa case d’approche réservée lors du placement des objets. Son repère vert apparaît après découverte. Avancer vers elle ou interagir devant elle ouvre une confirmation gratuite. Annuler conserve l’expédition ; confirmer verse une seule fois tout le butin accumulé et termine l’expédition. Le boss vivant bloque l’escalier final, jamais la porte de retour.
+- Les commandes secondaires sont regroupées dans une fenêtre « Options et exploration », accessible au clavier avec fermeture par Échap. Les sons sont synthétisés, muets au départ, réglables de 0 à 100 ; leur indisponibilité n’empêche pas le jeu.
+- Le tour du héros précède visuellement la réaction ennemie. Deux phases de 140 ms en combat, 80 ms en déplacement calme et 55 ms pour le trajet rapide. Les commandes restent bloquées pendant la résolution du tour.
+- Validation : 385 vérifications automatisées, dont 100 étages générés avec sortie unique et accessible, interruptions de trajet, sortie annulée/confirmée et crédit unique du butin. Navigateur : clic réel et toucher émulé, trajet rapide, fenêtre d’options, activation du contexte audio, sortie à l’étage 3, vues ordinateur/mobile/paysage, aucune erreur console.
+
 ### Lisibilité et rencontres — 10 septembre 2026
 
 - La caméra suit le héros sans le repousser vers les bords, dans une vue utilisant toute la fenêtre. Zoom réglable de 80 à 160 % ; aucun tour consommé.

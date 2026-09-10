@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Chroniques d'Obsidienne — Donjon Mystère</title>
-  <link rel="stylesheet" href="modes/dungeon-mystery/css/dungeon-mystery.css?v=8">
+  <link rel="stylesheet" href="modes/dungeon-mystery/css/dungeon-mystery.css?v=9">
 </head>
 <body>
   <main id="mystery-app">
@@ -27,13 +27,11 @@
     <section id="map-panel" class="map-panel" aria-label="Carte des zones explorées">
       <strong>CARTE DE L’ÉTAGE</strong>
       <canvas id="minimap" width="180" height="120" aria-label="Mini-carte : héros crème, ennemis roses, coffres dorés, escalier violet"></canvas>
-      <small><span class="map-hero">◆ Toi</span> · <span class="map-enemy">◆ Ennemi</span><br><span class="map-chest">◆ Coffre</span> · <span class="map-stairs">◆ Escalier</span></small>
+      <small><span class="map-hero">◆ Toi</span> · <span style="color:#71efba">◆ Sortie</span><br><span class="map-enemy">◆ Ennemi</span> · <span class="map-chest">◆ Coffre</span><br><span class="map-stairs">◆ Escalier</span></small>
     </section>
 
     <ol id="combat-log" class="combat-log" aria-label="Derniers événements"></ol>
-    <label class="zoom-control" for="zoom-level">Zoom
-      <input id="zoom-level" type="range" min="0.8" max="1.6" step="0.1" value="1" aria-label="Zoom du donjon">
-    </label>
+    <button id="travel-stop" type="button" hidden>Arrêter le trajet</button>
     <nav class="movement-controls" aria-label="Déplacements en huit directions">
       <div class="movement-pad">
         <button type="button" data-direction="upLeft" aria-label="Nord-ouest">↖</button><button type="button" data-direction="up" aria-label="Nord">↑</button><button type="button" data-direction="upRight" aria-label="Nord-est">↗</button>
@@ -50,9 +48,21 @@
       <small id="spell-description"></small>
       <small id="summon-status"></small>
       <button id="bag-toggle" type="button">Sac du jardin [I]</button>
+      <button id="stairs-action" type="button" hidden>Prendre l’escalier [R]</button>
+      <button id="more-toggle" type="button" aria-expanded="false" aria-controls="extra-controls">Options et exploration</button>
+    </aside>
+    <section id="extra-controls" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+      <div class="settings-card">
+      <div class="inventory-heading"><h2 id="settings-title">Options et exploration</h2><button id="settings-close" type="button">Fermer</button></div>
+      <button id="stairs-route" type="button">Rejoindre l’escalier</button>
       <button id="wait-turn" type="button">Attendre un tour [.]</button>
       <button id="map-toggle" type="button" aria-expanded="true" aria-controls="map-panel">Carte [M]</button>
-      <button id="stairs-action" type="button" hidden>Prendre l’escalier [R]</button>
+      <label class="setting-control" for="zoom-level">Zoom
+        <input id="zoom-level" type="range" min="0.8" max="1.6" step="0.1" value="1" aria-label="Zoom du donjon">
+      </label>
+      <label class="setting-control" for="sound-volume">Volume des sons
+        <input id="sound-volume" type="range" min="0" max="100" step="10" value="0" aria-label="Volume des sons (0 : muet)">
+      </label>
       <button id="new-run" type="button">Préparer une expédition</button>
       <div class="legend">
         <b>Commandes</b>
@@ -63,7 +73,8 @@
         <span>Pavé numérique : 8 directions · 5 : attendre</span>
         <span>I : inventaire</span>
       </div>
-    </aside>
+      </div>
+    </section>
 
     <section id="inventory-panel" class="inventory-panel" hidden>
       <div class="inventory-heading">
@@ -87,7 +98,7 @@
     <section id="intro" class="intro">
       <span class="rune">◆</span>
       <h1>Donjon Mystère</h1>
-      <p>Explore les salles et terrasse le gardien du cinquième étage. Chaque action fait jouer les monstres. V pour viser, F pour lancer. Quitte les cases rouges avant l’attaque !<br>Repères : △ piège · ≈ fontaine de soin · ✦ réserve de nourriture.</p>
+      <p>Clique ou touche une case découverte pour t’y rendre ; le trajet s’arrête en cas de danger. Chaque action fait jouer les monstres. V pour viser, F pour lancer. Quitte les cases rouges avant l’attaque !<br>Une porte à chaque étage permet de rentrer avec le butin. Options : sons, zoom et trajet vers l’escalier après nettoyage.<br>Repères : △ piège · ≈ fontaine de soin · ✦ réserve de nourriture.</p>
       <p id="run-report" class="run-report" hidden></p>
       <div id="hero-picker" class="hero-picker">
         <label for="hero-select">Ton héros du mode idle</label>
@@ -98,6 +109,6 @@
       <button id="start-run" type="button" disabled>Chargement…</button>
     </section>
   </main>
-  <script src="modes/dungeon-mystery/js/dungeon-mystery.js?v=25"></script>
+  <script src="modes/dungeon-mystery/js/dungeon-mystery.js?v=26"></script>
 </body>
 </html>
