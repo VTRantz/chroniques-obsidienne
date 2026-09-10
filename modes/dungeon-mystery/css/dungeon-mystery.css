@@ -32,6 +32,14 @@ button:focus-visible{outline:2px solid #ffe3a3;outline-offset:2px}
 @media(max-width:720px){.map-panel{top:92px;right:8px;width:120px;padding:6px}.map-panel small{font-size:8px}.side-panel{right:8px;width:160px}.side-panel small{font-size:9px}.movement-controls{left:8px;width:125px}.combat-log{display:none}.message{left:8px;transform:none;max-width:calc(100% - 146px);font-size:10px}.stairs-card{padding:17px}.hero-card{width:calc(100% - 16px)}}
 @media(max-height:560px){.map-panel{top:86px}.legend{display:none}.side-panel{gap:4px;padding:7px}.side-panel button{min-height:26px;padding:5px}.side-panel small{font-size:9px}}
 @media(max-height:460px){.map-panel{width:110px}.map-panel small{display:none}}
+.zoom-control{position:absolute;left:13px;top:120px;width:125px;display:grid;gap:5px;padding:8px 10px;background:var(--panel);border:1px solid var(--line);border-radius:6px;font-size:11px;color:var(--ink)}
+.zoom-control input{width:100%;margin:0;accent-color:#71efba;min-height:24px}
+#spell-preview[aria-pressed="true"]{background:#35466d;border-color:#afd1ff}
+.intro .run-report{padding:12px;border:1px solid var(--line);border-radius:6px;background:#101b29;line-height:1.7}
+#mystery-app{min-height:0}
+.side-panel{max-height:calc(100% - 320px);overflow:auto}
+@media(max-height:649px){.side-panel{max-height:calc(100% - 220px)}.map-panel{width:110px}.map-panel small{display:none}.zoom-control{top:100px;width:105px}}
+@media(max-width:720px){.zoom-control{left:8px;width:110px}}
 
 /* Des commandes plus grandes quand la hauteur permet de garder la carte dégagée. */
 @media(min-height:650px) {

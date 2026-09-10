@@ -71,6 +71,17 @@
 
 ## Vérification
 
+### Lisibilité et rencontres — 10 septembre 2026
+
+- La caméra suit le héros sans le repousser vers les bords, dans une vue utilisant toute la fenêtre. Zoom réglable de 80 à 160 % ; aucun tour consommé.
+- V ou « Viser le sort » affiche les cases affectées. Les directions orientent gratuitement pendant la visée ; F lance le sort, V quitte la visée. Les projectiles s’arrêtent au premier ennemi et respectent murs, grilles, objets et angles. Les soins ciblent le héros ; zones et invocations indiquent leur rayon.
+- Les attaques ont un mouvement bref, une traînée et un cercle d’impact ; les cibles touchées s’éclaircissent. Les sprites existants sont conservés.
+- Les vampires préparent un tir entre deux et quatre cases ; le gardien prépare sa frappe jusqu’à deux cases. Une case rouge annonce la position visée. L’attaque se résout à l’action ennemie suivante : quitter la case, tuer le lanceur ou couper sa ligne de vue évite les dégâts. Aucun multiplicateur de dégâts supplémentaire.
+- Un monstre existant peut être placé près d’un coffre. Il reste en garde tant qu’il ne repère pas le héros ; aucun ennemi ni récompense supplémentaire n’est créé pour cela.
+- Chaque étage place, si des cases libres existent hors départ, objets et sorties, une fontaine (20 % des PV max), deux pièges visibles (8 % des PV max, arrondi supérieur) et, avec 25 % de probabilité, une réserve d’une ration. Ces rencontres se déclenchent en marchant dessus et une seule fois. Le déplacement garde son coût habituel d’un tour.
+- Le bilan indique l’étage atteint, les salles effectivement visitées, les ennemis vaincus, les coffres ouverts et les ressources rapportées ou perdues. Après au moins une minute et un retour vivant, il affiche aussi l’or et les essences par minute, pauses incluses. Aucun gain proportionnel au temps : les barèmes d’or et d’essences restent identiques.
+- Validation : 168 vérifications automatisées ; contrôles navigateur en 1440 × 900, 390 × 844 et 844 × 390, visée sans mouvement ni tour, zoom, effets d’impact, bilan de sortie, console sans erreur. Le rendement en partie humaine reste à observer.
+
 - `node tools/dungeon-smoke.js` : tests sans sauvegarde, couvrant les huit héros, leurs fichiers de sprites, le pont de statistiques, les sorts, les tours, les obstacles, les soins et les récompenses.
 - Validation navigateur : sélection et lancement de chacun des huit héros, invocation, recharge, consommation depuis le sac et contrôle visuel.
 - `node tools/dungeon-smoke.js` : 133 vérifications, incluant désormais les huit directions, les angles, la faim, les soins, la carte et les escaliers.

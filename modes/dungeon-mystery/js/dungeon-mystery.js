@@ -198,6 +198,10 @@
       // dans une planche 4-directions V1.
       ctx.fillStyle = '#0007'; ctx.beginPath(); ctx.ellipse(px, py - 1, 7, 3, 0, 0, Math.PI * 2); ctx.fill();
       ctx.save();
+      const direction = DIRECTIONS[this.direction];
+      const lunge = this.state === 'attack' ? Math.sin(Math.min(1, this.stateTime / .3) * Math.PI) * 5 : 0;
+      ctx.translate(direction.x * lunge, direction.y * lunge);
+      if (this.hitUntil > performance.now()) ctx.filter = 'brightness(2)';
       if (DIRECTIONS[this.direction].x < 0) { ctx.translate(px * 2, 0); ctx.scale(-1, 1); }
       ctx.drawImage(image, Math.round(px - size / 2), Math.round(py - size + 7), size, size); ctx.restore();
       if (this.type !== 'player' && !this.dead) {
@@ -253,6 +257,8 @@
       this.canvas = canvas; this.ctx = canvas.getContext('2d', { alpha: false });
       this.ctx.imageSmoothingEnabled = false; this.assets = {}; this.sprites = {};
       this.camera = { x: 0, y: 0, zoom: 3 }; this.width = 1; this.height = 1;
+      this.zoomFactor = 1; this.previewSpell = false; this.vfx = []; this.encounters = [];
+      this.runStats = { kills: 0, chests: 0 }; this.visitedRooms = new Set();
       this.floor = 1; this.turn = 0; this.seed = Date.now() >>> 0; this.rng = new RNG(this.seed);
       this.player = null; this.enemies = []; this.objects = []; this.items = []; this.doors = []; this.gates = [];
       this.wallTiles = [];
@@ -322,11 +328,12 @@
         if (key === 'i') return this.toggleBag();
         if (key === 'm' && !event.repeat) return this.toggleMap();
         if (key === 'r' && !event.repeat) return this.tryStairs();
+        if (key === 'v' && !event.repeat) { event.preventDefault(); this.toggleSpellPreview(); return; }
         if (key === 'f') { if (!event.repeat) this.castSpell(); return; }
         if (key === ' ' || key === 'enter') return this.tryAttack();
         if (key === '.' || event.code === 'Numpad5') return this.waitTurn();
         const direction = numpad || { z: 'up', w: 'up', arrowup: 'up', s: 'down', arrowdown: 'down', q: 'left', a: 'left', arrowleft: 'left', d: 'right', arrowright: 'right' }[key];
-        if (direction && (event.shiftKey || this.aimMode) && this.canAct()) { this.player.direction = direction; return; }
+        if (direction && (event.shiftKey || this.aimMode || this.previewSpell) && this.canAct()) { this.player.direction = direction; return; }
         if (direction) this.tryMove(direction);
       });
       addEventListener('message', event => {
@@ -353,13 +360,17 @@
       document.getElementById('new-run').onclick = () => this.prepareExpedition();
       document.getElementById('basic-attack').onclick = () => { this.tryAttack(); this.canvas.focus(); };
       document.getElementById('cast-spell').onclick = () => { this.castSpell(); this.canvas.focus(); };
+      document.getElementById('spell-preview').onclick = () => this.toggleSpellPreview();
+      document.getElementById('zoom-level').oninput = event => {
+        this.zoomFactor = clamp(Number(event.target.value) || 1, .8, 1.6); this.resize();
+      };
       document.getElementById('hero-select').onchange = event => { this.selectedHeroId = event.target.value; this.renderHeroPreview(); };
       document.getElementById('bag-toggle').onclick = () => this.toggleBag(true);
       document.getElementById('bag-close').onclick = () => this.toggleBag(false);
       document.getElementById('wait-turn').onclick = () => { this.waitTurn(); this.canvas.focus(); };
       document.querySelectorAll('[data-direction]').forEach(button => {
         button.onclick = () => {
-          if (this.canAct()) { if (this.aimMode) this.player.direction = button.dataset.direction; else this.tryMove(button.dataset.direction); }
+          if (this.canAct()) { if (this.aimMode || this.previewSpell) this.player.direction = button.dataset.direction; else this.tryMove(button.dataset.direction); }
           this.canvas.focus();
         };
       });
@@ -457,6 +468,8 @@
     }
 
     beginStart(freshSeed = false) {
+      this.runStats = { kills: 0, chests: 0 }; this.visitedRooms.clear(); this.vfx = []; this.previewSpell = false;
+      document.getElementById('run-report').hidden = true;
       this.runSerial += 1; this.spellReadyTurn = 0; this.summons = [];
       this.effects = [];
       this.runStartedAt = performance.now();
@@ -481,7 +494,7 @@
       this.objects = []; this.items = []; this.enemies = []; this.doors = []; this.gates = []; this.explored.clear();
       this.doors = this.buildDoors();
       this.wallTiles = this.buildWallTiles();
-      this.placeGates(); this.placeObjects(); this.placeItems(); this.placeEnemies(); this.updateFov(); this.snapCamera(); this.updateHud();
+      this.placeGates(); this.placeObjects(); this.placeItems(); this.placeEnemies(); this.placeEncounters(); this.updateFov(); this.snapCamera(); this.updateHud();
       requestAnimationFrame(() => this.canvas.focus());
     }
 
@@ -647,6 +660,53 @@
     }
 
     tile(x, y) { return this.map?.grid[y]?.[x] ?? WALL; }
+
+    placeEncounters() {
+      this.encounters = []; this.vfx = [];
+      const chest=this.objects.find(object=>object.kind==='chest' && distance(object,this.map.start)>8);
+      const guard=this.enemies.find(enemy=>enemy.type!=='boss');
+      if(chest && guard) {
+        const spot=Object.values(DIRECTIONS).map(d=>({x:chest.x+d.x,y:chest.y+d.y}))
+          .find(cell=>this.tile(cell.x,cell.y)===FLOOR && !this.occupied(cell.x,cell.y) && this.cornerClear(chest,cell));
+        if(spot) { guard.x=guard.visualX=spot.x; guard.y=guard.visualY=spot.y; guard.guarding=true; }
+      }
+      const cells = this.rng.shuffle(this.map.rooms.slice(1).flatMap(room => this.roomCells(room))
+        .filter(cell => !this.occupied(cell.x,cell.y) && !this.items.some(item=>item.x===cell.x && item.y===cell.y)));
+      for (const kind of ['fountain','trap','trap']) {
+        const cell=cells.pop(); if (cell) this.encounters.push({...cell,kind,used:false});
+      }
+      // Une rencontre rare fournit une réserve, sans ajouter d'or à la récompense de l'étage.
+      if (this.rng.chance(.25)) { const cell=cells.pop(); if(cell) this.encounters.push({...cell,kind:'supplies',used:false}); }
+    }
+
+    triggerEncounter(x,y) {
+      const encounter=this.encounters.find(cell=>cell.x===x && cell.y===y && !cell.used);
+      if (!encounter) return;
+      encounter.used=true;
+      if (encounter.kind==='fountain') {
+        const healed=this.healPlayer(this.player.maxHp*.2);
+        this.message(`Fontaine épuisée : +${healed} PV. Chaque fontaine ne sert qu’une fois.`);
+      } else if (encounter.kind==='supplies') {
+        this.runItems.ration+=1; this.message('Réserve oubliée : une ration pour poursuivre l’exploration.');
+      } else {
+        const damage=Math.min(this.player.hp,Math.max(1,Math.ceil(this.player.maxHp*.08)));
+        this.player.hp-=damage;
+        this.effects.push({x,y,text:`Piège −${damage}`,color:'#ff8298',until:performance.now()+1000});
+        this.message(`Dalles piégées : −${damage} PV. Les triangles rouges signalent les pièges.`);
+      }
+    }
+
+    enemyHit(enemy) {
+      const stats=this.runHero.stats;
+      const dodged=this.rng.chance(stats.dodge), parried=!dodged && this.rng.chance(stats.parry);
+      const damage=dodged ? 0 : Math.max(1,Math.round(enemy.damage*(1-stats.reduction)*(this.guardTurns>0?.75:1)*(parried?.5:1)));
+      this.player.hp=Math.max(0,this.player.hp-damage);
+      this.player.hitUntil=performance.now()+180;
+      enemy.face(this.player.x-enemy.x,this.player.y-enemy.y); enemy.setState('attack');
+      this.vfx.push({from:{x:enemy.x,y:enemy.y},to:{x:this.player.x,y:this.player.y},start:performance.now(),color:'#ff8298'});
+      this.effects.push({x:this.player.x,y:this.player.y,text:dodged?'Esquive':`${parried?'Parade ':''}−${damage}`,color:'#ff8298',until:performance.now()+1000});
+      this.message(dodged?'Attaque esquivée !':`Le monstre inflige ${damage} dégâts${parried?' (parade)':''}.`);
+    }
     objectAt(x, y) { return this.objects.find(object => object.x === x && object.y === y); }
     gateAt(x, y) { return this.gates.find(gate => gate.cells.some(cell => cell.x === x && cell.y === y)); }
     enemyAt(x, y) { return this.enemies.find(enemy => !enemy.dead && enemy.x === x && enemy.y === y); }
@@ -674,7 +734,8 @@
       if (this.tile(x, y) !== FLOOR) { this.message('Le mur bloque le passage.'); return; }
       const door = this.doors.find(candidate => candidate.x === x && candidate.y === y);
       if (door) door.openness = 3;
-      this.player.moveTo(x, y); this.collectAt(x, y);
+      this.previewSpell = false;
+      this.player.moveTo(x, y); this.collectAt(x, y); this.triggerEncounter(x, y);
       const reachedStairs = x === this.map.stairs.x && y === this.map.stairs.y;
       this.completePlayerTurn(true, reachedStairs ? () => this.tryStairs() : null);
     }
@@ -703,10 +764,13 @@
     damageEnemy(enemy, amount, label = '') {
       if (!enemy || enemy.dead) return 0;
       const damage = Math.min(enemy.hp, Math.max(1, Math.round(amount))); enemy.hp -= damage;
+      enemy.hitUntil = performance.now() + 180;
+      this.vfx.push({from:{x:this.player.x,y:this.player.y},to:{x:enemy.x,y:enemy.y},start:performance.now(),color:label ? '#b6a1ff' : '#ffe0a0'});
       this.effects.push({x:enemy.x, y:enemy.y, text:`${label ? label + ' ' : ''}−${damage}`, color:'#ffd68a', until:performance.now() + 1000});
       this.message(`${enemy.type === 'boss' ? 'Boss' : 'Monstre'} : -${damage} PV`);
       if (enemy.hp <= 0) {
         enemy.hp = 0; enemy.dead = true; enemy.setState('death');
+        this.runStats.kills += 1;
         this.grantRunReward(enemy.type === 'boss' ? REWARDS.bossGold : 6 + this.floor * 2,
           enemy.type === 'boss' ? REWARDS.bossEssence : this.rng.chance(.25) ? 1 : 0);
         const resource = MOB_RESOURCE_BY_FAMILY[enemy.family];
@@ -723,6 +787,33 @@
     }
 
     attackRange() { return ['archer', 'mage', 'necromancer'].includes(this.runHero?.id) ? 4 : 1; }
+
+    toggleSpellPreview() {
+      if (!this.canAct()) return;
+      this.previewSpell = !this.previewSpell;
+      this.message(this.previewSpell ? 'Visée : direction pour orienter, F pour lancer, V pour reprendre la marche.' : 'Visée terminée.');
+      this.canvas.focus();
+    }
+
+    spellCells() {
+      if (!this.player || !this.runHero) return [];
+      const spell = this.runHero.spell;
+      if (spell.type === 'heal') return [{x:this.player.x,y:this.player.y}];
+      if (spell.type === 'aoe' || spell.type === 'summon') {
+        const range = spell.type === 'aoe' ? 2 : 4; const cells = [];
+        for (let y=this.player.y-range;y<=this.player.y+range;y++) for (let x=this.player.x-range;x<=this.player.x+range;x++) {
+          if (this.tile(x,y) === FLOOR && this.hasLineOfSight(this.player.x,this.player.y,x,y)) cells.push({x,y});
+        }
+        return cells;
+      }
+      const cells = []; const vector = DIRECTIONS[this.player.direction];
+      for (let step=1;step<=(spell.projectile ? 4 : 1);step++) {
+        const x=this.player.x+vector.x*step, y=this.player.y+vector.y*step;
+        if (!this.cornerClear({x:x-vector.x,y:y-vector.y},{x,y}) || this.tile(x,y)!==FLOOR || this.objectAt(x,y) || (this.gateAt(x,y) && !this.gateAt(x,y).opened)) break;
+        cells.push({x,y}); if (this.enemyAt(x,y)) break;
+      }
+      return cells;
+    }
 
     lineTarget(range) {
       const vector = DIRECTIONS[this.player.direction];
@@ -763,6 +854,7 @@
       }
       this.player.setState('attack');
       // Le tour de lancement ne compte pas dans la recharge.
+      this.previewSpell = false;
       this.spellReadyTurn = this.turn + 1 + Math.max(1, Number(spell.cooldownTurns) || 1);
       this.message(spell.name); this.completePlayerTurn();
     }
@@ -781,6 +873,7 @@
     openChest(object) {
       if (object.opened) { this.message('Ce coffre est déjà ouvert.'); return; }
       object.opened = true; object.animationTime = 0;
+      this.runStats.chests += 1;
       const reward = this.grantRunReward(REWARDS.chestGoldBase + this.floor * REWARDS.chestGoldPerFloor,
         REWARDS.chestEssenceBase + this.floor * REWARDS.chestEssencePerFloor);
       // Même fréquence de consommables qu’avant : 20 % ration, 20 % potion.
@@ -890,16 +983,21 @@
       const reserved = new Set(this.enemies.filter(enemy => !enemy.dead).map(enemy => keyOf(enemy.x, enemy.y)));
       this.enemies.filter(enemy => !enemy.dead).forEach(enemy => {
         if (this.player.hp <= 0) return;
+        if (enemy.intent) {
+          const target=enemy.intent; enemy.intent=null;
+          if (this.player.x===target.x && this.player.y===target.y && this.hasLineOfSight(enemy.x,enemy.y,target.x,target.y)) this.enemyHit(enemy);
+          else { enemy.setState('attack'); if(this.visible.has(keyOf(enemy.x,enemy.y))) this.message('L’attaque préparée manque sa cible !'); }
+          return;
+        }
+        const range=gridDistance(enemy,this.player);
+        if ((enemy.type==='boss' && range<=2 || enemy.family==='vampire' && range>1 && range<=4)
+          && this.hasLineOfSight(enemy.x,enemy.y,this.player.x,this.player.y)) {
+          enemy.intent={x:this.player.x,y:this.player.y}; enemy.face(this.player.x-enemy.x,this.player.y-enemy.y);
+          this.message(enemy.type==='boss'?'Le gardien prépare sa frappe : quitte la case rouge !':'Le vampire vise : quitte la case rouge au prochain tour !');
+          return;
+        }
         if (gridDistance(enemy, this.player) === 1 && this.cornerClear(enemy, this.player)) {
-          enemy.face(this.player.x - enemy.x, this.player.y - enemy.y); enemy.setState('attack');
-          const stats = this.runHero.stats;
-          const dodged = this.rng.chance(stats.dodge); const parried = !dodged && this.rng.chance(stats.parry);
-          const guard = this.guardTurns > 0 ? .75 : 1;
-          const damage = dodged ? 0 : Math.max(1, Math.round(enemy.damage * (1 - stats.reduction) * guard * (parried ? .5 : 1)));
-          this.player.hp = Math.max(0, this.player.hp - damage);
-          const text = dodged ? 'Esquive' : `${parried ? 'Parade ' : ''}−${damage}`;
-          this.effects.push({x:this.player.x,y:this.player.y,text,color:'#ff8298',until:performance.now()+1000});
-          this.message(dodged ? 'Attaque esquivée !' : `Le monstre inflige ${damage} dégâts${parried ? ' (parade)' : ''}.`); return;
+          this.enemyHit(enemy); return;
         }
         let step = null;
         if (gridDistance(enemy, this.player) <= 10 && this.hasLineOfSight(enemy.x, enemy.y, this.player.x, this.player.y)) {
@@ -907,7 +1005,7 @@
         }
         if (enemy.alertTurns > 0) {
           step = this.findStep(enemy, enemy.lastSeen); enemy.alertTurns -= 1;
-        } else if (this.rng.chance(.28)) { const direction = this.rng.pick(Object.values(DIRECTIONS)); step = { x: enemy.x + direction.x, y: enemy.y + direction.y }; }
+        } else if (!enemy.guarding && this.rng.chance(.28)) { const direction = this.rng.pick(Object.values(DIRECTIONS)); step = { x: enemy.x + direction.x, y: enemy.y + direction.y }; }
         if (!step || !this.cornerClear(enemy, step) || (step.x === this.player.x && step.y === this.player.y) || reserved.has(keyOf(step.x, step.y)) || !this.isWalkable(step.x, step.y, enemy)) return;
         reserved.delete(keyOf(enemy.x, enemy.y)); reserved.add(keyOf(step.x, step.y)); enemy.moveTo(step.x, step.y);
       });
@@ -957,6 +1055,9 @@
       intro.querySelector('p').textContent = won || escaped
         ? `Butin sécurisé : ${this.runGold} or et ${this.runEssence} essences. Durée totale : ${duration}.`
         : `Butin perdu : ${this.runGold} or et ${this.runEssence} essences. Durée totale : ${duration}. Regagne la porte de sortie pour sécuriser tes prochaines trouvailles.`;
+      const report=document.getElementById('run-report'); report.hidden=false;
+      const resources=Object.entries(this.runMobResources).filter(([,count])=>count>0).map(([id,count])=>`${count} ${{slimeGel:'gels de slime',orcTusk:'défenses d’orc',vampireDust:'poussières de vampire'}[id]}`).join(' · ');
+      report.textContent=`Étage atteint : ${this.floor}/${MAX_FLOOR} · ${this.visitedRooms.size} salles visitées · ${this.runStats.kills} ennemis vaincus · ${this.runStats.chests} coffres ouverts. ${resources ? `Ressources ${won||escaped?'rapportées':'perdues'} : ${resources}. `:''}${seconds>=60 && (won||escaped) ? `Rendement : ${Math.round(this.runGold*60/seconds)} or/min · ${(this.runEssence*60/seconds).toFixed(1)} essences/min. `:''}Le temps inclut les pauses ; attendre ne donne aucun bonus.`;
       const button = document.getElementById('start-run'); button.textContent = 'Nouvelle expédition'; button.onclick = () => this.start(true);
       this.prepareExpedition();
     }
@@ -979,6 +1080,7 @@
       }
       const room = this.map.rooms.find(candidate => this.player.x >= candidate.x && this.player.x < candidate.x + candidate.w && this.player.y >= candidate.y && this.player.y < candidate.y + candidate.h);
       if (room) {
+        this.visitedRooms.add(`${this.floor}:${room.x},${room.y}`);
         for (let y = room.y - 1; y <= room.y + room.h; y += 1) for (let x = room.x - 1; x <= room.x + room.w; x += 1) {
           if (x < 0 || y < 0 || x >= MAP_W || y >= MAP_H) continue;
           const key = keyOf(x, y); this.visible.add(key); this.explored.add(key);
@@ -1037,15 +1139,14 @@
       const rect = this.canvas.getBoundingClientRect(); const dpr = Math.min(2, devicePixelRatio || 1);
       this.width = Math.max(1, rect.width); this.height = Math.max(1, rect.height);
       this.canvas.width = Math.round(this.width * dpr); this.canvas.height = Math.round(this.height * dpr);
-      this.camera.zoom = this.width < 700 ? 2.25 : this.width < 1000 ? 2.65 : 3.1; this.ctx.imageSmoothingEnabled = false;
+      this.camera.zoom = (this.width < 700 ? 2.8 : this.width < 1000 ? 3.4 : 4) * this.zoomFactor; this.ctx.imageSmoothingEnabled = false;
       if (this.player) this.snapCamera();
     }
     snapCamera() { this.camera.x = this.player.x * TILE + 8; this.camera.y = this.player.y * TILE + 8; }
     updateCamera(dt) {
       if (!this.player) return; const targetX = this.player.visualX * TILE + 8; const targetY = this.player.visualY * TILE + 8; const follow = 1 - Math.exp(-8 * dt);
       this.camera.x += (targetX - this.camera.x) * follow; this.camera.y += (targetY - this.camera.y) * follow;
-      const halfW = this.width / (2 * this.camera.zoom); const halfH = this.height / (2 * this.camera.zoom);
-      this.camera.x = clamp(this.camera.x, halfW, MAP_W * TILE - halfW); this.camera.y = clamp(this.camera.y, halfH, MAP_H * TILE - halfH);
+      // Garder le héros au centre, même lorsque le viewport dépasse les bords de la carte.
     }
 
     update(dt) {
@@ -1067,6 +1168,10 @@
       document.getElementById('hero-name').textContent = `${this.runHero.name} · niv. ${this.runHero.level}`;
       const remaining = Math.max(0, this.spellReadyTurn - this.turn);
       const spellButton = document.getElementById('cast-spell');
+      const previewButton = document.getElementById('spell-preview');
+      previewButton.setAttribute('aria-pressed',String(this.previewSpell));
+      previewButton.textContent=this.previewSpell?'Quitter la visée [V]':'Viser le sort [V]';
+      previewButton.disabled=!this.canAct();
       spellButton.textContent = `${this.runHero.spell.name} [F]${remaining ? ` · ${remaining} tour(s)` : ''}`;
       spellButton.disabled = !this.canAct() || remaining > 0;
       document.getElementById('basic-attack').disabled = !this.canAct();
@@ -1094,8 +1199,14 @@
     draw() {
       const ctx = this.ctx; const dpr = Math.min(2, devicePixelRatio || 1); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingEnabled = false;
       ctx.fillStyle = '#03060b'; ctx.fillRect(0, 0, this.width, this.height); if (!this.map) return;
-      ctx.save(); ctx.translate(this.width / 2, this.height / 2); ctx.scale(this.camera.zoom, this.camera.zoom); ctx.translate(-this.camera.x, -this.camera.y);
+      ctx.save(); ctx.translate(this.width / 2, this.height * .43); ctx.scale(this.camera.zoom, this.camera.zoom); ctx.translate(-this.camera.x, -this.camera.y);
       this.drawTiles(ctx); this.drawItems(ctx);
+      for (const cell of this.encounters) {
+        if (!this.visible.has(keyOf(cell.x,cell.y))) continue;
+        ctx.fillStyle=cell.used?'#52616b':cell.kind==='trap'?'#ff947e':cell.kind==='fountain'?'#71e6fa':'#ffe099';
+        ctx.font='bold 12px system-ui'; ctx.textAlign='center';
+        ctx.fillText(cell.kind==='trap'?'△':cell.kind==='fountain'?'≈':'✦',cell.x*TILE+8,cell.y*TILE+13);
+      }
       const drawables = [
         ...this.wallTiles.filter(wall => this.explored.has(keyOf(wall.revealX, wall.revealY))).map(wall => ({ y: wall.depth * TILE, draw: () => this.drawWall(ctx, wall) })),
         ...this.doors.filter(door => this.explored.has(keyOf(door.x, door.y))).map(door => ({ y: door.y * TILE + TILE, draw: () => this.drawDoor(ctx, door) })),
@@ -1105,11 +1216,28 @@
         { y: this.player.visualY * TILE + TILE, draw: () => this.player.draw(ctx) }
       ].sort((a, b) => a.y - b.y);
       drawables.forEach(item => item.draw()); this.drawFog(ctx);
+      if (this.previewSpell) for(const cell of this.spellCells()) {
+        if (!this.visible.has(keyOf(cell.x,cell.y))) continue;
+        ctx.fillStyle=this.enemyAt(cell.x,cell.y)?'#f7b35e88':'#8fb7ff55'; ctx.fillRect(cell.x*TILE+1,cell.y*TILE+1,TILE-2,TILE-2);
+        ctx.strokeStyle='#afd1ff'; ctx.strokeRect(cell.x*TILE+1,cell.y*TILE+1,TILE-2,TILE-2);
+      }
+      for(const enemy of this.enemies) if(!enemy.dead && enemy.intent && this.visible.has(keyOf(enemy.x,enemy.y))) {
+        ctx.fillStyle='#ff486c88'; ctx.fillRect(enemy.intent.x*TILE,enemy.intent.y*TILE,TILE,TILE);
+        ctx.strokeStyle='#ffadb9'; ctx.strokeRect(enemy.intent.x*TILE,enemy.intent.y*TILE,TILE,TILE);
+      }
       const direction = DIRECTIONS[this.player.direction];
       ctx.strokeStyle = '#71efba'; ctx.lineWidth = 1;
       ctx.strokeRect((this.player.x + direction.x) * TILE + 2, (this.player.y + direction.y) * TILE + 2, TILE - 4, TILE - 4);
       if (this.summons.length && this.assets.skull) ctx.drawImage(this.assets.skull, this.player.visualX * TILE - 12, this.player.visualY * TILE - 22, 24, 24);
       this.effects = this.effects.filter(effect => effect.until > performance.now());
+      this.vfx=this.vfx.filter(effect=>performance.now()-effect.start<350);
+      for(const effect of this.vfx) {
+        const progress=clamp((performance.now()-effect.start)/350,0,1);
+        ctx.save(); ctx.globalAlpha=1-progress; ctx.strokeStyle=effect.color; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(effect.from.x*TILE+8,effect.from.y*TILE+8);
+        ctx.lineTo((effect.from.x+(effect.to.x-effect.from.x)*Math.min(1,progress*3))*TILE+8,(effect.from.y+(effect.to.y-effect.from.y)*Math.min(1,progress*3))*TILE+8); ctx.stroke();
+        ctx.beginPath(); ctx.arc(effect.to.x*TILE+8,effect.to.y*TILE+8,2+progress*9,0,Math.PI*2); ctx.stroke(); ctx.restore();
+      }
       ctx.font = 'bold 6px system-ui'; ctx.textAlign = 'center'; ctx.lineWidth = 2;
       this.effects.forEach((effect, index) => {
         const x = effect.x * TILE + 8; const y = effect.y * TILE - 8 - (1000 - effect.until + performance.now()) / 80 - index * 3;
@@ -1125,6 +1253,7 @@
       return [
         ...this.objects.filter(object => object.kind === 'chest' && !object.opened && known(object)).map(object => ({...object,color:'#e6bb64'})),
         ...this.items.filter(item => known(item)).map(item => ({...item,color:'#93c9ec'})),
+        ...this.encounters.filter(cell=>!cell.used && known(cell)).map(cell=>({...cell,color:cell.kind==='trap'?'#ff947e':'#71e6fa'})),
         ...(known(this.map.stairs) ? [{...this.map.stairs,color:'#a79cff'}] : []),
         ...this.doors.filter(door => door.exit && known(door)).map(door => ({...door,color:'#71efba'})),
         ...this.enemies.filter(enemy => !enemy.dead && known(enemy,true)).map(enemy => ({...enemy,color:'#fa7784'})),

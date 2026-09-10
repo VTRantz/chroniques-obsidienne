@@ -49,6 +49,7 @@ function gameFor(id='mage') {
   game.sprites.player={}; game.seed=123; game.beginStart();
   game.map.grid=Array.from({length:20},()=>Array(30).fill(1));
   game.objects=[]; game.gates=[]; game.doors=[]; game.items=[]; game.enemies=[];
+  game.encounters=[];
   game.player.x=5; game.player.y=5; game.player.direction='right';
   game.updateFov(); nodes.get('inventory-panel').hidden=true;
   return game;
@@ -225,7 +226,49 @@ for(const blocker of ['wall','vase','gate']){
   for(let i=0;i<10;i++)game.message(`Event ${i}`);game.message('Event 9');
   check(game.journal.length===4 && game.journal[0]==='Event 6','Combat journal remains bounded and deduplicates messages');
 }
-console.log(`Donjon : ${checks} vérifications réussies (héros, sorts, récompenses, diagonales, faim, carte et escaliers).`);
+{
+  const game=gameFor('mage'); enemy(game,8,5);
+  check(game.spellCells().map(c=>c.x).join(',')==='6,7,8','Spell preview stops at first enemy');
+  game.map.grid[5][7]=0;
+  check(game.spellCells().map(c=>c.x).join(',')==='6','Spell preview stops before wall');
+  game.map.grid[5][7]=1; game.player.direction='downRight'; game.map.grid[5][6]=0;
+  check(game.spellCells().length===0,'Spell preview respects diagonal blocked corners');
+  game.toggleSpellPreview();check(game.previewSpell && game.turn===0,'Preview is free');
+  game.toggleSpellPreview();check(!game.previewSpell && game.turn===0,'Cancel preview is free');
+}
+{
+  const game=gameFor();const vampire=enemy(game,8,5);vampire.family='vampire';
+  const hp=game.player.hp;game.enemyTurn();
+  check(vampire.intent?.x===5 && game.player.hp===hp,'Ranged enemy announces shot before damage');
+  game.player.y=6;game.enemyTurn();
+  check(!vampire.intent && game.player.hp===hp,'Moving off telegraph avoids shot');
+  game.player.y=5;game.enemyTurn();game.enemyTurn();
+  check(game.player.hp<hp,'Remaining on telegraph takes damage');
+  vampire.intent=null;game.map.grid[5][7]=0;game.enemyTurn();
+  check(!vampire.intent,'Ranged enemy cannot announce through wall');
+}
+{
+  const game=gameFor();const boss=enemy(game,6,5);boss.type='boss';
+  const hp=game.player.hp;game.enemyTurn();check(boss.intent && game.player.hp===hp,'Boss prepares adjacent attack');
+  game.damageEnemy(boss,boss.hp);game.enemyTurn();check(game.player.hp===hp,'Killing caster cancels pending attack');
+}
+{
+  const game=gameFor();game.encounters=[{kind:'fountain',x:5,y:5,used:false}];game.player.hp=1;
+  game.triggerEncounter(5,5);const hp=game.player.hp;game.triggerEncounter(5,5);
+  check(hp>1 && game.player.hp===hp,'Fountain heals only once');
+  game.encounters=[{kind:'trap',x:5,y:5,used:false}];game.triggerEncounter(5,5);const hurt=game.player.hp;game.triggerEncounter(5,5);
+  check(hurt<hp && game.player.hp===hurt,'Visible trap triggers only once');
+  game.encounters=[{kind:'supplies',x:5,y:5,used:false}];const ration=game.runItems.ration;game.triggerEncounter(5,5);game.triggerEncounter(5,5);
+  check(game.runItems.ration===ration+1,'Rare reserve gives exactly one ration');
+  game.width=2000;game.height=1200;game.player.visualX=1;game.player.visualY=1;
+  game.player.x=1;game.player.y=1;game.snapCamera();game.updateCamera(1);
+  check(game.camera.x===24 && game.camera.y===24,'Wide camera stays centered near edge without inverted clamp');
+}
+for(let seed=1;seed<=20;seed++) {
+  const game=gameFor();game.seed=seed;game.generateFloor();
+  check(game.encounters.every(cell=>game.tile(cell.x,cell.y)===1 && !game.occupied(cell.x,cell.y)),`Seed ${seed}: encounters occupy free floor only`);
+}
+console.log(`Donjon : ${checks} vérifications réussies (héros, sorts, récompenses, exploration, visée et attaques annoncées).`);
 
 if(process.argv.includes('--rewards-audit')){
   const profiles=Array.from({length:6},(_,index)=>{

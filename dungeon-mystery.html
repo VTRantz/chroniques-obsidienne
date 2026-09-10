@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Chroniques d'Obsidienne — Donjon Mystère</title>
-  <link rel="stylesheet" href="modes/dungeon-mystery/css/dungeon-mystery.css?v=7">
+  <link rel="stylesheet" href="modes/dungeon-mystery/css/dungeon-mystery.css?v=8">
 </head>
 <body>
   <main id="mystery-app">
@@ -31,6 +31,9 @@
     </section>
 
     <ol id="combat-log" class="combat-log" aria-label="Derniers événements"></ol>
+    <label class="zoom-control" for="zoom-level">Zoom
+      <input id="zoom-level" type="range" min="0.8" max="1.6" step="0.1" value="1" aria-label="Zoom du donjon">
+    </label>
     <nav class="movement-controls" aria-label="Déplacements en huit directions">
       <div class="movement-pad">
         <button type="button" data-direction="upLeft" aria-label="Nord-ouest">↖</button><button type="button" data-direction="up" aria-label="Nord">↑</button><button type="button" data-direction="upRight" aria-label="Nord-est">↗</button>
@@ -43,6 +46,7 @@
     <aside class="side-panel">
       <button id="basic-attack" type="button">Attaque [Espace]</button>
       <button id="cast-spell" type="button" disabled>Sort [F]</button>
+      <button id="spell-preview" type="button" aria-pressed="false">Viser le sort [V]</button>
       <small id="spell-description"></small>
       <small id="summon-status"></small>
       <button id="bag-toggle" type="button">Sac du jardin [I]</button>
@@ -83,7 +87,8 @@
     <section id="intro" class="intro">
       <span class="rune">◆</span>
       <h1>Donjon Mystère</h1>
-      <p>Explore les salles, surveille ta satiété et choisis ton placement. Chaque action fait jouer les monstres. Trouve l’escalier et terrasse le gardien du cinquième étage.</p>
+      <p>Explore les salles et terrasse le gardien du cinquième étage. Chaque action fait jouer les monstres. V pour viser, F pour lancer. Quitte les cases rouges avant l’attaque !<br>Repères : △ piège · ≈ fontaine de soin · ✦ réserve de nourriture.</p>
+      <p id="run-report" class="run-report" hidden></p>
       <div id="hero-picker" class="hero-picker">
         <label for="hero-select">Ton héros du mode idle</label>
         <select id="hero-select" disabled><option>Connexion au mode idle…</option></select>
@@ -93,6 +98,6 @@
       <button id="start-run" type="button" disabled>Chargement…</button>
     </section>
   </main>
-  <script src="modes/dungeon-mystery/js/dungeon-mystery.js?v=23"></script>
+  <script src="modes/dungeon-mystery/js/dungeon-mystery.js?v=25"></script>
 </body>
 </html>
